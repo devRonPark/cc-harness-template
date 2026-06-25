@@ -1,0 +1,34 @@
+# Harness v4 Configuration
+# Edit this file, then run `harness sync` to generate CC plugin files.
+
+[project]
+name = "YOUR_PROJECT_NAME"
+version = "0.1.0"
+description = "YOUR PROJECT DESCRIPTION"
+
+[agent]
+# default = "security-reviewer"
+
+[env]
+# CLAUDE_CODE_SUBPROCESS_ENV_SCRUB = "1"
+
+[safety.permissions]
+deny = [
+  "Bash(sudo:*)",
+]
+ask = [
+  "Bash(rm -r:*)",
+  "Bash(git push --force:*)",
+]
+
+# Optional break-glass protected paths
+# [[safety.guardrail.protectedPathAskList]]
+# path = ".env"
+# reason = "production env — confirm before edit"
+
+[safety.sandbox]
+failIfUnavailable = false
+
+[safety.sandbox.filesystem]
+# denyRead = [".env", "secrets/**"]
+# allowRead = [".env.example"]
