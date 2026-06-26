@@ -238,13 +238,28 @@ Task 선택 (cc:TODO)
 | Workflow | 트리거 | 목적 |
 |----------|--------|------|
 | `ci.yml` | push/PR → main | 기술 스택별 빌드·테스트 |
-| `plans-guard.yml` | PR → main | WIP Task ↔ 브랜치 일관성 검증 |
+| `plans-guard.yml` | PR → main | WIP Task ↔ 브랜치 일관성 검증 + Acceptance Oracle 실행 |
+
+### Acceptance Oracle
+
+Plans.md 각 Task의 `Acceptance` 컬럼에 기계 검증 명령을 기입한다.
+PR 오픈 시 `plans-guard.yml`이 WIP Task의 acceptance 명령을 실행하고, 실패 시 PR을 차단한다.
+
+```markdown
+| Task | 내용 | DoD | Acceptance | Depends | Status | GH |
+| 1.1  | 로그인 구현 | 200 응답 | pytest tests/test_auth.py -k login | - | cc:WIP | #5 |
+| 2.0  | DB 마이그레이션 | 스키마 적용 | python manage.py showmigrations \| grep '\[X\]' | 1.1 | cc:WIP | #8 |
+```
+
+- `-` 이면 acceptance 검증 skip (기계 검증 불가 항목)
+- 명령이 0 외 종료 코드를 반환하면 PR 차단
+- 스택 설정(npm ci, pip install 등)은 `plans-guard.yml` 상단 주석 해제
 
 ### Branch Protection 권장 설정
 
 ```
 GitHub → Settings → Branches → main:
-  ✓ Require status checks to pass: ci, plans-guard/WIP↔Branch
+  ✓ Require status checks to pass: ci, plans-guard/WIP↔Branch, plans-guard/Acceptance Oracle
   ✓ Require pull request before merging
   ✓ Dismiss stale pull request approvals
 ```
