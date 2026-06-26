@@ -291,8 +291,9 @@ GitHub → Settings → Branches → main:
 7. advisor에게 방침 요청 (caveman OFF + VFF v2)
 8. worker에게 구현 위임 (caveman lite + ponytail + VFF 검증)
    └─ SubagentStart 훅 → ponytail이 worker에 자동 주입
-9. reviewer에게 검토 요청 (caveman OFF + VFF v2)
-10. 결과를 Plans.md에 반영 (cc:WIP → cc:완료)
+9. test-agent 검증 (Acceptance 명령 + 프로젝트 테스트 스위트) — FAIL 시 worker에 재위임
+10. reviewer에게 검토 요청 (caveman OFF + VFF v2)
+11. 결과를 Plans.md에 반영 (cc:WIP → cc:완료)
 ```
 
 ---
