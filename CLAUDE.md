@@ -38,9 +38,17 @@
 
 - **브랜치 명명**: `task/{task-id}-{짧은-설명}` (예: `task/1.1-auth-login`)
 - **Planning**: `/harness-plan` → Week → Milestone, Task → Issue 자동 생성
-- **Implementation**: Task당 브랜치 생성 → 구현 → `Closes #{issue}` PR 오픈
+- **Implementation**: Task당 브랜치 생성 → 구현 → reviewer 자동 실행 → APPROVE 후 PR 오픈
 - **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
 - **CI 설정**: `.github/workflows/ci.yml` 기술 스택 블록 주석 해제 후 사용
+
+## 리뷰 규칙
+
+- **worker 완료 후 PR 오픈 전에 반드시 `/harness-review`를 실행한다.**
+- `harness.toml`의 `[review] require_before_pr = true` 설정 시 harness가 자동 강제.
+- `/harness-work` 사용 시 step 9(자동 리뷰 스테이지)가 내장 실행됨 — 별도 호출 불필요.
+- `/harness-work` 없이 직접 구현한 경우: 커밋 후 PR 오픈 전 `/harness-review` 수동 실행.
+- `REQUEST_CHANGES` 상태에서 PR 오픈 금지. 지적 해결 후 재리뷰 통과 필수.
 
 ## 개발 일정
 

@@ -40,3 +40,8 @@ enabled = false                # true → GitHub 연동 모드 활성화 (gh CLI
 # milestone_per_week = true    # Plans.md Week → GitHub Milestone 자동 생성
 # issue_per_task = true        # Plans.md Task → GitHub Issue 자동 생성
 # require_ci = true            # CI 통과 없이 main 머지 금지 (branch protection 별도 설정 필요)
+
+[review]
+auto_trigger = true            # worker 완료 시 reviewer 자동 실행 (harness-work step 9 내장)
+require_before_pr = true       # PR 오픈 전 APPROVE 필수 — REQUEST_CHANGES 상태에서 PR 금지
+# max_iterations = 3           # 수정 루프 최대 횟수 (기본값 3)
