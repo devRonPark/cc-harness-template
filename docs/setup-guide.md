@@ -126,7 +126,47 @@ harness doctor
 
 ---
 
-## Step 3. 작업 시작
+## Step 3. GitHub 연동 (선택)
+
+GitHub로 코드 변경사항을 관리하려면:
+
+### 3-1. 사전 조건 확인
+
+```bash
+gh auth login          # GitHub CLI 로그인
+git remote -v          # 원격 repo 연결 확인
+```
+
+### 3-2. harness.toml 활성화
+
+```toml
+[github]
+enabled = true
+milestone_per_week = true
+issue_per_task = true
+require_ci = true
+```
+
+```bash
+harness sync
+```
+
+### 3-3. CI 스택 블록 활성화
+
+`.github/workflows/ci.yml`에서 프로젝트 기술 스택 블록 주석 해제.
+`placeholder` job 삭제 후 GitHub branch protection 상태 체크 업데이트.
+
+### 3-4. Branch Protection 설정
+
+GitHub → Settings → Branches → main:
+- Require status checks: `ci job명`, `plans-guard / WIP↔Branch`
+- Require pull request before merging
+
+> 상세 가이드: `docs/github-integration.md`
+
+---
+
+## Step 4. 작업 시작
 
 ### Plans.md에 Task 추가
 
@@ -162,6 +202,9 @@ harness doctor
 | `/caveman lite\|full\|ultra` | 압축 강도 조절 |
 | `/ponytail lite\|full\|ultra` | lazy mode 강도 조절 |
 | `/itsvff` | VFF 세션 모드 활성화 |
+| `gh issue list` | GitHub 이슈 목록 |
+| `gh pr list` | GitHub PR 목록 |
+| `gh run watch` | CI 실행 실시간 모니터링 |
 
 ---
 

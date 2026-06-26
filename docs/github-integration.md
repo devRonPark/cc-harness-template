@@ -1,0 +1,134 @@
+# GitHub 통합 가이드
+
+harness 템플릿의 GitHub 연동 기능 설정 및 사용법.
+
+---
+
+## 사전 조건
+
+- `gh` CLI 설치 및 로그인: `gh auth login`
+- GitHub에 원격 repo 존재 (`git remote -v`로 확인)
+
+---
+
+## Step 1. 활성화
+
+`harness.toml`에서 `[github]` 섹션 수정:
+
+```toml
+[github]
+enabled = true
+# remote = "origin"           # 기본값, 변경 불필요
+# default_branch = "main"     # 기본값
+milestone_per_week = true     # Week → Milestone 자동 생성
+issue_per_task = true         # Task → Issue 자동 생성
+require_ci = true             # CI 통과 없이 main 머지 금지
+```
+
+이후:
+```bash
+harness sync
+```
+
+---
+
+## Step 2. Branch Protection 설정
+
+GitHub 웹 → **Settings → Branches → Add branch ruleset → main**:
+
+| 항목 | 값 |
+|------|----|
+| Require status checks | `placeholder` (ci.yml 활성화 후 실제 job명으로 변경) |
+| Require status checks | `plans-guard / WIP↔Branch` |
+| Require pull request | ✓ |
+| Dismiss stale reviews | ✓ |
+
+---
+
+## Step 3. CI 기술 스택 활성화
+
+`.github/workflows/ci.yml` 열고 프로젝트 스택 블록 주석 해제:
+
+```yaml
+# 예: Node.js 프로젝트
+# ── [STACK: Node.js / Bun] 블록 주석 해제 후 ──
+check:
+  name: Type check & lint
+  ...
+```
+
+활성화 후 `placeholder` job 삭제 + branch protection 상태 체크명 업데이트.
+
+---
+
+## Step 4. Planning 단계 사용법
+
+```
+/harness-plan
+```
+
+GitHub 연동 시 추가 동작:
+1. Plans.md `## Week N` → GitHub Milestone `Week N` 생성
+2. 각 Task → GitHub Issue 생성 (`[1.1] 내용` 형식)
+3. Plans.md `GH` 컬럼에 `#N` 자동 기입
+
+직접 생성 시:
+```bash
+# Milestone
+gh api repos/{owner}/{repo}/milestones -f title="Week 1" -f due_on="YYYY-MM-DDT00:00:00Z"
+
+# Issue
+gh issue create --title "[1.1] 기능 구현" --body "DoD: ..." --milestone "Week 1"
+```
+
+---
+
+## Step 5. Implementation 단계 사용법
+
+```
+/harness-work
+```
+
+GitHub 연동 시 추가 동작:
+1. Task 시작 → `task/{task-id}-{설명}` 브랜치 자동 생성
+2. 구현 완료 → PR 자동 오픈 (`Closes #{issue}` 포함)
+3. CI 통과 + 승인 → main 머지
+4. Plans.md `cc:WIP → cc:완료` 자동 업데이트
+
+직접 브랜치/PR 생성 시:
+```bash
+git checkout -b task/1.1-auth-login
+# ... 구현 ...
+git push -u origin task/1.1-auth-login
+gh pr create \
+  --title "[1.1] auth login 구현" \
+  --body "Closes #5" \
+  --base main
+```
+
+---
+
+## plans-guard 동작 원리
+
+PR → main 시 `plans-guard.yml`이 자동 실행:
+
+```
+Plans.md에서 cc:WIP Task 추출
+  → 각 Task에 대해 task/{task-id}-* 브랜치 존재 확인
+  → 브랜치 없으면 CI 실패 (머지 차단)
+```
+
+`cc:WIP`인데 브랜치가 없는 경우 → `/harness-work`가 브랜치를 생성했는지 확인.
+
+---
+
+## 자주 쓰는 명령어
+
+```bash
+gh issue list                          # 현재 이슈 목록
+gh issue create --title "..." --body "..."
+gh pr list                             # PR 목록
+gh pr create --title "..." --body "Closes #N"
+gh run list --workflow=ci.yml          # CI 실행 이력
+gh run watch                           # CI 실시간 모니터링
+```

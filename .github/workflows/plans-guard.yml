@@ -1,0 +1,50 @@
+name: Plans Guard
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: plans-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  wip-branch-check:
+    name: WIP↔Branch
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: WIP Task에 해당 브랜치 존재 확인
+        shell: bash
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          wip_lines=$(grep 'cc:WIP' Plans.md || true)
+          if [ -z "$wip_lines" ]; then
+            echo "WIP Task 없음 — OK"
+            exit 0
+          fi
+
+          failed=0
+          while IFS='|' read -ra fields; do
+            task_id=$(echo "${fields[1]}" | tr -d ' ')
+            # Task ID 형식이 숫자.숫자인 경우만 처리 (헤더 행 등 skip)
+            if ! echo "$task_id" | grep -qE '^[0-9]+\.[0-9]+$'; then
+              continue
+            fi
+            if git ls-remote --heads origin | grep -q "refs/heads/task/${task_id}-"; then
+              echo "✓ Task ${task_id}: 브랜치 존재"
+            else
+              echo "✗ Task ${task_id}: task/${task_id}-* 브랜치 없음 (harness-work가 브랜치를 생성했는지 확인)"
+              failed=1
+            fi
+          done <<< "$wip_lines"
+
+          exit $failed

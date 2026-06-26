@@ -1,0 +1,151 @@
+# GitHub Actions CI — [PROJECT_NAME]
+#
+# 사용법:
+#   1. 프로젝트 기술 스택 블록의 주석을 해제한다.
+#   2. 불필요한 블록은 삭제한다.
+#   3. placeholder job 삭제 후 branch protection 상태 체크를 실제 job명으로 변경.
+#
+# /harness-setup 실행 시 기술 스택 자동 감지 → 해당 블록 자동 주석 해제 제안.
+#
+# 보안 권장: uses: action@TAG 를 SHA로 고정 권장.
+#   예) actions/checkout@v4 → actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+#   참고: gajae-code/.github/workflows/ci.yml
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ── [STACK: Node.js / Bun] ──────────────────────────────────────────────────
+  # check:
+  #   name: Type check & lint
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 15
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #         cache: "npm"           # "yarn" / "pnpm" / "bun" 으로 변경 가능
+  #     - run: npm ci
+  #     - run: npm run typecheck   # tsconfig 기반; 없으면 삭제
+  #     - run: npm run lint
+  #
+  # test:
+  #   name: Unit tests
+  #   needs: [check]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 20
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #         cache: "npm"
+  #     - run: npm ci
+  #     - run: npm test
+  # ── [/STACK: Node.js / Bun] ─────────────────────────────────────────────────
+
+
+  # ── [STACK: Python] ──────────────────────────────────────────────────────────
+  # check:
+  #   name: Lint & type check
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.12"
+  #         cache: "pip"
+  #     - run: pip install ruff mypy
+  #     - run: ruff check .
+  #     - run: mypy .             # mypy.ini 또는 pyproject.toml 설정 필요
+  #
+  # test:
+  #   name: Unit tests
+  #   needs: [check]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 20
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.12"
+  #         cache: "pip"
+  #     - run: pip install -r requirements.txt
+  #     - run: pytest
+  # ── [/STACK: Python] ─────────────────────────────────────────────────────────
+
+
+  # ── [STACK: Go] ──────────────────────────────────────────────────────────────
+  # check:
+  #   name: Vet & lint
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version: "1.22"
+  #         cache: true
+  #     - run: go vet ./...
+  #
+  # test:
+  #   name: Unit tests
+  #   needs: [check]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 20
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version: "1.22"
+  #         cache: true
+  #     - run: go test -race ./...
+  # ── [/STACK: Go] ─────────────────────────────────────────────────────────────
+
+
+  # ── [STACK: Rust] ────────────────────────────────────────────────────────────
+  # check:
+  #   name: Clippy & fmt
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 20
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: dtolnay/rust-toolchain@stable
+  #     - uses: Swatinem/rust-cache@v2
+  #     - run: cargo clippy -- -D warnings
+  #     - run: cargo fmt --check
+  #
+  # test:
+  #   name: Unit tests
+  #   needs: [check]
+  #   runs-on: ubuntu-22.04
+  #   timeout-minutes: 30
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: dtolnay/rust-toolchain@stable
+  #     - uses: Swatinem/rust-cache@v2
+  #     - run: cargo test
+  # ── [/STACK: Rust] ───────────────────────────────────────────────────────────
+
+
+  # 스택 블록 활성화 전까지 CI가 빈 job으로 실패하지 않도록 유지.
+  # 스택 블록 주석 해제 후 이 job 삭제 + branch protection 체크명 변경.
+  placeholder:
+    name: CI (스택 미설정 — ci.yml 블록 활성화 후 삭제)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - run: echo "스택 블록 주석 해제 후 이 placeholder job 삭제 필요"

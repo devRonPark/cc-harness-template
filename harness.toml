@@ -32,3 +32,11 @@ failIfUnavailable = false
 [safety.sandbox.filesystem]
 # denyRead = [".env", "secrets/**"]
 # allowRead = [".env.example"]
+
+[github]
+enabled = false                # true → GitHub 연동 모드 활성화 (gh CLI 로그인 필요)
+# remote = "origin"
+# default_branch = "main"
+# milestone_per_week = true    # Plans.md Week → GitHub Milestone 자동 생성
+# issue_per_task = true        # Plans.md Task → GitHub Issue 자동 생성
+# require_ci = true            # CI 통과 없이 main 머지 금지 (branch protection 별도 설정 필요)

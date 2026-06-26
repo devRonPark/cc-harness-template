@@ -202,6 +202,57 @@ ask  = ["Bash(rm -r:*)", "Bash(git push --force:*)"]
 
 ---
 
+## 3.5 GitHub 통합 레이어 (선택)
+
+`harness.toml`의 `[github] enabled = true` 설정 시 활성화.
+
+### 활성화 전제조건
+```bash
+gh auth login          # GitHub CLI 로그인
+gh repo view           # 현재 디렉토리가 GitHub 원격 repo에 연결됐는지 확인
+harness sync           # toml → plugin 파일 동기화
+```
+
+### Planning 단계 (`/harness-plan`)
+
+| 액션 | Plans.md 입력 | GitHub 결과 |
+|------|-------------|-------------|
+| Week 항목 | `## Week 1 — [주제]` | Milestone `Week 1` 생성 |
+| Task 행 | `| 1.1 | 내용 | ...` | Issue `[1.1] 내용` 생성, Milestone 연결 |
+| Issue 번호 기록 | — | Plans.md `GH` 컬럼에 `#N` 자동 기입 |
+
+### Implementation 단계 (`/harness-work`)
+
+```
+Task 선택 (cc:TODO)
+  → git checkout -b task/{task-id}-{설명}
+  → worker 구현
+  → reviewer 검토
+  → gh pr create --title "[{task-id}] ..." --body "Closes #{issue}"
+  → CI 통과 + 승인 후 main 머지
+  → Plans.md cc:WIP → cc:완료 자동 업데이트
+```
+
+### CI 게이트
+
+| Workflow | 트리거 | 목적 |
+|----------|--------|------|
+| `ci.yml` | push/PR → main | 기술 스택별 빌드·테스트 |
+| `plans-guard.yml` | PR → main | WIP Task ↔ 브랜치 일관성 검증 |
+
+### Branch Protection 권장 설정
+
+```
+GitHub → Settings → Branches → main:
+  ✓ Require status checks to pass: ci, plans-guard/WIP↔Branch
+  ✓ Require pull request before merging
+  ✓ Dismiss stale pull request approvals
+```
+
+> 상세 설정 가이드: `docs/github-integration.md`
+
+---
+
 ## 4. 세션 타임라인 — 실제 실행 흐름
 
 ### 세션 시작 시
