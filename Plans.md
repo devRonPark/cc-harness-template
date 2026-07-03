@@ -38,6 +38,7 @@
 | 2.4 | 계획 파이프라인 테스트 (task-decomposer → Plans.md) | ../routine-saas/Plans.md에 세분화 기준 통과 Task 표 존재 | grep -qE 'cc:TODO' ../routine-saas/Plans.md | 2.3 | cc:완료 | - |
 | 2.5 | 템플릿 결함 기록 | 테스트 중 발견한 템플릿 문제를 .harness/LESSONS.md에 기록, 수정 필요 항목은 Week 3 후보로 정리 | - | 2.4 | cc:완료 | - |
 | 2.6 | DESIGN.md 기획 산출물 추가 | docs/templates/DESIGN.md 골격 존재, CLAUDE.md 기획 규칙에 DESIGN 단계 반영, routine-saas에 실제 작성 적용 | test -f docs/templates/DESIGN.md && test -f ../routine-saas/docs/DESIGN.md | 2.5 | cc:완료 | - |
+| 2.7 | GitHub 연동 E2E 검증 + plans-complete 워크플로 | harness-gh-test repo에서 plans-guard 3잡 시나리오 4종 검증, 빈틈 7건 도출, plans-complete.yml 신설 검증, CLAUDE.md GitHub 플로우 명문화 | test -f .github/workflows/plans-complete.yml && grep -q 'plans-complete' CLAUDE.md | 2.5 | cc:완료 | - |
 
 ---
 

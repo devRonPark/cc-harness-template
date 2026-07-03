@@ -1,0 +1,56 @@
+name: Plans Complete
+
+# task/* 브랜치 PR이 머지되면 Plans.md의 해당 Task를 cc:WIP → cc:완료로 자동 전환.
+# 이게 없으면 머지 후 main에 stale WIP가 남아, 후속 모든 PR의 plans-guard가
+# 남의 Task acceptance까지 재실행한다 (무관한 PR 차단 위험).
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  flip-status:
+    name: WIP → 완료
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'task/')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Plans.md 상태 전환 후 main에 커밋
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          if [[ ! "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+(\.[0-9]+)?)- ]]; then
+            echo "task/{X.Y}-* 패턴 아님 ($HEAD_REF) — skip"
+            exit 0
+          fi
+          task_id="${BASH_REMATCH[1]}"
+          task_id_re="${task_id//./\\.}"
+
+          if ! grep -qE "^\|[[:space:]]*${task_id_re}[[:space:]]*\|.*cc:WIP" Plans.md; then
+            echo "Task ${task_id}: cc:WIP 행 없음 (이미 완료 처리됐거나 마커 누락) — skip"
+            exit 0
+          fi
+
+          sed -i -E "s/^(\|[[:space:]]*${task_id_re}[[:space:]]*\|.*)cc:WIP(.*)$/\1cc:완료\2/" Plans.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Plans.md
+          git commit -m "chore: task ${task_id} 완료 반영 (PR #${PR_NUMBER} 머지)"
+          # ponytail: 동시 머지 경합 시 1회 rebase 재시도 — 그 이상 겹치면 수동 해결
+          git push origin main || (git pull --rebase origin main && git push origin main)

@@ -75,9 +75,24 @@
 > `harness.toml`의 `[github] enabled = true` 시 적용. 미사용이면 이 섹션 삭제.
 
 - **브랜치 명명**: `task/{task-id}-{짧은-설명}` (예: `task/1.1-auth-login`)
-- **Planning**: `/harness-plan` → Week → Milestone, Task → Issue 자동 생성
-- **Implementation**: Task당 브랜치 생성 → 구현 → reviewer 자동 실행 → APPROVE 후 PR 오픈
+- **커밋 메시지**: task 브랜치 커밋은 `task {task-id}: {내용}` 형태로 시작 —
+  커밋↔Task 추적의 근거 (브랜치명만으로는 squash 머지 후 추적이 끊긴다)
+- **Planning**: Week → Milestone은 `gh api repos/{owner}/{repo}/milestones -f title="..."`
+  (gh CLI에 milestone 기본 명령 없음). Task → Issue는
+  `gh issue create --title "[{task-id}] {내용}" --milestone "..."` — 본문에
+  DoD·Acceptance·Depends 기재. 생성된 이슈 번호를 Plans.md GH 컬럼에 `#N`으로 기입
+- **Implementation**: Task당 브랜치 생성 → **브랜치에서 해당 Task를 cc:WIP로 마킹**
+  → 구현 → reviewer APPROVE 후 PR 오픈. PR 본문에 `Closes #{이슈번호}` 필수
+  (누락 시 머지돼도 이슈가 안 닫힌다)
 - **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
+- **완료 전환**: 머지 시 `plans-complete.yml`이 해당 Task를 cc:WIP → cc:완료로
+  자동 커밋한다. PR 안에서 미리 완료로 바꾸지 말 것 — wip-branch-check가 cc:WIP를
+  요구하므로 모순. stale WIP가 main에 남으면 이후 모든 PR이 그 Task의 acceptance를
+  재실행하므로 이 자동 전환이 꼭 필요하다
+- **Plans.md 충돌 주의**: 여러 task 브랜치가 Plans.md 상태를 동시에 고치면 머지
+  충돌이 잦다 — PR 오픈 전 main을 머지해 최신화할 것
+- **branch protection**: plans-guard는 PR에만 걸린다. main 직접 push를 막으려면
+  Settings → Branches에서 required checks 설정 필수 (`[github] require_ci` 참고)
 - **CI 설정**: `.github/workflows/ci.yml` 기술 스택 블록 주석 해제 후 사용
 
 ## 구현 규칙 (세분화 게이트)

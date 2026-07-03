@@ -26,5 +26,6 @@
 | `agents/task-decomposer.md` | Task 세분화 기준·게이트 정의 | 계획/게이트 실행 시 |
 | `agents/test-agent.md` | 런타임 검증 절차 정의 | worker 완료 후 |
 | `.github/workflows/plans-guard.yml` | WIP 확인 + Acceptance Oracle + 세분화 CI | CI 수정 시 |
+| `.github/workflows/plans-complete.yml` | 머지 시 cc:WIP→완료 자동 커밋 (stale WIP 방지) | CI 수정 시 |
 | `docs/PRD.md`, `docs/UserFlow.md`, `docs/Architecture.md` | 기획 산출물 | 기획 참조 시 |
 | `docs/templates/` | 기획 문서 골격 4종 (PRD·UserFlow·DESIGN·Architecture) | 새 기획 착수 시 |
