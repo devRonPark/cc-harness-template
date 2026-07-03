@@ -26,8 +26,8 @@ jobs:
             exit 0
           fi
 
-          # task/{X.Y}-* 브랜치가 아니면 검사 대상 아님 (docs, hotfix 등)
-          if [[ ! "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+)- ]]; then
+          # task/{X.Y}-* 또는 구현 중 재분해된 task/{X.Y.Z}-* 브랜치가 아니면 검사 대상 아님 (docs, hotfix 등)
+          if [[ ! "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+(\.[0-9]+)?)- ]]; then
             echo "task/* 브랜치 아님 ($HEAD_REF) — skip"
             exit 0
           fi
@@ -95,8 +95,8 @@ jobs:
             task_id=$(echo "${fields[1]}" | xargs)
             status=$(echo "${fields[n-2]}" | xargs)
 
-            # Task ID 형식 (숫자.숫자) + cc:WIP 행만 처리
-            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+$ ]] && continue
+            # Task ID 형식 (숫자.숫자 또는 재분해된 숫자.숫자.숫자) + cc:WIP 행만 처리
+            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
             [[ "$status" != "cc:WIP" ]] && continue
 
             wip_found=$((wip_found + 1))
@@ -120,6 +120,75 @@ jobs:
             else
               echo "✗ Task ${task_id}: FAIL — acceptance 명령이 실패했습니다"
               failed=1
+            fi
+          done < Plans.md
+
+          if [ "$wip_found" -eq 0 ]; then
+            echo "WIP Task 없음 — skip"
+          fi
+
+          exit $failed
+
+  granularity-check:
+    name: Task Granularity
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: cc:WIP Task 세분화 기준 확인 (agents/task-decomposer.md 기준)
+        shell: bash
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          failed=0
+          wip_found=0
+          vague_re='(전체|모든| 및 |그리고)'
+
+          while IFS= read -r line; do
+            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
+            [[ "$line" != *"|"* ]] && continue
+
+            line="${line%"${line##*[![:space:]]}"}"
+            line="${line%|}"
+
+            IFS='|' read -ra fields <<< "$line"
+            n=${#fields[@]}
+            [ "$n" -lt 8 ] && continue
+
+            task_id=$(echo "${fields[1]}" | xargs)
+            content=$(echo "${fields[2]}" | xargs)
+            dod=$(echo "${fields[3]}" | xargs)
+            depends=$(echo "${fields[n-3]}" | xargs)
+            status=$(echo "${fields[n-2]}" | xargs)
+
+            # Task ID 형식 (숫자.숫자 또는 재분해된 숫자.숫자.숫자) + cc:WIP 행만 처리
+            # (harness-work가 Task를 WIP로 옮기는 시점 = 세분화 게이트가 걸려야 하는 시점)
+            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
+            [[ "$status" != "cc:WIP" ]] && continue
+
+            wip_found=$((wip_found + 1))
+            reasons=()
+
+            if [ -z "$dod" ] || [[ "$dod" =~ ^\[.*\]$ ]]; then
+              reasons+=("DoD 미기재/placeholder")
+            fi
+            if [ -z "$depends" ]; then
+              reasons+=("Depends 비어있음(- 라도 명시 필요)")
+            fi
+            if [[ "$content" =~ $vague_re ]]; then
+              reasons+=("내용에 뭉뚱그린 표현 감지: ${BASH_REMATCH[1]}")
+            fi
+
+            if [ ${#reasons[@]} -gt 0 ]; then
+              echo "✗ Task ${task_id}: 세분화 기준 미달 — ${reasons[*]}"
+              echo "  → agents/task-decomposer.md로 하위 Task(${task_id}.N)로 재분해 필요"
+              failed=1
+            else
+              echo "✓ Task ${task_id}: 세분화 기준 통과"
             fi
           done < Plans.md
 

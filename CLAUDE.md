@@ -39,6 +39,10 @@
 - 보완 문서 골격: `docs/templates/UserFlow.md`, `docs/templates/Architecture.md` 복사 후 작성.
 - 기획 중 확정된 결정은 PRD의 Decisions 섹션에 근거와 함께 기록한다.
   ADR 별도 파일은 만들지 않는다 — 큰 결정이 쌓이면 그때 `docs/adr/`로 분리.
+- **`/harness-plan`이 Plans.md에 Task 행을 쓰기 전, 반드시 `agents/task-decomposer.md`를
+  먼저 실행한다.** PRD 핵심 기능을 바로 Task 행으로 옮기지 않는다 — 세분화 기준
+  (agents/task-decomposer.md 참고)을 통과한 행 단위로만 Plans.md에 적는다.
+  이 순서를 건너뛰고 뭉뚱그린 Task를 바로 적으면 안 된다.
 - 이 단계는 harness 플러그인이 자동 실행하지 않는다 — Claude가 이 규칙에 따라
   세션에서 직접 수행한다 (테스트 규칙과 동일 패턴).
 
@@ -51,6 +55,26 @@
 - **Implementation**: Task당 브랜치 생성 → 구현 → reviewer 자동 실행 → APPROVE 후 PR 오픈
 - **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
 - **CI 설정**: `.github/workflows/ci.yml` 기술 스택 블록 주석 해제 후 사용
+
+## 구현 규칙 (세분화 게이트)
+
+- **`/harness-work` 실행 전, Plans.md의 대상 cc:TODO Task가 전부
+  `agents/task-decomposer.md`의 세분화 기준을 통과했는지 먼저 확인한다.**
+  하나라도 미달(DoD·Acceptance 미기재, "전체/모든/및"으로 뭉뚱그린 표현,
+  여러 관심사 혼재 등)이면 worker에게 위임하지 않는다 — task-decomposer를
+  먼저 실행해 하위 Task로 쪼갠 뒤에만 `/harness-work`를 진행한다.
+- 이 게이트는 `.github/workflows/plans-guard.yml`의 `granularity-check` 잡으로도
+  기계적으로 강제된다 — PR 단계에서도 동일 기준 미달 Task가 있으면 CI가 막는다.
+  세션 중 수동 확인과 CI 게이트를 이중으로 둔 이유: 세션 확인은 worker 호출
+  *전에* 낭비를 막고, CI는 그 확인이 생략됐을 때의 최종 방어선이다.
+- **worker가 작업 도중 범위가 예상보다 크다는 걸 발견하면**(관련 없는 파일
+  3개 이상을 동시에 고쳐야 하거나, 서로 다른 관심사가 뒤섞여 있음을 인지하면)
+  즉시 구현을 멈추고 `agents/task-decomposer.md`를 다시 호출한다. 남은 작업을
+  `{원본 task-id}.{n}` 형태 하위 Task로 분리하고, 원본 Task는 "분리 완료"로
+  마킹한 뒤 하위 Task 단위로 이어서 진행한다 — 같은 에이전트를 재사용해
+  계획 단계와 구현 단계 세분화를 하나의 기준으로 유지한다.
+- 이 단계는 harness 플러그인이 자동 실행하지 않는다 — `/harness-work` 흐름에서
+  Claude가 이 규칙에 따라 직접 수행한다 (`harness.toml [plan] gate_work` 참고).
 
 ## 테스트 규칙
 

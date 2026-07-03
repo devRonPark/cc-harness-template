@@ -58,3 +58,10 @@ auto_run = true            # worker 완료 후 test-agent 자동 실행 (reviewe
 agent = "agents/test-agent.md"
 fail_blocks_review = true  # FAIL이면 reviewer 진입 금지, worker에 재위임
 # timeout_seconds = 120    # 테스트 타임아웃 (기본 120초)
+
+[plan]
+auto_run = true                     # /harness-plan이 Task 작성 전 task-decomposer 자동 실행
+agent = "agents/task-decomposer.md"
+gate_work = true                     # 세분화 기준 미달 Task 있으면 /harness-work 실행 자체를 차단
+allow_mid_work_split = true          # worker 작업 중 범위 초과 발견 시 재호출해 하위 Task로 분리 허용
+# max_task_hours = 4                 # Task 하나당 예상 작업 시간 상한 (기본 4시간)

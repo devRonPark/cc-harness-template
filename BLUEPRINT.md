@@ -137,7 +137,8 @@ claude plugin install value-for-fable@itsinseong
 
 ## 2. Agent Layer (per-agent 규칙)
 
-harness가 요청을 처리할 때 spawning하는 세 종류의 에이전트.
+harness가 요청을 처리할 때 spawning하는 세 종류의 플러그인 에이전트 +
+프로젝트가 직접 추가한 두 종류의 companion 에이전트.
 각각 다른 Plugin 조합을 적용한다.
 
 ```
@@ -145,7 +146,16 @@ harness가 요청을 처리할 때 spawning하는 세 종류의 에이전트.
 ├── claude-code-harness-worker/MEMORY.md    ← worker 전용 규칙
 ├── claude-code-harness-reviewer/MEMORY.md  ← reviewer 전용 규칙
 └── claude-code-harness-advisor/MEMORY.md   ← advisor 전용 규칙
+
+agents/                                      ← 플러그인이 모르는 프로젝트 전용 에이전트
+├── task-decomposer.md                      ← 계획 단계 세분화 + 구현 단계 게이트 (공용)
+└── test-agent.md                           ← worker 완료 후 런타임 검증
 ```
+
+> `worker.md`는 `disallowedTools: [Agent]`로 정의돼 있어 스스로 sub-agent를
+> 부를 수 없다. 그래서 task-decomposer·test-agent 같은 companion 에이전트는
+> worker가 아니라 **세션을 운영하는 Claude(오케스트레이터 역할)** 가 CLAUDE.md
+> 규칙에 따라 직접 호출한다 — worker 전/후 단계에 끼워 넣는 구조.
 
 ### Plugin 적용 매트릭스
 
@@ -290,16 +300,32 @@ GitHub → Settings → Branches → main:
                                     VFF 리마인더를 컨텍스트에 주입
 ```
 
-### harness-work 실행 시 (`/harness-work`)
+### harness-plan 실행 시 (`/harness-plan`) — 계획 단계
+```
+0. task-decomposer에게 PRD 핵심 기능을 세분화 기준(1 PR 이내·단일 관심사·
+   독립 검증 가능)에 맞춰 Task 후보로 분해 요청 — 이 단계 생략 금지
+1. 분해 결과를 Plans.md Task 행(Week/Task/DoD/Acceptance/Depends)으로 기록
+2. `[github] enabled = true`면 Task → GitHub Issue 자동 생성
+```
+
+### harness-work 실행 시 (`/harness-work`) — 구현 단계
 ```
 6. harness가 Plans.md에서 cc:TODO Task 선택
+6-a. 세분화 게이트: 선택된 Task가 task-decomposer 기준 미달이면(DoD·Acceptance
+     미기재, 뭉뚱그린 표현, 관심사 혼재 등) worker에게 넘기지 않고 task-decomposer를
+     다시 호출해 하위 Task(`{task-id}.N`)로 쪼갠 뒤에만 진행
 7. advisor에게 방침 요청 (caveman OFF + VFF v2)
 8. worker에게 구현 위임 (caveman lite + ponytail + VFF 검증)
    └─ SubagentStart 훅 → ponytail이 worker에 자동 주입
+   └─ worker가 작업 중 범위 초과를 발견하면(무관한 파일 3개+/관심사 혼재) 즉시
+      멈추고 task-decomposer를 재호출 — 남은 작업을 하위 Task로 분리 후 재개
 9. test-agent 검증 (Acceptance 명령 + 프로젝트 테스트 스위트) — FAIL 시 worker에 재위임
 10. reviewer에게 검토 요청 (caveman OFF + VFF v2)
 11. 결과를 Plans.md에 반영 (cc:WIP → cc:완료)
 ```
+
+> 6-a와 8의 재분해 게이트는 세션 내 수동 확인 + `plans-guard.yml`의
+> `granularity-check` CI 잡, 이중으로 강제된다 (3. Harness Layer 참고).
 
 ---
 
