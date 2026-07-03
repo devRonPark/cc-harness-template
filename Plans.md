@@ -1,7 +1,7 @@
 # Plans.md — [PROJECT_NAME]
 
 작성일: YYYY-MM-DD
-기준 문서: docs/your-prd.md
+기준 문서: docs/PRD.md
 
 ---
 
@@ -9,9 +9,10 @@
 
 | Task | 내용 | DoD | Acceptance | Depends | Status | GH |
 |------|------|-----|------------|---------|--------|----|
-| 0.1 | PRD 작성 | docs/your-prd.md v0.1 존재 | test -f docs/your-prd.md | - | cc:완료 | - |
-| 0.2 | Harness 초기화 | harness doctor 전체 통과, CLAUDE.md·Plans.md 존재 | test -f CLAUDE.md && test -f Plans.md && test -f harness.toml | - | cc:완료 | - |
-| 0.3 | Plugin 설정 | ponytail·caveman·VFF 설치 확인, agent MEMORY.md 3개 존재 | grep -q 'caveman\|ponytail' ~/.claude/settings.json 2>/dev/null \|\| echo skip | 0.2 | cc:완료 | - |
+| 0.1 | PRD 작성 (`/grill-me` 인터뷰) | docs/PRD.md v0.1 존재, Open Questions 정리됨 | test -f docs/PRD.md | - | cc:완료 | - |
+| 0.2 | 기획 보완 문서 | UserFlow.md·Architecture.md 작성 (docs/templates/ 골격 사용) | test -f docs/UserFlow.md && test -f docs/Architecture.md | 0.1 | cc:완료 | - |
+| 0.3 | Harness 초기화 | harness doctor 전체 통과, CLAUDE.md·Plans.md 존재 | test -f CLAUDE.md && test -f Plans.md && test -f harness.toml | - | cc:완료 | - |
+| 0.4 | Plugin 설정 | ponytail·caveman·VFF 설치 확인, agent MEMORY.md 3개 존재 | grep -q 'caveman\|ponytail' ~/.claude/settings.json 2>/dev/null \|\| echo skip | 0.3 | cc:완료 | - |
 
 ---
 
@@ -21,6 +22,7 @@
 |------|------|-----|------------|---------|--------|----|
 | 1.0 | Plans.md 템플릿 개선 | bootstrap Task에 Acceptance 예시 있음, 현실적 샘플 Task 포함 | grep -qE 'test -f\|npm test\|pytest\|go test\|curl' Plans.md | - | cc:완료 | - |
 | 1.1 | test agent 추가 | agents/test-agent.md 존재, harness.toml [test] 섹션, BLUEPRINT.md 업데이트 | test -f agents/test-agent.md | - | cc:완료 | - |
+| 1.2 | 기획 파이프라인 추가 | grill-me 스킬 + docs/templates/ 골격 3종, CLAUDE.md 기획 규칙 | test -f .claude/skills/grill-me/SKILL.md && test -f docs/templates/PRD.md | - | cc:완료 | - |
 
 ---
 

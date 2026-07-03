@@ -32,6 +32,16 @@
 - [프로젝트별 코딩 컨벤션 기입]
 - [예: 함수 네이밍 규칙, import 순서, 에러 처리 방식 등]
 
+## 기획 규칙
+
+- **새 프로젝트/기능 착수 시 코드보다 먼저 `/grill-me`를 실행한다.**
+  인터뷰 → `docs/PRD.md` 초안 → UserFlow·Architecture 보완 → `/harness-plan` 순서.
+- 보완 문서 골격: `docs/templates/UserFlow.md`, `docs/templates/Architecture.md` 복사 후 작성.
+- 기획 중 확정된 결정은 PRD의 Decisions 섹션에 근거와 함께 기록한다.
+  ADR 별도 파일은 만들지 않는다 — 큰 결정이 쌓이면 그때 `docs/adr/`로 분리.
+- 이 단계는 harness 플러그인이 자동 실행하지 않는다 — Claude가 이 규칙에 따라
+  세션에서 직접 수행한다 (테스트 규칙과 동일 패턴).
+
 ## GitHub 플로우
 
 > `harness.toml`의 `[github] enabled = true` 시 적용. 미사용이면 이 섹션 삭제.

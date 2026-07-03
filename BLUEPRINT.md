@@ -307,6 +307,7 @@ GitHub → Settings → Branches → main:
 
 | 명령어 | 역할 |
 |--------|------|
+| `/grill-me` | 인터뷰 기반 PRD 작성 — 기획 단계 진입점 (프로젝트 스코프 스킬, `.claude/skills/grill-me/`) |
 | `/harness-plan` | Plans.md Task 추가·관리 |
 | `/harness-work` | Plans.md Task 실행 (worker 팀 가동) |
 | `/harness-review` | 코드·계획 리뷰 |

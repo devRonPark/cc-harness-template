@@ -73,12 +73,15 @@ cc-harness-template/
 │
 ├── .claude/
 │   ├── settings.local.json.example # 프로젝트 전용 권한 설정 (복사 후 rename)
+│   ├── skills/
+│   │   └── grill-me/SKILL.md       # 인터뷰 기반 PRD 작성 스킬 (기획 단계 진입점)
 │   └── agent-memory/
 │       ├── claude-code-harness-worker/MEMORY.md    # worker 행동 규칙
 │       ├── claude-code-harness-reviewer/MEMORY.md  # reviewer 행동 규칙
 │       └── claude-code-harness-advisor/MEMORY.md   # advisor 행동 규칙
 │
 └── docs/
+    ├── templates/                  # 기획 산출물 골격 (PRD·UserFlow·Architecture)
     ├── setup-guide.md              # 상세 설치 가이드
     ├── github-integration.md       # GitHub 연동 상세 가이드
     └── global-settings-reference.md  # ~/.claude/settings.json 레퍼런스
@@ -191,6 +194,11 @@ cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-reviewer/MEMORY.md 
 cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-advisor/MEMORY.md \
    .claude/agent-memory/claude-code-harness-advisor/
 cp /tmp/harness-tpl/.claude/settings.local.json.example .claude/settings.local.json
+
+# 기획 스킬 + 산출물 골격 (grill-me → PRD → UserFlow·Architecture)
+mkdir -p .claude/skills docs
+cp -r /tmp/harness-tpl/.claude/skills/grill-me .claude/skills/
+cp -r /tmp/harness-tpl/docs/templates docs/
 ```
 
 ### Step 2 — 커스터마이징 체크리스트
@@ -264,16 +272,20 @@ harness sync    # 연동 활성화
 # 1. Claude Code 열기
 claude
 
-# 2. 할 일 추가 (Plans.md에 Task 작성)
+# 2. (새 프로젝트/기능이면) 기획 — 인터뷰로 PRD 작성
+/grill-me
+#    → docs/PRD.md 초안 → UserFlow·Architecture 보완 (docs/templates/ 골격)
+
+# 3. 할 일 추가 (PRD 기반으로 Plans.md에 Task 작성)
 /harness-plan
 
-# 3. 실행 (worker → reviewer → advisor 자동 순환)
+# 4. 실행 (worker → reviewer → advisor 자동 순환)
 /harness-work
 
-# 4. 진행 상황 확인
+# 5. 진행 상황 확인
 /harness-progress
 
-# 5. Plans.md ↔ 구현 동기화 확인
+# 6. Plans.md ↔ 구현 동기화 확인
 /harness-sync
 ```
 
@@ -302,6 +314,7 @@ claude
 |--------|------|
 | `harness doctor` | 설치 상태 전체 점검 |
 | `harness sync` | `harness.toml` 변경 후 적용 |
+| `/grill-me` | 인터뷰 기반 PRD 작성 (기획 단계 진입점) |
 | `/harness-plan` | Plans.md Task 추가·관리 |
 | `/harness-work` | Task 실행 (worker 팀 가동) |
 | `/harness-review` | 현재 코드·계획 리뷰 |
