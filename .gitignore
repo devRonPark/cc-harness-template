@@ -11,3 +11,8 @@ dist/
 .claude/state/
 .claude/sessions/
 out/progress-snapshot.html
+
+# 플러그인 런타임 산출물 (세션별 자동 생성 — 커밋 금지)
+.claude/memory/
+docs/.bkit-memory.json
+docs/.pdca-status.json
