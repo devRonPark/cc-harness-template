@@ -14,8 +14,8 @@ cc-harness-template 템플릿 개선 (Week 1)
 
 ## 마지막 검증 결과
 
-- Week 2 dogfooding Acceptance 2.1~2.4 전부 **PASS** (2026-07-03)
-  — ../routine-saas/에 골격·PRD·UserFlow·Architecture·Plans.md 생성 확인
+- Task 2.7 GitHub 연동 E2E: plans-guard 3잡 시나리오 4종 + plans-complete 자동
+  flip 전부 실증 **PASS** (2026-07-04, harness-gh-test repo)
 
 ## 차단 요소
 
@@ -23,9 +23,9 @@ cc-harness-template 템플릿 개선 (Week 1)
 
 ## 마지막 커밋
 
-- `a4c6ef1` feat: .harness/ 상태 문서 체계 추가 (Task 1.4)
-  (Week 2 변경분은 사용자 지시로 커밋하지 않음)
+- `2f94273` feat: plans-complete 워크플로 + GitHub 플로우 규약 (Task 2.7, push 완료)
+  (routine-saas 산출물만 커밋 제외 유지)
 
 ## 최종 갱신
 
-- 2026-07-03, Week 2 dogfooding 완료 시점
+- 2026-07-04, Task 2.7 완료 시점

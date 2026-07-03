@@ -5,7 +5,7 @@
 
 | 일시 | Task | 내용 | 커밋 | 검증 |
 |------|------|------|------|------|
-| 2026-07-04 | 2.7 | GitHub 연동 E2E 검증 + plans-complete.yml | (커밋 예정) | 시나리오 A~D 실검증 PASS |
+| 2026-07-04 | 2.7 | GitHub 연동 E2E 검증 + plans-complete.yml | 2f94273 | 시나리오 A~D 실검증 PASS |
 | 2026-07-03 | 2.6 | DESIGN.md 기획 산출물 추가 (골격+규칙+routine-saas 적용) | 6a51ad0 | Acceptance PASS |
 | 2026-07-03 | 2.1~2.5 | Week 2 dogfooding — routine-saas 기획 파이프라인 통과 | (커밋 금지 지시) | Acceptance 2.1~2.4 PASS |
 | 2026-07-03 | 1.4 | .harness/ 상태 문서 체계 (골격 7종 + CLAUDE.md 규칙) | a4c6ef1 | Acceptance PASS |
