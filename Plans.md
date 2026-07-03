@@ -24,6 +24,7 @@
 | 1.1 | test agent 추가 | agents/test-agent.md 존재, harness.toml [test] 섹션, BLUEPRINT.md 업데이트 | test -f agents/test-agent.md | - | cc:완료 | - |
 | 1.2 | 기획 파이프라인 추가 | grill-me 스킬 + docs/templates/ 골격 3종, CLAUDE.md 기획 규칙 | test -f .claude/skills/grill-me/SKILL.md && test -f docs/templates/PRD.md | - | cc:완료 | - |
 | 1.3 | task-decomposer + 세분화 게이트 추가 | agents/task-decomposer.md 존재, harness.toml [plan] 섹션, plans-guard.yml granularity-check 잡, CLAUDE.md 구현 규칙 | test -f agents/task-decomposer.md && grep -q 'granularity-check' .github/workflows/plans-guard.yml | 1.1 | cc:완료 | - |
+| 1.4 | .harness/ 상태 문서 체계 추가 | .harness/ 골격 7종(STATE·HANDOFF·TASKS·LOG·LESSONS·CHECKPOINTS·CONTEXT_INDEX) 존재, CLAUDE.md 상태 문서 규칙 섹션 존재 | test -f .harness/STATE.md && test -f .harness/CONTEXT_INDEX.md && grep -q '상태 문서 규칙' CLAUDE.md | - | cc:완료 | - |
 
 ---
 
