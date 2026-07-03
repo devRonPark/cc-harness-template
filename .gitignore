@@ -3,3 +3,11 @@ dist/
 .env
 *.local
 .DS_Store
+
+# 프로젝트 스코프 로컬 설정 (settings.local.json.example을 복사해서 생성)
+.claude/settings.local.json
+
+# harness 런타임 산출물 (세션마다 자동 생성 — 커밋 금지)
+.claude/state/
+.claude/sessions/
+out/progress-snapshot.html

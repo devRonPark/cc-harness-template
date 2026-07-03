@@ -206,6 +206,11 @@ ask  = ["Bash(rm -r:*)", "Bash(git push --force:*)"]
 
 `harness.toml`의 `[github] enabled = true` 설정 시 활성화.
 
+> **주의**: `[github]`·`[review]`·`[test]` 섹션은 harness sync가 파싱하지 않는
+> 프로젝트 규약이다 (플러그인 지원 섹션: project/agent/env/safety/tdd).
+> 실제 동작은 CLAUDE.md의 지시에 따라 Claude가 세션에서 gh CLI로 직접 수행한다.
+> CI 게이트(ci.yml, plans-guard.yml)만 GitHub Actions가 기계적으로 강제한다.
+
 ### 활성화 전제조건
 ```bash
 gh auth login          # GitHub CLI 로그인

@@ -33,6 +33,13 @@ failIfUnavailable = false
 # denyRead = [".env", "secrets/**"]
 # allowRead = [".env.example"]
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 주의: 아래 [github]·[review]·[test] 섹션은 harness sync가 파싱하지 않는다.
+# (claude-code-harness v4.16.3 지원 섹션: project / agent / env / safety / tdd)
+# 이 섹션들은 CLAUDE.md의 지시를 통해 Claude가 세션에서 직접 수행하는
+# 프로젝트 규약의 SSOT다. 값을 바꾸면 CLAUDE.md 해당 섹션도 함께 갱신할 것.
+# ─────────────────────────────────────────────────────────────────────────────
+
 [github]
 enabled = false                # true → GitHub 연동 모드 활성화 (gh CLI 로그인 필요)
 # remote = "origin"

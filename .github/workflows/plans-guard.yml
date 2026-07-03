@@ -15,44 +15,40 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: WIP Task에 해당 브랜치 존재 확인
+      - name: PR 브랜치 ↔ Plans.md WIP 일관성 확인
         shell: bash
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           if [ ! -f Plans.md ]; then
             echo "Plans.md 없음 — skip"
             exit 0
           fi
 
-          wip_lines=$(grep 'cc:WIP' Plans.md || true)
-          if [ -z "$wip_lines" ]; then
-            echo "WIP Task 없음 — OK"
+          # task/{X.Y}-* 브랜치가 아니면 검사 대상 아님 (docs, hotfix 등)
+          if [[ ! "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+)- ]]; then
+            echo "task/* 브랜치 아님 ($HEAD_REF) — skip"
             exit 0
           fi
+          task_id="${BASH_REMATCH[1]}"
+          task_id_re="${task_id//./\\.}"
 
-          failed=0
-          while IFS='|' read -ra fields; do
-            task_id=$(echo "${fields[1]}" | tr -d ' ')
-            # Task ID 형식이 숫자.숫자인 경우만 처리 (헤더 행 등 skip)
-            if ! echo "$task_id" | grep -qE '^[0-9]+\.[0-9]+$'; then
-              continue
-            fi
-            if git ls-remote --heads origin | grep -q "refs/heads/task/${task_id}-"; then
-              echo "✓ Task ${task_id}: 브랜치 존재"
-            else
-              echo "✗ Task ${task_id}: task/${task_id}-* 브랜치 없음 (harness-work가 브랜치를 생성했는지 확인)"
-              failed=1
-            fi
-          done <<< "$wip_lines"
-
-          exit $failed
+          # 이 PR의 Task 행이 Plans.md에서 cc:WIP 상태인지만 검사한다.
+          # (다른 WIP Task는 이 PR과 무관 — 전체 검사 시 병렬 작업이 오탐으로 차단됨)
+          if grep -E "^\|[[:space:]]*${task_id_re}[[:space:]]*\|" Plans.md | grep -q 'cc:WIP'; then
+            echo "✓ Task ${task_id}: Plans.md cc:WIP 확인"
+          else
+            echo "✗ Task ${task_id}: Plans.md에 cc:WIP 행 없음 (harness-work가 마커를 갱신했는지 확인)"
+            exit 1
+          fi
 
   acceptance-check:
     name: Acceptance Oracle
     runs-on: ubuntu-22.04
     timeout-minutes: 15
+    # fork PR은 Plans.md에 임의 명령을 심어 CI에서 eval시킬 수 있으므로 same-repo PR만 실행
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
 
@@ -80,23 +76,38 @@ jobs:
           wip_found=0
 
           while IFS= read -r line; do
-            # 구분자 행·주석 행·파이프 없는 행 skip
+            # 구분자 행·파이프 없는 행 skip
             [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
             [[ "$line" != *"|"* ]] && continue
 
+            # 행 정규화: 끝 공백·마지막 파이프 제거 → 필드 인덱스 고정
+            line="${line%"${line##*[![:space:]]}"}"
+            line="${line%|}"
+
             IFS='|' read -ra fields <<< "$line"
-            # 컬럼: 0=빈칸 1=Task 2=내용 3=DoD 4=Acceptance 5=Depends 6=Status 7=GH
-            [ "${#fields[@]}" -lt 7 ] && continue
+            n=${#fields[@]}
+
+            # 컬럼은 오른쪽부터 센다: n-1=GH, n-2=Status, n-3=Depends.
+            # Acceptance 셀 안의 \| 는 split로 조각나므로 fields[4..n-4]를 다시 합친다.
+            # (왼쪽부터 세면 파이프 포함 acceptance에서 Status가 밀려 WIP 행이 조용히 skip됨)
+            [ "$n" -lt 8 ] && continue
 
             task_id=$(echo "${fields[1]}" | xargs)
-            acceptance=$(echo "${fields[4]}" | xargs)
-            status=$(echo "${fields[6]}" | xargs)
+            status=$(echo "${fields[n-2]}" | xargs)
 
             # Task ID 형식 (숫자.숫자) + cc:WIP 행만 처리
             [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+$ ]] && continue
             [[ "$status" != "cc:WIP" ]] && continue
 
             wip_found=$((wip_found + 1))
+
+            acceptance=""
+            for ((i=4; i<=n-4; i++)); do
+              [ -n "$acceptance" ] && acceptance+="|"
+              acceptance+="${fields[i]}"
+            done
+            # markdown escape 복원(\| → |) + 앞뒤 공백 제거 (xargs는 따옴표를 삼키므로 사용 금지)
+            acceptance=$(echo "$acceptance" | sed 's/\\|/|/g; s/^[[:space:]]*//; s/[[:space:]]*$//')
 
             if [ -z "$acceptance" ] || [ "$acceptance" = "-" ]; then
               echo "⚠ Task ${task_id}: acceptance 없음 — skip"

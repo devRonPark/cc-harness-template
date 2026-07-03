@@ -40,6 +40,7 @@ GitHub 웹 → **Settings → Branches → Add branch ruleset → main**:
 |------|----|
 | Require status checks | `placeholder` (ci.yml 활성화 후 실제 job명으로 변경) |
 | Require status checks | `plans-guard / WIP↔Branch` |
+| Require status checks | `plans-guard / Acceptance Oracle` |
 | Require pull request | ✓ |
 | Dismiss stale reviews | ✓ |
 
@@ -113,12 +114,24 @@ gh pr create \
 PR → main 시 `plans-guard.yml`이 자동 실행:
 
 ```
-Plans.md에서 cc:WIP Task 추출
-  → 각 Task에 대해 task/{task-id}-* 브랜치 존재 확인
-  → 브랜치 없으면 CI 실패 (머지 차단)
+WIP↔Branch:
+  PR 브랜치명에서 task-id 추출 (task/{X.Y}-*)
+  → Plans.md에서 해당 Task가 cc:WIP인지 확인
+  → 아니면 CI 실패 (머지 차단)
+  → task/* 형식이 아닌 브랜치(docs, hotfix 등)는 skip
+
+Acceptance Oracle:
+  Plans.md의 cc:WIP Task 각각의 Acceptance 명령을 실행
+  → 하나라도 실패(exit ≠ 0)하면 CI 실패 (머지 차단)
+  → fork PR에서는 실행하지 않음 (임의 명령 주입 방지)
 ```
 
-`cc:WIP`인데 브랜치가 없는 경우 → `/harness-work`가 브랜치를 생성했는지 확인.
+PR 브랜치의 Task가 `cc:WIP`이 아닌 경우 → `/harness-work`가 마커를 갱신했는지 확인.
+
+> **cc:완료 갱신 시점 주의**: branch protection으로 main 직접 push를 막으면
+> 머지 후 Plans.md 마커 갱신도 커밋이 필요하다. 갱신 커밋을 **task PR 마지막
+> 커밋에 포함**시키거나(머지와 동시에 완료 처리), 다음 task 브랜치에서 함께
+> 반영하는 방식 중 하나를 팀 규칙으로 정해둘 것.
 
 ---
 

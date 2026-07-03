@@ -42,6 +42,14 @@
 - **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
 - **CI 설정**: `.github/workflows/ci.yml` 기술 스택 블록 주석 해제 후 사용
 
+## 테스트 규칙
+
+- **worker 구현 완료 후, reviewer 검토 전에 `agents/test-agent.md` 절차를 실행한다.**
+  Plans.md 해당 Task의 Acceptance 명령 + 프로젝트 테스트 스위트를 돌린다.
+- Verdict FAIL이면 reviewer 진입 금지. 실패 내용을 근거로 수정 후 재실행.
+- 이 단계는 harness 플러그인이 자동 실행하지 않는다 — `/harness-work` 흐름에서
+  Claude가 이 규칙에 따라 직접 수행한다 (`harness.toml [test]` 참고).
+
 ## 리뷰 규칙
 
 - **worker 완료 후 PR 오픈 전에 반드시 `/harness-review`를 실행한다.**

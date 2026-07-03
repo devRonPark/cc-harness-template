@@ -99,7 +99,7 @@ cp /path/to/cc-harness-template/.claude/agent-memory/claude-code-harness-reviewe
    .claude/agent-memory/claude-code-harness-reviewer/
 cp /path/to/cc-harness-template/.claude/agent-memory/claude-code-harness-advisor/MEMORY.md \
    .claude/agent-memory/claude-code-harness-advisor/
-cp /path/to/cc-harness-template/.claude/settings.local.json .claude/
+cp /path/to/cc-harness-template/.claude/settings.local.json.example .claude/settings.local.json
 ```
 
 ### 2-2. 프로젝트별 커스터마이징
@@ -159,7 +159,7 @@ harness sync
 ### 3-4. Branch Protection 설정
 
 GitHub → Settings → Branches → main:
-- Require status checks: `ci job명`, `plans-guard / WIP↔Branch`
+- Require status checks: `ci job명`, `plans-guard / WIP↔Branch`, `plans-guard / Acceptance Oracle`
 - Require pull request before merging
 
 > 상세 가이드: `docs/github-integration.md`

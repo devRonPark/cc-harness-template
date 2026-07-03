@@ -72,7 +72,7 @@ cc-harness-template/
 │   └── ISSUE_TEMPLATE/
 │
 ├── .claude/
-│   ├── settings.local.json         # 이 프로젝트 전용 권한 설정
+│   ├── settings.local.json.example # 프로젝트 전용 권한 설정 (복사 후 rename)
 │   └── agent-memory/
 │       ├── claude-code-harness-worker/MEMORY.md    # worker 행동 규칙
 │       ├── claude-code-harness-reviewer/MEMORY.md  # reviewer 행동 규칙
@@ -190,7 +190,7 @@ cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-reviewer/MEMORY.md 
    .claude/agent-memory/claude-code-harness-reviewer/
 cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-advisor/MEMORY.md \
    .claude/agent-memory/claude-code-harness-advisor/
-cp /tmp/harness-tpl/.claude/settings.local.json .claude/
+cp /tmp/harness-tpl/.claude/settings.local.json.example .claude/settings.local.json
 ```
 
 ### Step 2 — 커스터마이징 체크리스트
@@ -288,6 +288,11 @@ claude
    FAIL 시 worker에 재위임, PASS 시에만 다음 단계 진행
 5. **reviewer**에게 검토 요청 (VFF v2 전체 — 판단 근거 명확하게)
 6. 완료 시 Plans.md 마커를 `cc:WIP` → `cc:완료`로 자동 업데이트
+
+> **동작 원리 주의**: 위 흐름 중 test-agent 실행(4)과 GitHub Issue/PR 자동화는
+> harness 플러그인 내장 기능이 아니라 **CLAUDE.md의 지시를 Claude가 세션에서 직접
+> 수행**하는 규약이다. `harness.toml`의 `[github]`·`[review]`·`[test]` 섹션은
+> `harness sync`가 파싱하지 않으며, 규약의 SSOT 역할만 한다.
 
 ---
 
