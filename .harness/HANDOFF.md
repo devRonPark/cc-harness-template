@@ -11,14 +11,15 @@
 
 ## 재개 지점
 
-- Task 1.4 완료 (Acceptance PASS), **미커밋** — .harness/ 7파일 + CLAUDE.md +
-  Plans.md 변경분이 working tree에 있음. 사용자 커밋 요청 시 바로 커밋 가능.
-- 커밋 후 다음 작업은 Week 2 Task 정의 (사용자 입력 필요).
+- Week 2 dogfooding 완료 (2.1~2.5 전부 cc:완료). **Week 2 변경분은 사용자
+  지시로 커밋하지 않음** — Plans.md·LESSONS.md 수정분이 working tree에 있음.
+- ../routine-saas/에 기획 산출물 생성 완료: PRD(검토 대기)·UserFlow·
+  Architecture·Plans.md(Task 11개).
+- 다음 작업: ① 사용자 PRD 검토 (성공 기준 잠정값 확정 필요)
+  ② Week 3 후보 결정 — LESSONS.md의 템플릿 결함 2건 (init 스크립트, grill-me 경로 인자)
 
 ## 주의사항
 
-- 커밋은 사용자 명시 요청 전까지 금지.
+- 커밋은 사용자 명시 요청 전까지 금지. routine-saas는 전면 커밋 금지.
 - Task 상태는 Plans.md가 단일 출처 — .harness/TASKS.md에 Task 상태를 복제하지 말 것.
-- Week 2 Task 2.1은 placeholder — 내용은 사용자에게 물어야 함.
-- CLAUDE.md 118줄 — 훅이 분할 권고(.claude/rules/ 또는 docs/ 참조). 스코프 확장이라
-  미실행, 사용자 판단 대기.
+- CLAUDE.md 118줄 — 훅이 분할 권고. 스코프 확장이라 미실행, 사용자 판단 대기.

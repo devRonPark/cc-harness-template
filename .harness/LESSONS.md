@@ -4,6 +4,24 @@
 > 최신 항목이 위. 세션 재개 시 최근 5개를 먼저 읽는다.
 > 항상 지켜야 할 규칙으로 승격되면 CLAUDE.md에도 반영하고 여기 표시한다.
 
+## 2026-07-03 — dogfooding에서 발견한 템플릿 결함 (Week 3 후보)
+
+- **결함 1 — 신규 프로젝트 초기화가 전부 수동.** README cp 목록에 .harness/ 골격이
+  없고, 템플릿 저장소의 .harness/·Plans.md는 실제 dogfood 상태가 들어 있어 그대로
+  복사할 수 없다. 이번엔 수동으로 초기 상태 버전을 다시 작성했다.
+  → Week 3 후보: 초기화 스크립트(init.sh) 또는 clean 골격 세트(templates/) 분리.
+- **결함 2 — grill-me가 대상 디렉토리 지정을 공식 지원 안 함.** 다른 프로젝트의
+  PRD를 쓰려면 args로 산출 경로를 우회 전달해야 했다.
+  → Week 3 후보: SKILL.md에 산출 경로 인자 규약 추가.
+- **결함 3 — 기획 파이프라인에 디자인 산출물이 없었다 (사용자 지적, 해결됨).**
+  UI Task가 있는데 디자인 기준 문서가 없으면 worker가 Task마다 색·간격·톤을
+  즉흥 결정 → 화면 간 일관성 붕괴. AI 에이전트 구현일수록 심해짐.
+  → Task 2.6으로 해결: docs/templates/DESIGN.md 골격 + CLAUDE.md 기획 규칙
+  (UI Task는 DESIGN.md를 Depends로 게이트). 툴 강제(CI lint)는 위반이 실제
+  발생하면 도입 — Atlassian식 자체 툴은 YAGNI.
+- **잘 작동한 것**: grill-me의 "무응답 시 확정분으로 초안 + Open Questions" 규칙,
+  task-decomposer 세분화 기준(R1~R7 → 11개 단일 관심사 Task로 자연 분해).
+
 ## 2026-07-03 — 상태 문서 부재를 가정으로 덮지 말 것
 
 - **상황**: 세션 재개 프롬프트가 `.harness/` 상태 문서를 전제했으나 저장소에 없었다.

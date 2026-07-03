@@ -28,11 +28,16 @@
 
 ---
 
-## Week 2 — [주제]
+## Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)
 
 | Task | 내용 | DoD | Acceptance | Depends | Status | GH |
 |------|------|-----|------------|---------|--------|----|
-| 2.1 | [내용] | [완료 기준] | - | - | cc:TODO | - |
+| 2.1 | 테스트 프로젝트 골격 생성 | ../routine-saas/에 CLAUDE.md·Plans.md·harness.toml·agents/·docs/templates/·.github/ 복사됨 | test -f ../routine-saas/CLAUDE.md && test -f ../routine-saas/harness.toml | - | cc:완료 | - |
+| 2.2 | 기획 파이프라인 테스트 (grill-me 인터뷰) | ../routine-saas/docs/PRD.md v0.1 존재, Decisions 섹션 기록됨 | test -f ../routine-saas/docs/PRD.md | 2.1 | cc:완료 | - |
+| 2.3 | 보완 문서 테스트 (UserFlow·Architecture 골격 적용) | ../routine-saas/docs/UserFlow.md·Architecture.md 존재 | test -f ../routine-saas/docs/UserFlow.md | 2.2 | cc:완료 | - |
+| 2.4 | 계획 파이프라인 테스트 (task-decomposer → Plans.md) | ../routine-saas/Plans.md에 세분화 기준 통과 Task 표 존재 | grep -qE 'cc:TODO' ../routine-saas/Plans.md | 2.3 | cc:완료 | - |
+| 2.5 | 템플릿 결함 기록 | 테스트 중 발견한 템플릿 문제를 .harness/LESSONS.md에 기록, 수정 필요 항목은 Week 3 후보로 정리 | - | 2.4 | cc:완료 | - |
+| 2.6 | DESIGN.md 기획 산출물 추가 | docs/templates/DESIGN.md 골격 존재, CLAUDE.md 기획 규칙에 DESIGN 단계 반영, routine-saas에 실제 작성 적용 | test -f docs/templates/DESIGN.md && test -f ../routine-saas/docs/DESIGN.md | 2.5 | cc:완료 | - |
 
 ---
 

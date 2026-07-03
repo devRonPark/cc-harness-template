@@ -12,3 +12,11 @@
   사용자 승인 받아 템플릿 정식 기능으로 추가.
 - Task 1.4 완료 — .harness/ 골격 7종 + CLAUDE.md 상태 문서 규칙. Acceptance PASS.
   미커밋 (사용자 요청 대기). 훅 경고: CLAUDE.md 118줄 분할 권고 → 미실행, HANDOFF에 기록.
+- Task 1.4 커밋 (`a4c6ef1`) — 사용자 승인.
+- Week 2 dogfooding (2.1~2.5, 커밋 금지 지시) — ../routine-saas/ 골격 생성,
+  grill-me 인터뷰 4문항 확정(실행 도구·직장인·코어 3종·PWA+웹푸시), 5번째(성공 기준)
+  무응답 → 권장값 잠정 적용. PRD·UserFlow·Architecture·Plans.md(Task 11개) 산출.
+  템플릿 결함 2건 발견 → LESSONS.md 기록.
+- Task 2.6 — DESIGN.md 기획 산출물 추가 (사용자 지적: 디자인 산출물 누락).
+  templates/DESIGN.md 골격 + CLAUDE.md 기획 규칙 + routine-saas 실제 작성 +
+  UI Task(2.1·2.3) Depends 게이트 연결. 훅 경고: CLAUDE.md 123줄 (분할 권고 지속).

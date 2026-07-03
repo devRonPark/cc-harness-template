@@ -10,21 +10,22 @@ cc-harness-template 템플릿 개선 (Week 1)
 
 ## 진행 중인 Task
 
-- 없음 (Week 1 전 Task 완료. Week 2는 placeholder — 내용 미정)
+- 없음 (Week 1·Week 2 전 Task 완료)
 
 ## 마지막 검증 결과
 
-- Task 1.4 Acceptance: `test -f .harness/STATE.md && test -f .harness/CONTEXT_INDEX.md && grep -q '상태 문서 규칙' CLAUDE.md` → **PASS** (2026-07-03)
+- Week 2 dogfooding Acceptance 2.1~2.4 전부 **PASS** (2026-07-03)
+  — ../routine-saas/에 골격·PRD·UserFlow·Architecture·Plans.md 생성 확인
 
 ## 차단 요소
 
-- 없음
+- 없음. 단, ../routine-saas/docs/PRD.md는 사용자 검토 대기 (성공 기준 잠정값)
 
 ## 마지막 커밋
 
-- `9c05093` chore: 플러그인 런타임 산출물 gitignore 추가
-  (Task 1.4 구현분은 미커밋 — 사용자 커밋 요청 대기)
+- `a4c6ef1` feat: .harness/ 상태 문서 체계 추가 (Task 1.4)
+  (Week 2 변경분은 사용자 지시로 커밋하지 않음)
 
 ## 최종 갱신
 
-- 2026-07-03, Task 1.4 완료 시점
+- 2026-07-03, Week 2 dogfooding 완료 시점

@@ -35,8 +35,13 @@
 ## 기획 규칙
 
 - **새 프로젝트/기능 착수 시 코드보다 먼저 `/grill-me`를 실행한다.**
-  인터뷰 → `docs/PRD.md` 초안 → UserFlow·Architecture 보완 → `/harness-plan` 순서.
-- 보완 문서 골격: `docs/templates/UserFlow.md`, `docs/templates/Architecture.md` 복사 후 작성.
+  인터뷰 → `docs/PRD.md` 초안 → UserFlow·DESIGN·Architecture 보완 → `/harness-plan` 순서.
+- 보완 문서 골격: `docs/templates/UserFlow.md`, `docs/templates/DESIGN.md`,
+  `docs/templates/Architecture.md` 복사 후 작성.
+- **UI가 있는 프로젝트는 DESIGN.md가 UI 구현의 single source of truth다.**
+  UI 관련 Task는 Plans.md Depends에 DESIGN.md 작성 Task를 걸어 게이트한다 —
+  worker가 색·간격·톤을 Task마다 즉흥 결정하지 않게 하기 위함. UI 없는
+  프로젝트(CLI·라이브러리)는 DESIGN.md 생략.
 - 기획 중 확정된 결정은 PRD의 Decisions 섹션에 근거와 함께 기록한다.
   ADR 별도 파일은 만들지 않는다 — 큰 결정이 쌓이면 그때 `docs/adr/`로 분리.
 - **`/harness-plan`이 Plans.md에 Task 행을 쓰기 전, 반드시 `agents/task-decomposer.md`를
