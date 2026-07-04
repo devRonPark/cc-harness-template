@@ -3,7 +3,10 @@
 # 사용법:
 #   1. 프로젝트 기술 스택 블록의 주석을 해제한다.
 #   2. 불필요한 블록은 삭제한다.
-#   3. placeholder job 삭제 후 branch protection 상태 체크를 실제 job명으로 변경.
+#   3. placeholder job을 삭제하고, 아래 ci-ok job의 `needs:` 목록을
+#      [check, test]로 바꾼다. branch protection의 required check는
+#      "ci-ok" 하나만 등록 — 이 이름은 스택 전환과 무관하게 고정이므로
+#      GitHub Settings → Branches에서 다시 등록할 필요가 없다(M6/2026-07-04 감사).
 #
 # /harness-setup 실행 시 기술 스택 자동 감지 → 해당 블록 자동 주석 해제 제안.
 #
@@ -142,10 +145,30 @@ jobs:
 
 
   # 스택 블록 활성화 전까지 CI가 빈 job으로 실패하지 않도록 유지.
-  # 스택 블록 주석 해제 후 이 job 삭제 + branch protection 체크명 변경.
+  # 스택 블록 주석 해제 후 이 job 삭제 + 아래 ci-ok의 needs를 [check, test]로 변경.
   placeholder:
     name: CI (스택 미설정 — ci.yml 블록 활성화 후 삭제)
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - run: echo "스택 블록 주석 해제 후 이 placeholder job 삭제 필요"
+
+  # M6 (2026-07-04 감사): 스택 잡(check/test) 이름을 required check로 직접
+  # 등록하면, 스택 블록을 켜거나 잡을 추가·삭제할 때마다 GitHub Settings →
+  # Branches의 required check가 깨진다(존재하지 않는 체크를 영구 대기하거나
+  # 무방비 상태가 됨). 이 job 하나만 required check로 등록하면 이름이
+  # 절대 안 바뀐다 — 아래 needs만 스택 상태에 맞춰 갱신하면 된다.
+  ci-ok:
+    name: ci-ok
+    if: always()
+    needs: [placeholder]  # 스택 활성화 후: needs: [check, test]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: 스택 잡 결과 집약
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "CI 실패 — 위 스택 잡 로그 확인"
+            exit 1
+          fi
+          echo "CI 통과"
