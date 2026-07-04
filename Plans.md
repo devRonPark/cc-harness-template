@@ -47,7 +47,7 @@
 | Task | 내용 | DoD | Acceptance | Depends | Status | GH |
 |------|------|-----|------------|---------|--------|----|
 | 3.1 | plans-complete branch protection 호환 (H1) | protection 활성 테스트 repo에서 자동 flip 실증, 선택한 방식(bypass/PR)의 근거를 워크플로 주석에 기록 | grep -qi 'protection' .github/workflows/plans-complete.yml | - | cc:완료 | - |
-| 3.2 | clean 골격 세트 분리 (H5) | templates/skeleton/에 Plans.md·.harness/ 7종 초기 상태 존재, dogfood 이력 미포함 | test -f templates/skeleton/Plans.md && test -f templates/skeleton/.harness/STATE.md | - | cc:TODO | - |
+| 3.2 | clean 골격 세트 분리 (H5) | templates/skeleton/에 Plans.md·.harness/ 7종 초기 상태 존재, dogfood 이력 미포함 | test -f templates/skeleton/Plans.md && test -f templates/skeleton/.harness/STATE.md | - | cc:완료 | - |
 | 3.3 | init.sh 초기화 스크립트 (H5) | init.sh가 plans-complete.yml·ci.yml·.harness/ 골격 포함 복사, README 수동 cp 절차를 스크립트 안내로 교체 | test -x init.sh && grep -q 'plans-complete.yml' init.sh | 3.2 | cc:TODO | - |
 | 3.4 | plans-guard diff 보호 잡 (H2) | 비-task 브랜치의 Status 변경 PR 차단, task 브랜치의 타 행 Status 변경 차단 — 시나리오 2종 테스트 repo 검증 | grep -q 'plans-diff-check' .github/workflows/plans-guard.yml | 3.6 | cc:TODO | - |
 | 3.5 | plans-guard depends-check 잡 (H3) | WIP Task의 Depends 대상이 cc:완료 아니면 FAIL — 시나리오 검증 | grep -q 'depends-check' .github/workflows/plans-guard.yml | 3.6 | cc:TODO | - |
