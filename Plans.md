@@ -53,7 +53,7 @@
 | 3.5 | plans-guard depends-check 잡 (H3) | WIP Task의 Depends 대상이 cc:완료 아니면 FAIL — 시나리오 검증 | grep -q 'depends-check' .github/workflows/plans-guard.yml | 3.6 | cc:완료 | - |
 | 3.6 | Plans.md 헤더 검증 선행 파싱 (M1·M7) | 헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard·plans-complete에 공통 적용 | grep -q 'header-check' .github/workflows/plans-guard.yml | - | cc:완료 | - |
 | 3.7 | 완료 전환 서술 통일 (M3) | README·BLUEPRINT의 세션 직접 flip 서술을 CLAUDE.md 기준(plans-complete 자동 전환)으로 교체 | grep -q 'plans-complete' README.md && grep -q 'plans-complete' BLUEPRINT.md | 3.1 | cc:완료 | - |
-| 3.8 | harness.toml 죽은 설정 정리 (M4) | 미사용 키 제거, 미파싱 섹션 역할 주석 재정의(실행 SSOT는 CLAUDE.md) | ! grep -q 'max_iterations' harness.toml | - | cc:TODO | - |
+| 3.8 | harness.toml 죽은 설정 정리 (M4) | 미사용 키 제거, 미파싱 섹션 역할 주석 재정의(실행 SSOT는 CLAUDE.md) | ! grep -q 'max_iterations' harness.toml | - | cc:완료 | - |
 | 3.9 | Plans.md anti-pattern 예시 교정 (M2) | 무력화 패턴(echo skip) 행 교정, repo 밖 경로 acceptance `-` 처리, 주석에 금지 규약 추가 | ! grep -qE 'echo sk[i]p' Plans.md | - | cc:TODO | - |
 | 3.10 | agents 문서 수행 주체 명시 (M5) | BLUEPRINT·README에 "절차 문서, 수행 주체=세션 Claude" 명시, .claude/agents/ 이전 여부 결정 기록 | grep -q '수행 주체' BLUEPRINT.md | - | cc:TODO | - |
 | 3.11 | ci.yml 이름 고정 요약 잡 (M6) | ci-ok 잡 신설(스택 잡 needs 집약), required check 등록 안내 주석 | grep -q 'ci-ok' .github/workflows/ci.yml | - | cc:TODO | - |

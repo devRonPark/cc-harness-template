@@ -34,10 +34,14 @@ failIfUnavailable = false
 # allowRead = [".env.example"]
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 주의: 아래 [github]·[review]·[test] 섹션은 harness sync가 파싱하지 않는다.
-# (claude-code-harness v4.16.3 지원 섹션: project / agent / env / safety / tdd)
-# 이 섹션들은 CLAUDE.md의 지시를 통해 Claude가 세션에서 직접 수행하는
-# 프로젝트 규약의 SSOT다. 값을 바꾸면 CLAUDE.md 해당 섹션도 함께 갱신할 것.
+# 주의(M4/2026-07-04 감사): 아래 [github]·[review]·[test]·[plan] 섹션은
+# harness sync가 파싱하지 않는다 (claude-code-harness v4.16.3 지원 섹션:
+# project / agent / env / safety / tdd). 실행 SSOT는 CLAUDE.md다 — 이
+# 섹션들은 CLAUDE.md 규약의 값을 한눈에 보는 요약 인덱스일 뿐, 여기 값을
+# 바꿔도 동작이 바뀌지 않는다. 값을 바꾸려면 CLAUDE.md 해당 섹션을 고치고,
+# 이 인덱스도 드리프트 없게 함께 갱신할 것. 어떤 문서·에이전트에서도 참조하지
+# 않는 키(예: max_iterations, timeout_seconds, max_task_hours)는 죽은 설정이므로
+# 추가하지 않는다 — 필요해지면 그때 실제 사용처와 함께 추가한다.
 # ─────────────────────────────────────────────────────────────────────────────
 
 [github]
@@ -51,17 +55,14 @@ enabled = false                # true → GitHub 연동 모드 활성화 (gh CLI
 [review]
 auto_trigger = true            # worker 완료 시 reviewer 자동 실행 (harness-work step 10 내장)
 require_before_pr = true       # PR 오픈 전 APPROVE 필수 — REQUEST_CHANGES 상태에서 PR 금지
-# max_iterations = 3           # 수정 루프 최대 횟수 (기본값 3)
 
 [test]
 auto_run = true            # worker 완료 후 test-agent 자동 실행 (reviewer 전, step 9)
 agent = "agents/test-agent.md"
 fail_blocks_review = true  # FAIL이면 reviewer 진입 금지, worker에 재위임
-# timeout_seconds = 120    # 테스트 타임아웃 (기본 120초)
 
 [plan]
 auto_run = true                     # /harness-plan이 Task 작성 전 task-decomposer 자동 실행
 agent = "agents/task-decomposer.md"
 gate_work = true                     # 세분화 기준 미달 Task 있으면 /harness-work 실행 자체를 차단
 allow_mid_work_split = true          # worker 작업 중 범위 초과 발견 시 재호출해 하위 Task로 분리 허용
-# max_task_hours = 4                 # Task 하나당 예상 작업 시간 상한 (기본 4시간)
