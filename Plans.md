@@ -12,7 +12,7 @@
 | 0.1 | PRD 작성 (`/grill-me` 인터뷰) | docs/PRD.md v0.1 존재, Open Questions 정리됨 | test -f docs/PRD.md | - | cc:완료 | - |
 | 0.2 | 기획 보완 문서 | UserFlow.md·Architecture.md 작성 (docs/templates/ 골격 사용) | test -f docs/UserFlow.md && test -f docs/Architecture.md | 0.1 | cc:완료 | - |
 | 0.3 | Harness 초기화 | harness doctor 전체 통과, CLAUDE.md·Plans.md 존재 | test -f CLAUDE.md && test -f Plans.md && test -f harness.toml | - | cc:완료 | - |
-| 0.4 | Plugin 설정 | ponytail·caveman·VFF 설치 확인, agent MEMORY.md 3개 존재 | grep -q 'caveman\|ponytail' ~/.claude/settings.json 2>/dev/null \|\| echo skip | 0.3 | cc:완료 | - |
+| 0.4 | Plugin 설정 | ponytail·caveman·VFF 설치 확인, agent MEMORY.md 3개 존재 | - | 0.3 | cc:완료 | - |
 
 ---
 
@@ -32,12 +32,12 @@
 
 | Task | 내용 | DoD | Acceptance | Depends | Status | GH |
 |------|------|-----|------------|---------|--------|----|
-| 2.1 | 테스트 프로젝트 골격 생성 | ../routine-saas/에 CLAUDE.md·Plans.md·harness.toml·agents/·docs/templates/·.github/ 복사됨 | test -f ../routine-saas/CLAUDE.md && test -f ../routine-saas/harness.toml | - | cc:완료 | - |
-| 2.2 | 기획 파이프라인 테스트 (grill-me 인터뷰) | ../routine-saas/docs/PRD.md v0.1 존재, Decisions 섹션 기록됨 | test -f ../routine-saas/docs/PRD.md | 2.1 | cc:완료 | - |
-| 2.3 | 보완 문서 테스트 (UserFlow·Architecture 골격 적용) | ../routine-saas/docs/UserFlow.md·Architecture.md 존재 | test -f ../routine-saas/docs/UserFlow.md | 2.2 | cc:완료 | - |
-| 2.4 | 계획 파이프라인 테스트 (task-decomposer → Plans.md) | ../routine-saas/Plans.md에 세분화 기준 통과 Task 표 존재 | grep -qE 'cc:TODO' ../routine-saas/Plans.md | 2.3 | cc:완료 | - |
+| 2.1 | 테스트 프로젝트 골격 생성 | ../routine-saas/에 CLAUDE.md·Plans.md·harness.toml·agents/·docs/templates/·.github/ 복사됨 | - | - | cc:완료 | - |
+| 2.2 | 기획 파이프라인 테스트 (grill-me 인터뷰) | ../routine-saas/docs/PRD.md v0.1 존재, Decisions 섹션 기록됨 | - | 2.1 | cc:완료 | - |
+| 2.3 | 보완 문서 테스트 (UserFlow·Architecture 골격 적용) | ../routine-saas/docs/UserFlow.md·Architecture.md 존재 | - | 2.2 | cc:완료 | - |
+| 2.4 | 계획 파이프라인 테스트 (task-decomposer → Plans.md) | ../routine-saas/Plans.md에 세분화 기준 통과 Task 표 존재 | - | 2.3 | cc:완료 | - |
 | 2.5 | 템플릿 결함 기록 | 테스트 중 발견한 템플릿 문제를 .harness/LESSONS.md에 기록, 수정 필요 항목은 Week 3 후보로 정리 | - | 2.4 | cc:완료 | - |
-| 2.6 | DESIGN.md 기획 산출물 추가 | docs/templates/DESIGN.md 골격 존재, CLAUDE.md 기획 규칙에 DESIGN 단계 반영, routine-saas에 실제 작성 적용 | test -f docs/templates/DESIGN.md && test -f ../routine-saas/docs/DESIGN.md | 2.5 | cc:완료 | - |
+| 2.6 | DESIGN.md 기획 산출물 추가 | docs/templates/DESIGN.md 골격 존재, CLAUDE.md 기획 규칙에 DESIGN 단계 반영, routine-saas에 실제 작성 적용 | test -f docs/templates/DESIGN.md | 2.5 | cc:완료 | - |
 | 2.7 | GitHub 연동 E2E 검증 + plans-complete 워크플로 | harness-gh-test repo에서 plans-guard 3잡 시나리오 4종 검증, 빈틈 7건 도출, plans-complete.yml 신설 검증, CLAUDE.md GitHub 플로우 명문화 | test -f .github/workflows/plans-complete.yml && grep -q 'plans-complete' CLAUDE.md | 2.5 | cc:완료 | - |
 
 ---
@@ -54,7 +54,7 @@
 | 3.6 | Plans.md 헤더 검증 선행 파싱 (M1·M7) | 헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard·plans-complete에 공통 적용 | grep -q 'header-check' .github/workflows/plans-guard.yml | - | cc:완료 | - |
 | 3.7 | 완료 전환 서술 통일 (M3) | README·BLUEPRINT의 세션 직접 flip 서술을 CLAUDE.md 기준(plans-complete 자동 전환)으로 교체 | grep -q 'plans-complete' README.md && grep -q 'plans-complete' BLUEPRINT.md | 3.1 | cc:완료 | - |
 | 3.8 | harness.toml 죽은 설정 정리 (M4) | 미사용 키 제거, 미파싱 섹션 역할 주석 재정의(실행 SSOT는 CLAUDE.md) | ! grep -q 'max_iterations' harness.toml | - | cc:완료 | - |
-| 3.9 | Plans.md anti-pattern 예시 교정 (M2) | 무력화 패턴(echo skip) 행 교정, repo 밖 경로 acceptance `-` 처리, 주석에 금지 규약 추가 | ! grep -qE 'echo sk[i]p' Plans.md | - | cc:TODO | - |
+| 3.9 | Plans.md anti-pattern 예시 교정 (M2) | 무력화 패턴(echo skip) 행 교정, repo 밖 경로 acceptance `-` 처리, 주석에 금지 규약 추가 | ! grep -qE 'echo sk[i]p' Plans.md | - | cc:완료 | - |
 | 3.10 | agents 문서 수행 주체 명시 (M5) | BLUEPRINT·README에 "절차 문서, 수행 주체=세션 Claude" 명시, .claude/agents/ 이전 여부 결정 기록 | grep -q '수행 주체' BLUEPRINT.md | - | cc:TODO | - |
 | 3.11 | ci.yml 이름 고정 요약 잡 (M6) | ci-ok 잡 신설(스택 잡 needs 집약), required check 등록 안내 주석 | grep -q 'ci-ok' .github/workflows/ci.yml | - | cc:TODO | - |
 | 3.12 | 플러그인 SHA 기록 절차 (M8) | README 버전 표에 검증 커밋 SHA 컬럼 추가, 업데이트 전 확인 절차 단락 | grep -q 'SHA' README.md | - | cc:TODO | - |
@@ -72,8 +72,10 @@ GH 컬럼:
   #N        — 연결된 GitHub Issue 번호 (harness-plan이 자동 기입)
 
 Acceptance 컬럼:
-  -         — 기계 검증 없음 (skip)
-  명령어     — PR 오픈 시 plans-guard CI가 실행, 실패하면 PR 차단
+  -         — 기계 검증 없음 (skip). "|| echo skip"처럼 항상 성공하는
+              패턴은 oracle을 무력화하므로 금지 — 검증 안 할 거면 "-"로 명시.
+  명령어     — PR 오픈 시 plans-guard CI가 실행, 실패하면 PR 차단.
+              CI checkout 범위 밖 경로(예: ../다른-repo/)는 실행 불가 — 금지.
   예시: pytest tests/test_auth.py -k login
   예시: curl -sf http://localhost/health | grep '"status":"ok"'
   패턴별 예시:
@@ -82,6 +84,8 @@ Acceptance 컬럼:
     HTTP 응답: curl -sf http://localhost:3000/health | grep ok
     테스트 통과: pytest tests/ -x -q
     출력 포함: go test ./... | grep -v SKIP
+  escaped pipe(예: grep 'a\|b')는 Acceptance 컬럼에서만 사용 — DoD 등 다른
+  컬럼에 쓰면 파서가 열 개수를 오인식한다.
   * 스택 설치(npm ci 등)는 .github/workflows/plans-guard.yml 상단 주석 해제
 
 DoD (Definition of Done) 작성 원칙:
