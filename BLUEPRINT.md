@@ -245,7 +245,8 @@ Task 선택 (cc:TODO)
   → reviewer 검토
   → gh pr create --title "[{task-id}] ..." --body "Closes #{issue}"
   → CI 통과 + 승인 후 main 머지
-  → Plans.md cc:WIP → cc:완료 자동 업데이트
+  → 머지 이벤트에서 plans-complete.yml 봇이 Plans.md cc:WIP → cc:완료 자동 커밋
+    (세션·worker가 PR 안에서 직접 바꾸지 않음 — wip-branch-check와 모순되므로 금지)
 ```
 
 ### CI 게이트
@@ -321,7 +322,10 @@ GitHub → Settings → Branches → main:
       멈추고 task-decomposer를 재호출 — 남은 작업을 하위 Task로 분리 후 재개
 9. test-agent 검증 (Acceptance 명령 + 프로젝트 테스트 스위트) — FAIL 시 worker에 재위임
 10. reviewer에게 검토 요청 (caveman OFF + VFF v2)
-11. 결과를 Plans.md에 반영 (cc:WIP → cc:완료)
+11. PR 오픈·머지. **GitHub 연동 시** 완료 반영은 세션이 아니라 머지 이벤트의
+    plans-complete.yml 봇이 수행(cc:WIP → cc:완료 자동 커밋) — PR 안에서
+    세션이 직접 바꾸면 wip-branch-check와 모순되므로 금지. **미연동 시**는
+    세션이 이 시점에 Plans.md를 직접 갱신한다.
 ```
 
 > 6-a와 8의 재분해 게이트는 세션 내 수동 확인 + `plans-guard.yml`의

@@ -291,7 +291,10 @@ claude
 4. **test-agent**가 런타임 검증 — Acceptance 명령 + 프로젝트 테스트 스위트 실행  
    FAIL 시 worker에 재위임, PASS 시에만 다음 단계 진행
 5. **reviewer**에게 검토 요청 (VFF v2 전체 — 판단 근거 명확하게)
-6. 완료 시 Plans.md 마커를 `cc:WIP` → `cc:완료`로 자동 업데이트
+6. 완료 반영: **GitHub 연동 시** PR 안에서 세션이 직접 `cc:완료`로 바꾸지
+   않는다 — 머지 후 `plans-complete.yml` 봇이 자동 커밋으로 전환한다
+   (PR 안에서 바꾸면 `wip-branch-check`와 모순된다). **GitHub 미연동 시**는
+   세션이 Task 완료 시점에 Plans.md를 직접 갱신한다.
 
 > **동작 원리 주의**: 위 흐름 중 task-decomposer 게이트(1-a)와 test-agent 실행(4),
 > GitHub Issue/PR 자동화는 harness 플러그인 내장 기능이 아니라 **CLAUDE.md의 지시를
@@ -326,8 +329,8 @@ claude
 | 마커 | 의미 |
 |------|------|
 | `cc:TODO` | 미시작. harness가 선택 대상으로 봄 |
-| `cc:WIP` | 진행 중. harness가 자동으로 설정 |
-| `cc:완료` | 완료. harness가 자동으로 설정 |
+| `cc:WIP` | 진행 중. task 브랜치 착수 시 세션이 설정 |
+| `cc:완료` | 완료. **GitHub 연동**: `plans-complete.yml` 봇이 머지 후 자동 커밋. **미연동**: 세션이 직접 갱신 |
 
 ---
 
