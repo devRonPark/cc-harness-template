@@ -147,15 +147,25 @@ harness가 요청을 처리할 때 spawning하는 세 종류의 플러그인 에
 ├── claude-code-harness-reviewer/MEMORY.md  ← reviewer 전용 규칙
 └── claude-code-harness-advisor/MEMORY.md   ← advisor 전용 규칙
 
-agents/                                      ← 플러그인이 모르는 프로젝트 전용 에이전트
+agents/                                      ← 플러그인이 모르는 프로젝트 전용 절차 문서
 ├── task-decomposer.md                      ← 계획 단계 세분화 + 구현 단계 게이트 (공용)
 └── test-agent.md                           ← worker 완료 후 런타임 검증
 ```
 
-> `worker.md`는 `disallowedTools: [Agent]`로 정의돼 있어 스스로 sub-agent를
-> 부를 수 없다. 그래서 task-decomposer·test-agent 같은 companion 에이전트는
-> worker가 아니라 **세션을 운영하는 Claude(오케스트레이터 역할)** 가 CLAUDE.md
-> 규칙에 따라 직접 호출한다 — worker 전/후 단계에 끼워 넣는 구조.
+> **M5 (2026-07-04 감사) — `agents/*.md`는 호출 가능한 서브에이전트가 아니다.**
+> Claude Code 서브에이전트 경로는 `.claude/agents/`이고 프론트매터 필드는
+> `tools`다. 이 디렉토리의 `role:`·`allowed-tools:` 필드는 어떤 런타임도
+> 읽지 않는다 — 즉 "task-decomposer를 실행한다"의 실제 수행 주체는 별도
+> 프로세스가 아니라 **세션을 운영하는 Claude(오케스트레이터) 자신의
+> 롤플레이**다. `worker.md`는 `disallowedTools: [Agent]`로 정의돼 있어
+> 스스로 sub-agent를 부를 수 없으므로, 오케스트레이터가 CLAUDE.md 규칙에
+> 따라 worker 전/후 단계에 이 절차 문서를 직접 읽고 그대로 수행한다.
+>
+> `.claude/agents/`로 이전해 진짜 서브에이전트화하는 방안도 검토했으나
+> 보류(YAGNI) — 현재 task-decomposer·test-agent는 Plans.md·CLAUDE.md를
+> 직접 읽고 고쳐야 해서 오케스트레이터 컨텍스트 안에서 도는 편이 자연스럽고,
+> 별도 프로세스로 분리할 실익(병렬화·격리)이 아직 없다. 실제 서브에이전트
+> 격리가 필요해지면(예: 대량 병렬 세분화) 그때 이전한다.
 
 ### Plugin 적용 매트릭스
 

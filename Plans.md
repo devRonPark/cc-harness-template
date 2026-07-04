@@ -55,7 +55,7 @@
 | 3.7 | 완료 전환 서술 통일 (M3) | README·BLUEPRINT의 세션 직접 flip 서술을 CLAUDE.md 기준(plans-complete 자동 전환)으로 교체 | grep -q 'plans-complete' README.md && grep -q 'plans-complete' BLUEPRINT.md | 3.1 | cc:완료 | - |
 | 3.8 | harness.toml 죽은 설정 정리 (M4) | 미사용 키 제거, 미파싱 섹션 역할 주석 재정의(실행 SSOT는 CLAUDE.md) | ! grep -q 'max_iterations' harness.toml | - | cc:완료 | - |
 | 3.9 | Plans.md anti-pattern 예시 교정 (M2) | 무력화 패턴(echo skip) 행 교정, repo 밖 경로 acceptance `-` 처리, 주석에 금지 규약 추가 | ! grep -qE 'echo sk[i]p' Plans.md | - | cc:완료 | - |
-| 3.10 | agents 문서 수행 주체 명시 (M5) | BLUEPRINT·README에 "절차 문서, 수행 주체=세션 Claude" 명시, .claude/agents/ 이전 여부 결정 기록 | grep -q '수행 주체' BLUEPRINT.md | - | cc:TODO | - |
+| 3.10 | agents 문서 수행 주체 명시 (M5) | BLUEPRINT·README에 "절차 문서, 수행 주체=세션 Claude" 명시, .claude/agents/ 이전 여부 결정 기록 | grep -q '수행 주체' BLUEPRINT.md | - | cc:완료 | - |
 | 3.11 | ci.yml 이름 고정 요약 잡 (M6) | ci-ok 잡 신설(스택 잡 needs 집약), required check 등록 안내 주석 | grep -q 'ci-ok' .github/workflows/ci.yml | - | cc:TODO | - |
 | 3.12 | 플러그인 SHA 기록 절차 (M8) | README 버전 표에 검증 커밋 SHA 컬럼 추가, 업데이트 전 확인 절차 단락 | grep -q 'SHA' README.md | - | cc:TODO | - |
 

@@ -302,6 +302,12 @@ claude
 > `[github]`·`[review]`·`[test]`·`[plan]` 섹션은 `harness sync`가 파싱하지 않으며,
 > 규약의 SSOT 역할만 한다. 단, task-decomposer 게이트는 `plans-guard.yml`의
 > `granularity-check` CI 잡으로 세션 확인이 생략돼도 PR 단계에서 기계적으로 재차 막힌다.
+>
+> `agents/task-decomposer.md`·`agents/test-agent.md`도 호출 가능한 서브에이전트가
+> 아니다 — Claude Code 서브에이전트 경로는 `.claude/agents/`이며 이 파일들의
+> `role:`·`allowed-tools:` 프론트매터는 어떤 런타임도 읽지 않는다. 실제 수행
+> 주체는 세션을 운영하는 Claude(오케스트레이터)이고, 이 파일은 그 절차를
+> 적어둔 문서다. 상세: [BLUEPRINT.md](./BLUEPRINT.md)의 M5 설명 참고.
 
 ---
 
