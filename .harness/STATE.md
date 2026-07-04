@@ -6,11 +6,12 @@
 
 ## 현재 목표
 
-cc-harness-template 템플릿 개선 (Week 3 — 2026-07-04 감사 빈틈 개선, 완료)
+cc-harness-template README/문서 고도화 + L1~L5 백로그를 Week 4 Task로 전환 (진행 중)
 
 ## 진행 중인 Task
 
-- 없음 (Week 1·2·3 전 Task 완료 — Plans.md 3.1~3.12 전부 cc:완료)
+- 없음 착수 전 (Week 4 Task 4.1~4.6은 방금 cc:TODO로 등록만 됨 — 구현은
+  아직 /harness-work를 거치지 않았다)
 
 ## 마지막 검증 결과
 
@@ -22,6 +23,11 @@ cc-harness-template 템플릿 개선 (Week 3 — 2026-07-04 감사 빈틈 개선
 - Task 3.6(M1·M7): 헤더 정상/컬럼 누락 케이스 양쪽 로컬 검증 **PASS**
 - Task 3.11(M6): ci-ok + placeholder 조합 실제 PR로 실행 **PASS**
 - harness doctor: All checks passed (2026-07-04)
+- README.md 전면 개편(Why·What You Get·Quick Start·Setup·Existing Project
+  Adoption·Hooks·Session Recovery·Error Memory 등 신규 섹션) + docs/
+  claude-code-hooks.md·session-recovery.md·error-memory.md 3개 신설 —
+  test-agent 실행 대상 아님(문서 변경, Acceptance 없음), 세션 내 리뷰만 거침.
+  **미커밋** (사용자 승인 대기).
 
 ## 차단 요소
 
@@ -34,7 +40,10 @@ cc-harness-template 템플릿 개선 (Week 3 — 2026-07-04 감사 빈틈 개선
   `603fcc0`(3.6) → `0c8ea99`(3.4) → `03d185f`(3.5) → `2594119`(3.7) →
   `2dd1d8b`(3.8) → `11aa504`(3.9) → `d5117bc`(3.10) → `2b9a6d8`(3.11) →
   `6667307`(3.12)
+- README.md 대개편 + docs 3개 신설은 **아직 커밋 안 됨** (`git status` 기준
+  README.md modified, docs/claude-code-hooks.md·session-recovery.md·
+  error-memory.md untracked)
 
 ## 최종 갱신
 
-- 2026-07-04, Week 3 전 Task + 문서 정합화 완료 시점
+- 2026-07-04, README/문서 개편 + Week 4 백로그(L1~L5→4.1~4.6) 등록 시점

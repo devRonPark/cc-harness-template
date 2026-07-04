@@ -63,3 +63,28 @@
     github-integration.md가 예전 3잡 구성을 서술하고 "완료를 PR 마지막
     커밋에 포함시켜도 된다"는, CLAUDE.md·plans-diff-check와 모순되는 안내를
     담고 있어서 함께 교정(`930e404`).
+
+## 2026-07-04 (계속) — README 고도화 + 백로그 정리
+
+- README.md 전면 개편: Why·What You Get·Quick Start·Claude Code Setup·
+  기존 프로젝트에 적용·Recommended Workflow·Commands·Hooks·Session Recovery·
+  Error Memory·Philosophy·Contributing·License 섹션 추가. 기존 정확한 내용
+  (플러그인 표, 파일 구조, 워크플로우, 치트시트, 버전 SHA)은 유지·재배치만 함.
+  없는 파일(ADR.md·verify-harness.sh·.claude/commands/)은 지어내지 않고
+  "미포함"으로 명시.
+- docs/claude-code-hooks.md·session-recovery.md·error-memory.md 3개 신설 —
+  README 요약을 실제 파일 형식 기준으로 심화.
+- 사용자 요청으로 템플릿 완결성 재감사 실시. docs/specs/2026-07-04-template-audit.md의
+  L1~L5가 Plans.md에 Task로 전환된 적 없이 백로그로만 남아 있음을 확인
+  (grep으로 실코드 재검증: vague_re 정규식 여전히 `(전체|모든| 및 |그리고)`,
+  test-agent.md:40 `grep -q '"test"'` 여전히 pretest 오탐 가능, CONTEXT_INDEX.md가
+  존재하지 않는 docs/PRD.md 등 인덱싱, harness.toml의 `rm -r` 패턴이
+  `rm -fr`/`rm -R` 미포착 — 전부 실제로 확인됨).
+- 세션 자체 점검 중 발견: README 개편 + docs 3개 신설이라는 작업 단위가
+  끝났는데도 `.harness/STATE.md`·`CONTEXT_INDEX.md`를 갱신하지 않은 채
+  다음 요청을 받음 — CLAUDE.md 상태 문서 규칙 위반. 이번에 STATE.md·
+  CONTEXT_INDEX.md·LOG.md를 갱신해 바로잡음.
+- L1~L5를 Plans.md Week 4 Task 4.1~4.6으로 등록(cc:TODO) — 계획 단계만
+  진행, 실제 수정은 /harness-work로 별도 진행 예정. 세분화 기준
+  (agents/task-decomposer.md) 통과 확인: 파일당 단일 관심사, grill-me 관련
+  2건(산출 경로 인자·headless 모드)은 관심사가 달라 4.5·4.6으로 분리.

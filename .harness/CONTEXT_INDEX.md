@@ -33,4 +33,7 @@
 | `docs/PRD.md`, `docs/UserFlow.md`, `docs/Architecture.md` | 기획 산출물 | 기획 참조 시 |
 | `docs/templates/` | 기획 문서 골격 4종 (PRD·UserFlow·DESIGN·Architecture) | 새 기획 착수 시 |
 | `docs/github-integration.md` | GitHub 연동 상세 가이드 (branch protection·CI 잡 6종·plans-complete 동작) | GitHub 연동 설정 시 |
-| `docs/specs/2026-07-04-template-audit.md` | 템플릿 빈틈 감사 보고서 (H1~H5·M1~M8·L1~L5), Week 3 Task 매핑 근거 | 감사 배경 확인 시 |
+| `docs/specs/2026-07-04-template-audit.md` | 템플릿 빈틈 감사 보고서 (H1~H5·M1~M8·L1~L5), Week 3 Task 매핑 근거 (L1~L5는 Plans.md Week 4 Task 4.1~4.6로 전환됨) | 감사 배경 확인 시 |
+| `docs/claude-code-hooks.md` | hooks 미설정 현황 + 권장 hooks 예시, harness.toml [safety.permissions]와 역할 분담 | hooks 추가 검토 시 |
+| `docs/session-recovery.md` | `.harness/` 재개 절차 심화 (파일별 역할·읽는 순서·실제 형식·다중 프로젝트 시나리오) | 세션 복구 절차 상세 확인 시 |
+| `docs/error-memory.md` | `LOG.md`/`LESSONS.md` 작성 규칙·실제 형식·CLAUDE.md 승격 기준 | 에러 기록 규칙 확인 시 |
