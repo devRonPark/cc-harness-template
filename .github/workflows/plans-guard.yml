@@ -54,6 +54,93 @@ jobs:
           fi
           echo "✓ 헤더 스키마 확인 (${#headers[@]}개 테이블)"
 
+  plans-diff-check:
+    name: Plans.md Diff 보호
+    needs: header-check
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    # H2 (2026-07-04 감사): wip-branch-check는 task/* 브랜치가 아니면 통째로
+    # skip한다 — 임의 브랜치(docs/x 등)에서 Plans.md Status 컬럼을 직접
+    # cc:완료로 바꾸거나 남의 행을 건드려도 검사가 0개다. task 브랜치도 자기
+    # Task 행 외 다른 행 변경은 아무도 보지 않는다. 이 잡은 base와 head 사이
+    # Plans.md의 Status 변경만 diff로 추출해: ① cc:완료 전환은 PR 안에서
+    # 절대 불가(완료는 plans-complete 봇의 머지 후 커밋으로만 발생) ② cc:TODO
+    # → cc:WIP 전환은 자기 task/{id}-* 브랜치의 해당 id 행에서만 허용.
+    # 그 외 Status 변경(신규 행 추가, 텍스트 컬럼 수정 등)은 제한하지 않는다.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Plans.md Status 컬럼 변경 범위 검증
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          parse() {
+            while IFS= read -r line; do
+              [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
+              [[ "$line" != *"|"* ]] && continue
+              line="${line%"${line##*[![:space:]]}"}"
+              line="${line%|}"
+              IFS='|' read -ra fields <<< "$line"
+              n=${#fields[@]}
+              [ "$n" -lt 8 ] && continue
+              task_id=$(echo "${fields[1]}" | xargs)
+              status=$(echo "${fields[n-2]}" | xargs)
+              [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
+              echo "$task_id $status"
+            done < "$1"
+          }
+
+          git show "$BASE_SHA:Plans.md" > /tmp/base-plans.md 2>/dev/null || : > /tmp/base-plans.md
+          parse /tmp/base-plans.md > /tmp/base-status.txt
+          parse Plans.md > /tmp/head-status.txt
+
+          owner=""
+          if [[ "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+(\.[0-9]+)?)- ]]; then
+            owner="${BASH_REMATCH[1]}"
+          fi
+
+          failed=0
+          while IFS=' ' read -r task_id new_status; do
+            old_status=$(awk -v t="$task_id" '$1==t{print $2}' /tmp/base-status.txt)
+            [ -z "$old_status" ] && old_status="(신규)"
+            [ "$old_status" == "$new_status" ] && continue
+
+            case "$new_status" in
+              "cc:완료")
+                echo "✗ PR 안에서 Task ${task_id}을(를) cc:완료로 전환할 수 없습니다 (${old_status} → cc:완료). 완료 전환은 plans-complete 봇의 머지 후 커밋만 허용됩니다."
+                failed=1
+                ;;
+              "cc:WIP")
+                if [ "$old_status" != "cc:TODO" ]; then
+                  echo "✗ Task ${task_id}: 비정상 Status 전환 (${old_status} → cc:WIP)"
+                  failed=1
+                elif [ -z "$owner" ]; then
+                  echo "✗ 비-task 브랜치(${HEAD_REF})에서 Task ${task_id} cc:TODO → cc:WIP 전환 감지"
+                  failed=1
+                elif [ "$task_id" != "$owner" ]; then
+                  echo "✗ Task ${owner} 브랜치에서 타 Task ${task_id}의 cc:TODO → cc:WIP 전환 감지"
+                  failed=1
+                else
+                  echo "✓ Task ${task_id}: cc:TODO → cc:WIP 정상 전환"
+                fi
+                ;;
+              *)
+                : # cc:TODO 유지·신규 행 추가 등은 제한하지 않음
+                ;;
+            esac
+          done < /tmp/head-status.txt
+
+          exit $failed
+
   wip-branch-check:
     name: WIP↔Branch
     needs: header-check
