@@ -332,3 +332,86 @@ jobs:
           fi
 
           exit $failed
+
+  depends-check:
+    name: Depends 검증
+    needs: header-check
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    # H3 (2026-07-04 감사): granularity-check는 Depends 컬럼이 "비어있지
+    # 않음"만 확인한다 — 선행 Task가 cc:완료인지는 아무도 검사하지 않아
+    # CLAUDE.md의 "UI Task는 DESIGN.md Task를 Depends로 게이트" 규약이
+    # 이빨 없었다. 이 잡은 cc:WIP 행의 Depends가 가리키는 모든 Task가
+    # 현재 Plans.md에서 cc:완료인지 확인, 아니면 FAIL.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: WIP Task의 Depends 완료 여부 확인
+        shell: bash
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          declare -A status_map
+          while IFS= read -r line; do
+            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
+            [[ "$line" != *"|"* ]] && continue
+            line="${line%"${line##*[![:space:]]}"}"
+            line="${line%|}"
+            IFS='|' read -ra fields <<< "$line"
+            n=${#fields[@]}
+            [ "$n" -lt 8 ] && continue
+            task_id=$(echo "${fields[1]}" | xargs)
+            status=$(echo "${fields[n-2]}" | xargs)
+            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
+            status_map["$task_id"]="$status"
+          done < Plans.md
+
+          failed=0
+          wip_found=0
+
+          while IFS= read -r line; do
+            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
+            [[ "$line" != *"|"* ]] && continue
+            line="${line%"${line##*[![:space:]]}"}"
+            line="${line%|}"
+            IFS='|' read -ra fields <<< "$line"
+            n=${#fields[@]}
+            [ "$n" -lt 8 ] && continue
+            task_id=$(echo "${fields[1]}" | xargs)
+            depends=$(echo "${fields[n-3]}" | xargs)
+            status=$(echo "${fields[n-2]}" | xargs)
+            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
+            [[ "$status" != "cc:WIP" ]] && continue
+
+            wip_found=$((wip_found + 1))
+
+            if [ -z "$depends" ] || [ "$depends" = "-" ]; then
+              echo "✓ Task ${task_id}: Depends 없음"
+              continue
+            fi
+
+            IFS=',' read -ra dep_list <<< "$depends"
+            for dep in "${dep_list[@]}"; do
+              dep=$(echo "$dep" | xargs)
+              [ -z "$dep" ] && continue
+              dep_status="${status_map[$dep]:-}"
+              if [ -z "$dep_status" ]; then
+                echo "✗ Task ${task_id}: Depends ${dep}가 Plans.md에 존재하지 않음"
+                failed=1
+              elif [ "$dep_status" != "cc:완료" ]; then
+                echo "✗ Task ${task_id}: Depends ${dep} 아직 미완료 (현재 ${dep_status}) — 선행 Task 완료 전까지 WIP 진행 불가"
+                failed=1
+              else
+                echo "✓ Task ${task_id}: Depends ${dep} 완료 확인"
+              fi
+            done
+          done < Plans.md
+
+          if [ "$wip_found" -eq 0 ]; then
+            echo "WIP Task 없음 — skip"
+          fi
+
+          exit $failed
