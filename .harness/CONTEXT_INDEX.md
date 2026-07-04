@@ -25,7 +25,12 @@
 | `README.md` | 템플릿 사용법 (외부 사용자용) | 문서 갱신 시 |
 | `agents/task-decomposer.md` | Task 세분화 기준·게이트 정의 | 계획/게이트 실행 시 |
 | `agents/test-agent.md` | 런타임 검증 절차 정의 | worker 완료 후 |
-| `.github/workflows/plans-guard.yml` | WIP 확인 + Acceptance Oracle + 세분화 CI | CI 수정 시 |
-| `.github/workflows/plans-complete.yml` | 머지 시 cc:WIP→완료 자동 커밋 (stale WIP 방지) | CI 수정 시 |
+| `.github/workflows/plans-guard.yml` | header-check·WIP 확인·diff 보호·depends 검증·Acceptance Oracle·세분화 CI (6잡) | CI 수정 시 |
+| `.github/workflows/plans-complete.yml` | 머지 시 cc:WIP→완료 자동 커밋, push 실패 시 PR 폴백 (stale WIP 방지, H1) | CI 수정 시 |
+| `.github/workflows/ci.yml` | 스택 빌드·테스트 + ci-ok 요약 잡(required check 이름 고정) | CI 수정 시 |
+| `init.sh` | 새 프로젝트에 이 템플릿 전체(설정+CI+골격) 자동 복사 | 새 프로젝트 적용 시 |
+| `templates/skeleton/` | init.sh가 복사하는 Plans.md·.harness/ 초기 상태 (dogfood 이력 없음) | 골격 자체를 고칠 때 |
 | `docs/PRD.md`, `docs/UserFlow.md`, `docs/Architecture.md` | 기획 산출물 | 기획 참조 시 |
 | `docs/templates/` | 기획 문서 골격 4종 (PRD·UserFlow·DESIGN·Architecture) | 새 기획 착수 시 |
+| `docs/github-integration.md` | GitHub 연동 상세 가이드 (branch protection·CI 잡 6종·plans-complete 동작) | GitHub 연동 설정 시 |
+| `docs/specs/2026-07-04-template-audit.md` | 템플릿 빈틈 감사 보고서 (H1~H5·M1~M8·L1~L5), Week 3 Task 매핑 근거 | 감사 배경 확인 시 |

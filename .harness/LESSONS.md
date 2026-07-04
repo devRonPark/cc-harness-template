@@ -4,6 +4,29 @@
 > 최신 항목이 위. 세션 재개 시 최근 5개를 먼저 읽는다.
 > 항상 지켜야 할 규칙으로 승격되면 CLAUDE.md에도 반영하고 여기 표시한다.
 
+## 2026-07-04 — Week 3 감사 빈틈 개선 (H1~H5·M1~M8 실증)
+
+- **GitHub Free 플랜 private repo는 branch protection/rulesets API가 403.**
+  harness-gh-test(private)에서 branch protection 테스트 시도 → "Upgrade to
+  GitHub Pro or make this repository public" 즉시 확인. protection 관련
+  기능을 검증하려면 테스트 repo를 임시 public 전환하거나 유료 플랜이 필요 —
+  감사 문서 작성 시점엔 이 제약을 몰랐음. 다음에 이런 검증 필요하면 이 제약을
+  먼저 확인하고 사용자에게 public 전환 여부를 물을 것(자동으로 켜지 말 것 —
+  실제로 이번엔 AskUserQuestion으로 승인받음).
+- **plans-complete의 PR 폴백은 저장소 설정 2개에 암묵적으로 의존한다.**
+  "Allow GitHub Actions to create and approve pull requests"와
+  "Allow auto-merge"가 둘 다 기본값 꺼짐 — 실제로 폴백 코드를 짜고 나서야
+  실행 중 발견했다(설계만으로는 안 보임). 자동화 코드가 gh CLI로 PR
+  생성·머지를 시도하는 워크플로를 짤 때는 이 두 설정을 먼저 켜져 있는지
+  확인하거나, 실패 시 폴백 메시지로 명확히 안내할 것 — 이번엔 후자로 처리.
+- **문서 갱신은 원본만 고치면 안 된다 — 링크된 상세 가이드까지 같이 확인.**
+  M3에서 README·BLUEPRINT의 완료 전환 서술을 고쳤지만, README가 링크하는
+  docs/github-integration.md는 그보다 더 오래된 서술(placeholder를 required
+  check로 등록하라, 완료를 PR 안에서 처리해도 된다)을 갖고 있어 사용자가
+  "README도 갱신해달라"고 재요청한 뒤에야 발견했다. 다음엔 문서 하나를
+  고칠 때 그 문서가 참조하는 다른 문서까지 grep으로 훑어 모순 여부를 먼저
+  확인할 것.
+
 ## 2026-07-04 — GitHub 연동 E2E 검증 (harness-gh-test repo)
 
 - **검증 통과**: plans-guard 3잡 모두 기대대로 — 정상 PR은 3잡 PASS, WIP 누락은

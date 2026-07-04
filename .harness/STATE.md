@@ -6,26 +6,35 @@
 
 ## 현재 목표
 
-cc-harness-template 템플릿 개선 (Week 1)
+cc-harness-template 템플릿 개선 (Week 3 — 2026-07-04 감사 빈틈 개선, 완료)
 
 ## 진행 중인 Task
 
-- 없음 (Week 1·Week 2 전 Task 완료)
+- 없음 (Week 1·2·3 전 Task 완료 — Plans.md 3.1~3.12 전부 cc:완료)
 
 ## 마지막 검증 결과
 
-- Task 2.7 GitHub 연동 E2E: plans-guard 3잡 시나리오 4종 + plans-complete 자동
-  flip 전부 실증 **PASS** (2026-07-04, harness-gh-test repo)
+- Task 3.1(H1): harness-gh-test repo public 임시 전환 + branch protection
+  활성 상태에서 push 실패 → PR 자동 생성(#9) → cc:완료 flip 전 과정 실증 **PASS**
+- Task 3.4(H2): 비-task 브랜치 Status 변경, task 브랜치 타 행 변경 2종
+  시나리오 실제 PR로 재현 **PASS** (둘 다 FAIL 확인)
+- Task 3.5(H3): 미완료 Task(1.3, cc:TODO) 의존 WIP 행 실제 PR 재현 **PASS**
+- Task 3.6(M1·M7): 헤더 정상/컬럼 누락 케이스 양쪽 로컬 검증 **PASS**
+- Task 3.11(M6): ci-ok + placeholder 조합 실제 PR로 실행 **PASS**
+- harness doctor: All checks passed (2026-07-04)
 
 ## 차단 요소
 
-- 없음. 단, ../routine-saas/docs/PRD.md는 사용자 검토 대기 (성공 기준 잠정값)
+- 없음
 
 ## 마지막 커밋
 
-- `2f94273` feat: plans-complete 워크플로 + GitHub 플로우 규약 (Task 2.7, push 완료)
-  (routine-saas 산출물만 커밋 제외 유지)
+- `930e404` docs: README·github-integration.md를 Week 3 변경사항에 맞춰 갱신
+- Week 3 Task 커밋 이력: `1ea64da`(3.1) → `d44a70a`(3.2) → `15ebe23`(3.3) →
+  `603fcc0`(3.6) → `0c8ea99`(3.4) → `03d185f`(3.5) → `2594119`(3.7) →
+  `2dd1d8b`(3.8) → `11aa504`(3.9) → `d5117bc`(3.10) → `2b9a6d8`(3.11) →
+  `6667307`(3.12)
 
 ## 최종 갱신
 
-- 2026-07-04, Task 2.7 완료 시점
+- 2026-07-04, Week 3 전 Task + 문서 정합화 완료 시점

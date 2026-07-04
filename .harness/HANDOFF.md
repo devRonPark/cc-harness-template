@@ -11,15 +11,22 @@
 
 ## 재개 지점
 
-- Week 2 dogfooding 완료 (2.1~2.5 전부 cc:완료). **Week 2 변경분은 사용자
-  지시로 커밋하지 않음** — Plans.md·LESSONS.md 수정분이 working tree에 있음.
-- ../routine-saas/에 기획 산출물 생성 완료: PRD(검토 대기)·UserFlow·
-  Architecture·Plans.md(Task 11개).
-- 다음 작업: ① 사용자 PRD 검토 (성공 기준 잠정값 확정 필요)
-  ② Week 3 후보 결정 — LESSONS.md의 템플릿 결함 2건 (init 스크립트, grill-me 경로 인자)
+- Week 3 전 Task(3.1~3.12) 완료 + 커밋 + push까지 끝난 상태. 진행 중인
+  작업 없음.
+- 이번 세션에서 발견한 새 사실(문서에 반영 완료, 여기는 참고용 요약):
+  - branch protection 켜진 private repo는 GitHub Free 플랜에서 API 자체가
+    403 — H1 실증을 위해 harness-gh-test를 잠깐 public 전환했다가 검증 후
+    원복함(사용자 승인받음).
+  - plans-complete의 PR 폴백이 동작하려면 저장소 설정 2개가 별도로 켜져야
+    함(Actions PR 생성 허용, Allow auto-merge) — 둘 다 기본값 꺼짐, 실증
+    중 실제로 막혀서 발견. `plans-complete.yml` 주석에 명시함.
+- 다음 세션에서 판단할 것: Week 4 스코프 — 남은 후보는 template-audit.md의
+  L1~L5(백로그, granularity vague_re 오탐, test-agent pretest 오매칭 등)와
+  M8에서 명시한 대로 "SHA 강제 핀"은 여전히 미지원(YAGNI 보류 상태 유지 중).
 
 ## 주의사항
 
-- 커밋은 사용자 명시 요청 전까지 금지. routine-saas는 전면 커밋 금지.
-- Task 상태는 Plans.md가 단일 출처 — .harness/TASKS.md에 Task 상태를 복제하지 말 것.
-- CLAUDE.md 118줄 — 훅이 분할 권고. 스코프 확장이라 미실행, 사용자 판단 대기.
+- Task 상태는 Plans.md가 단일 출처 — `.harness/TASKS.md`에 Task 상태를 복제하지 말 것.
+- harness-gh-test repo는 private + branch protection 해제 상태로 복원됨 —
+  다시 H1류 검증이 필요하면 이 순서(public 전환 승인 → protection 설정
+  승인 → 검증 → 전부 원복)를 다시 밟을 것, 자동화하지 말고 매번 확인받을 것.
