@@ -176,40 +176,17 @@ harness doctor
 
 ### Step 1 — 템플릿 파일 복사
 
-```bash
-# 내 프로젝트 디렉토리로 이동
-cd /path/to/my-new-project
+`init.sh`가 아래 모든 파일(CI 워크플로 3종, PR/Issue 템플릿, `.harness/` 골격
+7종 포함)을 한 번에 복사한다. `Plans.md`·`.harness/`는 이 템플릿 저장소
+자신의 작업 이력이 아니라 `templates/skeleton/`의 깨끗한 초기 상태에서
+복사되므로, 새 프로젝트가 남의 완료 Task를 물려받지 않는다.
 
+```bash
 # 템플릿 클론 (임시)
 git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
 
-# 파일 복사
-cp /tmp/harness-tpl/harness.toml .
-cp /tmp/harness-tpl/CLAUDE.md .
-cp /tmp/harness-tpl/Plans.md .
-cp /tmp/harness-tpl/BLUEPRINT.md .
-
-# 프로젝트 전용 companion 에이전트 (task-decomposer + test-agent)
-mkdir -p agents .github/workflows
-cp -r /tmp/harness-tpl/agents/. agents/
-cp /tmp/harness-tpl/.github/workflows/plans-guard.yml .github/workflows/
-
-mkdir -p .claude/agent-memory/claude-code-harness-worker
-mkdir -p .claude/agent-memory/claude-code-harness-reviewer
-mkdir -p .claude/agent-memory/claude-code-harness-advisor
-
-cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-worker/MEMORY.md \
-   .claude/agent-memory/claude-code-harness-worker/
-cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-reviewer/MEMORY.md \
-   .claude/agent-memory/claude-code-harness-reviewer/
-cp /tmp/harness-tpl/.claude/agent-memory/claude-code-harness-advisor/MEMORY.md \
-   .claude/agent-memory/claude-code-harness-advisor/
-cp /tmp/harness-tpl/.claude/settings.local.json.example .claude/settings.local.json
-
-# 기획 스킬 + 산출물 골격 (grill-me → PRD → UserFlow·Architecture)
-mkdir -p .claude/skills docs
-cp -r /tmp/harness-tpl/.claude/skills/grill-me .claude/skills/
-cp -r /tmp/harness-tpl/docs/templates docs/
+# 내 프로젝트 디렉토리에 적용
+/tmp/harness-tpl/init.sh /path/to/my-new-project
 ```
 
 ### Step 2 — 커스터마이징 체크리스트
