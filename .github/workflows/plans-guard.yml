@@ -9,8 +9,54 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  header-check:
+    name: Plans.md 헤더 스키마
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    # M1/M7 (2026-07-04 감사): 아래 acceptance-check·granularity-check의
+    # `[ "$n" -lt 8 ] && continue`는 컬럼이 하나라도 빠지면 전 행을 조용히
+    # skip한다 — "게이트가 도는 것"과 "아무것도 안 보는 것"이 CI 로그만
+    # 봐선 구분되지 않는다. 파싱 전에 헤더 7컬럼을 명시 검증해 불일치 시
+    # FAIL로 드러낸다. plans-complete.yml에도 동일 로직 적용.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 헤더 컬럼 스키마 검증
+        shell: bash
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          expected='|Task|내용|DoD|Acceptance|Depends|Status|GH|'
+          mapfile -t headers < <(grep -E '^\|[[:space:]]*Task[[:space:]]*\|' Plans.md)
+
+          if [ ${#headers[@]} -eq 0 ]; then
+            echo "✗ Plans.md에 'Task' 헤더 행이 없습니다"
+            exit 1
+          fi
+
+          failed=0
+          for h in "${headers[@]}"; do
+            norm=$(echo "$h" | sed -E 's/[[:space:]]+//g')
+            if [ "$norm" != "$expected" ]; then
+              echo "✗ 헤더 불일치: $h"
+              echo "  기대: | Task | 내용 | DoD | Acceptance | Depends | Status | GH |"
+              failed=1
+            fi
+          done
+
+          if [ "$failed" -eq 1 ]; then
+            echo "Plans.md 컬럼 스키마가 기대값과 다릅니다 — acceptance-check/granularity-check가"
+            echo "행을 조용히 건너뛸 수 있어 명시적으로 차단합니다."
+            exit 1
+          fi
+          echo "✓ 헤더 스키마 확인 (${#headers[@]}개 테이블)"
+
   wip-branch-check:
     name: WIP↔Branch
+    needs: header-check
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
@@ -45,6 +91,7 @@ jobs:
 
   acceptance-check:
     name: Acceptance Oracle
+    needs: header-check
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     # fork PR은 Plans.md에 임의 명령을 심어 CI에서 eval시킬 수 있으므로 same-repo PR만 실행
@@ -131,6 +178,7 @@ jobs:
 
   granularity-check:
     name: Task Granularity
+    needs: header-check
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:

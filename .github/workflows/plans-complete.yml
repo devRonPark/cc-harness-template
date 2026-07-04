@@ -38,8 +38,51 @@ permissions:
   pull-requests: write
 
 jobs:
+  header-check:
+    name: Plans.md 헤더 스키마
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    # M1/M7 (2026-07-04 감사): plans-guard.yml과 동일한 헤더 검증을 적용해
+    # 컬럼 스키마 불일치를 조용한 skip 대신 명시 FAIL로 드러낸다.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: 헤더 컬럼 스키마 검증
+        shell: bash
+        run: |
+          if [ ! -f Plans.md ]; then
+            echo "Plans.md 없음 — skip"
+            exit 0
+          fi
+
+          expected='|Task|내용|DoD|Acceptance|Depends|Status|GH|'
+          mapfile -t headers < <(grep -E '^\|[[:space:]]*Task[[:space:]]*\|' Plans.md)
+
+          if [ ${#headers[@]} -eq 0 ]; then
+            echo "✗ Plans.md에 'Task' 헤더 행이 없습니다"
+            exit 1
+          fi
+
+          failed=0
+          for h in "${headers[@]}"; do
+            norm=$(echo "$h" | sed -E 's/[[:space:]]+//g')
+            if [ "$norm" != "$expected" ]; then
+              echo "✗ 헤더 불일치: $h"
+              failed=1
+            fi
+          done
+
+          if [ "$failed" -eq 1 ]; then
+            echo "Plans.md 컬럼 스키마가 기대값과 다릅니다 — 명시적으로 차단합니다."
+            exit 1
+          fi
+          echo "✓ 헤더 스키마 확인 (${#headers[@]}개 테이블)"
+
   flip-status:
     name: WIP → 완료
+    needs: header-check
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'task/')
     runs-on: ubuntu-22.04
     timeout-minutes: 5
