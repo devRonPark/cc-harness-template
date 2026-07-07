@@ -2,20 +2,25 @@
 // merge-settings.mjs — settings.json에 이 템플릿이 요구하는 plugin 설정만
 // 병합한다. 기존에 사용자가 넣어둔 다른 plugin·permissions·설정은 그대로 둔다.
 // setup-plugins.sh가 백업본을 만든 뒤에 이 스크립트를 호출한다.
+//
+// value-for-fable은 optional plugin이다 — 세 번째 인자로 "--skip-vff"를
+// 넘기면 enabledPlugins·extraKnownMarketplaces에서 제외한다.
 
 import { readFileSync, writeFileSync } from "node:fs";
 
 const target = process.argv[2];
 if (!target) {
-  console.error("사용법: node merge-settings.mjs <settings.json 경로>");
+  console.error("사용법: node merge-settings.mjs <settings.json 경로> [--skip-vff]");
   process.exit(1);
 }
+
+const includeVff = process.argv[3] !== "--skip-vff";
 
 const REQUIRED_PLUGINS = {
   "claude-code-harness@claude-code-harness-marketplace": true,
   "ponytail@ponytail": true,
   "caveman@caveman": true,
-  "value-for-fable@itsinseong": true,
+  ...(includeVff ? { "value-for-fable@itsinseong": true } : {}),
 };
 
 const REQUIRED_MARKETPLACES = {
@@ -28,9 +33,13 @@ const REQUIRED_MARKETPLACES = {
   caveman: {
     source: { source: "github", repo: "JuliusBrussee/caveman" },
   },
-  itsinseong: {
-    source: { source: "git", url: "https://github.com/itsinseong/value-for-fable.git" },
-  },
+  ...(includeVff
+    ? {
+        itsinseong: {
+          source: { source: "git", url: "https://github.com/itsinseong/value-for-fable.git" },
+        },
+      }
+    : {}),
 };
 
 let raw = "{}";

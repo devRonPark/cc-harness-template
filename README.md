@@ -72,16 +72,22 @@ claude
 
 ## 구성 요소 한눈에 보기
 
-이 템플릿은 **4개 Plugin** + **5개 에이전트 규칙** + **프로젝트 설정 파일**로 이루어진다.
+이 템플릿은 **필수 Plugin 3개** + **선택 Plugin 1개** + **5개 에이전트 규칙** +
+**프로젝트 설정 파일**로 이루어진다.
 
-### Plugin 4개 — 세션 시작 시 자동으로 켜진다
+### Plugin 3개(필수) — 세션 시작 시 자동으로 켜진다
 
 | Plugin | 한 줄 설명 |
 |--------|-----------|
 | **claude-code-harness** | Plans.md를 읽어서 할 일을 worker·reviewer·advisor에게 나눠준다 |
 | **ponytail** | 코드를 쓰기 전에 "이게 정말 필요한가?"를 7단계로 확인하게 만든다 |
 | **caveman** | AI 응답의 군더더기를 제거해 토큰을 약 65% 줄인다 |
-| **value-for-fable** | Sonnet 모델에 Fable 5 수준의 진단 규율을 적용한다 |
+
+### Plugin 1개(선택) — 개인 취향에 따라 설치 여부를 고른다
+
+| Plugin | 한 줄 설명 |
+|--------|-----------|
+| **value-for-fable** | Sonnet 모델에 Fable 5 수준의 진단 규율을 적용한다. `setup-plugins.sh` 실행 시 설치 여부를 묻는다 (`--skip-vff`/`--with-vff`로 무인 지정 가능) |
 
 ### 에이전트 5종 — 계획·구현 단계에서 자동으로 협업한다
 
@@ -126,13 +132,20 @@ git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
 이 스크립트가 하는 일:
 
 1. `~/.claude/settings.json`이 없으면 새로 만들고, 있으면 백업(`settings.json.bak.<시각>`)한 뒤
-   기존 내용을 보존한 채 이 템플릿이 필요로 하는 4개 plugin만 병합한다
+   기존 내용을 보존한 채 이 템플릿이 필요로 하는 plugin만 병합한다
    (다른 plugin·permissions·theme 설정은 건드리지 않는다).
-2. 4개 plugin을 `claude plugin install`로 설치한다.
+2. 필수 3종(claude-code-harness·ponytail·caveman)은 항상 설치한다.
+   선택 plugin인 value-for-fable은 대화형 터미널이면 설치 여부를 묻고,
+   `--skip-vff`/`--with-vff` 플래그나 `SETUP_SKIP_VFF=1` 환경변수로 무인 지정할 수 있다.
 3. `harness doctor`로 설치 상태를 확인한다.
 
 `claude`/`harness` CLI가 아직 없으면 해당 단계만 건너뛰고 안내 메시지를 출력한다 —
 설치 후 다시 실행하면 된다(멱등적이라 여러 번 실행해도 안전).
+
+```bash
+./scripts/setup-plugins.sh --skip-vff   # value-for-fable 제외
+./scripts/setup-plugins.sh --with-vff   # value-for-fable 포함 (프롬프트 생략)
+```
 
 <details>
 <summary>수동으로 편집하고 싶다면 (참고용)</summary>
@@ -164,13 +177,16 @@ git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
 }
 ```
 
-이후 아래 3종을 개별 설치한다.
+`value-for-fable` 블록(enabledPlugins·extraKnownMarketplaces 양쪽 모두)은 선택 사항이다 —
+설치하지 않으려면 통째로 빼면 된다.
+
+이후 필수 3종을 개별 설치한다 (value-for-fable은 원할 때만 추가로 설치).
 
 ```bash
 claude plugin install claude-code-harness@claude-code-harness-marketplace
 claude plugin install ponytail@ponytail
 claude plugin install caveman@caveman
-claude plugin install value-for-fable@itsinseong
+claude plugin install value-for-fable@itsinseong  # 선택
 ```
 
 </details>

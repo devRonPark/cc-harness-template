@@ -7,6 +7,10 @@
 
 ## 완성본 예시
 
+`value-for-fable@itsinseong` (및 `itsinseong` 마켓플레이스 항목)은 선택 plugin이다 —
+설치하지 않기로 했다면 아래 예시에서 해당 항목을 빼면 된다. `scripts/setup-plugins.sh`를
+`--skip-vff`로 실행하면 자동으로 제외된 상태가 된다.
+
 ```json
 {
   "enabledPlugins": {

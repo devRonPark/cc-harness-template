@@ -24,13 +24,22 @@ git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
 /tmp/harness-tpl/scripts/setup-plugins.sh
 ```
 
-`~/.claude/settings.json`에 4개 plugin을 등록(기존 설정은 백업 후 보존)하고,
-`claude plugin install`로 설치한 뒤, `harness doctor`까지 자동 실행한다.
-여러 번 실행해도 안전(멱등적)하다.
+`~/.claude/settings.json`에 필수 plugin 3종(claude-code-harness·ponytail·caveman)을
+등록(기존 설정은 백업 후 보존)하고, `claude plugin install`로 설치한 뒤,
+`harness doctor`까지 자동 실행한다. 여러 번 실행해도 안전(멱등적)하다.
+
+`value-for-fable`은 선택 plugin이다 — 대화형 터미널이면 설치 여부를 묻고,
+무인 실행 시에는 아래처럼 명시한다.
+
+```bash
+./scripts/setup-plugins.sh --skip-vff   # value-for-fable 제외
+./scripts/setup-plugins.sh --with-vff   # value-for-fable 포함
+```
 
 ### 1-2. 수동 설치 (참고용)
 
-자동 스크립트 대신 직접 하고 싶다면:
+자동 스크립트 대신 직접 하고 싶다면 (아래 `value-for-fable`/`itsinseong` 블록과
+`claude plugin install value-for-fable@itsinseong`은 선택 사항이므로 원치 않으면 생략):
 
 ```json
 {
@@ -75,7 +84,7 @@ git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
 claude plugin install claude-code-harness@claude-code-harness-marketplace
 claude plugin install ponytail@ponytail
 claude plugin install caveman@caveman
-claude plugin install value-for-fable@itsinseong
+claude plugin install value-for-fable@itsinseong  # 선택
 ```
 
 ### 1-3. 설치 확인
