@@ -14,10 +14,23 @@
 
 ## Step 1. 전역 Plugin 설치 (최초 1회)
 
-### 1-1. `~/.claude/settings.json` 수정
+### 1-1. 자동 스크립트 실행 (권장)
 
-아래 내용을 `~/.claude/settings.json`에 추가한다.
-파일이 없으면 새로 만든다.
+`~/.claude/settings.json`을 손으로 편집하지 않는다 — 대신 스크립트가
+기존 설정을 백업하고 필요한 값만 병합한다.
+
+```bash
+git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
+/tmp/harness-tpl/scripts/setup-plugins.sh
+```
+
+`~/.claude/settings.json`에 4개 plugin을 등록(기존 설정은 백업 후 보존)하고,
+`claude plugin install`로 설치한 뒤, `harness doctor`까지 자동 실행한다.
+여러 번 실행해도 안전(멱등적)하다.
+
+### 1-2. 수동 설치 (참고용)
+
+자동 스크립트 대신 직접 하고 싶다면:
 
 ```json
 {
@@ -58,8 +71,6 @@
 }
 ```
 
-### 1-2. Plugin 설치
-
 ```bash
 claude plugin install claude-code-harness@claude-code-harness-marketplace
 claude plugin install ponytail@ponytail
@@ -73,7 +84,7 @@ claude plugin install value-for-fable@itsinseong
 harness doctor
 ```
 
-전체 항목이 통과되면 완료.
+전체 항목이 통과되면 완료 (자동 스크립트를 썼다면 이미 실행됨).
 
 ---
 
