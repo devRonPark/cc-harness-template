@@ -104,7 +104,11 @@ claude plugin install caveman@caveman
 
 ---
 
-### 1-4. value-for-fable (Fable 5 품질 구조)
+### 1-4. value-for-fable (Fable 5 품질 구조, 선택)
+
+필수 3종(claude-code-harness·ponytail·caveman)과 달리 이 plugin은 optional이다 —
+`scripts/setup-plugins.sh` 실행 시 설치 여부를 묻거나 `--skip-vff`/`--with-vff`로
+지정한다. 설치하지 않아도 나머지 3종·harness 규칙은 정상 동작한다.
 
 Sonnet 모델에 Fable 5의 운영 규율을 적용해 Opus 수준 품질을
 Sonnet 비용(약 70% 절감)으로 끌어낸다. 압축이 아니라 **진단 구조**가 핵심.
