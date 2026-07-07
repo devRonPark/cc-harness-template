@@ -110,7 +110,7 @@ jobs:
 
           failed=0
           while IFS=' ' read -r task_id new_status; do
-            old_status=$(awk -v t="$task_id" '$1==t{print $2}' /tmp/base-status.txt)
+            old_status=$(awk -v t="$task_id" '("x" $1)==("x" t){print $2}' /tmp/base-status.txt)
             [ -z "$old_status" ] && old_status="(신규)"
             [ "$old_status" == "$new_status" ] && continue
 
