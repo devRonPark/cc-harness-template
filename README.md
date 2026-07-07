@@ -517,6 +517,7 @@ cc-harness-template/
 │
 └── docs/
     ├── templates/                  # 기획 산출물 골격 (PRD·UserFlow·DESIGN·Architecture)
+    ├── specs/                      # 이 템플릿 자체의 감사·설계 기록 (온보딩 자료 아님)
     ├── setup-guide.md              # 상세 설치 가이드
     ├── github-integration.md       # GitHub 연동 상세 가이드
     └── global-settings-reference.md  # ~/.claude/settings.json 레퍼런스
@@ -537,9 +538,9 @@ cc-harness-template/
 
 ### `CLAUDE.md`가 길어져 컨텍스트를 많이 차지함
 
-실제로 이 템플릿을 dogfooding하는 동안 `CLAUDE.md`가 120줄을 넘기자 분할
-권고 훅 경고가 발생한 이력이 있다(`.harness/LOG.md` 참고). 프로젝트 전역
-규칙만 `CLAUDE.md`에 남기고, 세부 절차는 `docs/`나 `agents/`로 옮긴다.
+실제로 이 템플릿을 dogfooding하는 동안 `CLAUDE.md`가 118줄, 이어서 123줄로
+늘어나며 분할 권고 훅 경고가 반복 발생한 이력이 있다(`.harness/LOG.md` 참고).
+프로젝트 전역 규칙만 `CLAUDE.md`에 남기고, 세부 절차는 `docs/`나 `agents/`로 옮긴다.
 
 ### 검증 명령을 실행하지 않고 완료라고 말함
 
@@ -637,6 +638,15 @@ worker/reviewer/advisor 분리가, 상태 유실은 `.harness/`가 각각 담당
 `why-claude-code-harness`·`how-this-template-works`류는 이미 `BLUEPRINT.md`가
 겸하고 있어 별도로 분리하지 않는다 — 중복 문서를 만들지 않는다.
 
+### `docs/specs/` — 내부 감사·설계 기록 (온보딩 자료 아님)
+
+새 프로젝트 적용에는 필요 없는, 이 템플릿 자체의 개발 이력 문서.
+
+| 문서 | 내용 |
+|------|------|
+| `docs/specs/2026-07-04-template-audit.md` | Week 3 감사에서 발견한 빈틈(H1~H5)과 개선 계획 |
+| `docs/specs/2026-07-03-planning-pipeline-design.md` | 기획 단계 산출물 파이프라인(PRD→UserFlow→Architecture) 설계 결정 |
+
 ---
 
 ## Plugin 버전 (이 템플릿 작성 기준)
@@ -648,8 +658,8 @@ worker/reviewer/advisor 분리가, 상태 유실은 `.harness/`가 각각 담당
 
 | Plugin | 버전 | 확인된 SHA | 확인일 | GitHub |
 |--------|------|-----------|--------|--------|
-| claude-code-harness | 4.16.3 | `c220671` | 2026-07-04 | [Chachamaru127/claude-code-harness](https://github.com/Chachamaru127/claude-code-harness) |
-| ponytail | 4.8.3 | `40e50d9` | 2026-07-04 | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) |
+| claude-code-harness | 4.16.4 | `c220671` | 2026-07-07 | [Chachamaru127/claude-code-harness](https://github.com/Chachamaru127/claude-code-harness) |
+| ponytail | 4.8.4 | `1b2760d` | 2026-07-07 | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) |
 | caveman | 25d22f8 | `0d95a81` | 2026-07-04 | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) |
 | value-for-fable | 1.0.1 | `afbfff6` | 2026-07-04 | [itsinseong/value-for-fable](https://github.com/itsinseong/value-for-fable) |
 
