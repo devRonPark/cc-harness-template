@@ -1,0 +1,283 @@
+{
+  "run_id": "plan-20260708-164729-fdf4d8",
+  "created_at": "2026-07-08T16:47:29+09:00",
+  "request": "README.md를 비개발자도 따라가기 쉬운 안내서로 개편한다. 첫 화면, Quick Start, Codex CLI Setup, 작업별 workflow 메뉴, Troubleshooting을 사용자 행동 순서 중심으로 정리한다.",
+  "documents": [
+    {
+      "label": "PRD",
+      "path": "docs/PRD.md",
+      "exists": false
+    },
+    {
+      "label": "User Flow",
+      "path": "docs/UserFlow.md",
+      "exists": false
+    },
+    {
+      "label": "Design",
+      "path": "docs/DESIGN.md",
+      "exists": false
+    },
+    {
+      "label": "Architecture",
+      "path": "docs/Architecture.md",
+      "exists": false
+    }
+  ],
+  "existing_tasks": [
+    {
+      "id": "0.1",
+      "title": "PRD 작성 (`/grill-me` 인터뷰)",
+      "status": "done",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "0.2",
+      "title": "기획 보완 문서",
+      "status": "done",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "0.3",
+      "title": "Harness 초기화",
+      "status": "done",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "0.4",
+      "title": "Plugin 설정",
+      "status": "done",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "1.0",
+      "title": "Plans.md 템플릿 개선",
+      "status": "done",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.1",
+      "title": "test agent 추가",
+      "status": "done",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.2",
+      "title": "기획 파이프라인 추가",
+      "status": "done",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.3",
+      "title": "task-decomposer + 세션 세분화 게이트 추가",
+      "status": "done",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.4",
+      "title": ".harness/ 상태 문서 체계 추가",
+      "status": "done",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "2.1",
+      "title": "테스트 프로젝트 골격 생성",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.2",
+      "title": "기획 파이프라인 테스트 (grill-me 인터뷰)",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.3",
+      "title": "보완 문서 테스트 (UserFlow·Architecture 골격 적용)",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.4",
+      "title": "계획 파이프라인 테스트 (task-decomposer → Plans.md)",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.5",
+      "title": "템플릿 결함 기록",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.6",
+      "title": "DESIGN.md 기획 산출물 추가",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.7",
+      "title": "GitHub 연동 E2E 검증",
+      "status": "done",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "3.1",
+      "title": "GitHub branch protection 호환 (H1)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.2",
+      "title": "clean 골격 세트 분리 (H5)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.3",
+      "title": "init.sh 초기화 스크립트 (H5)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.4",
+      "title": "plans-guard 상태 변경 보호 검토 기록 (H2)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.5",
+      "title": "Depends 검증 경로 정리 (H3)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.6",
+      "title": "Plans.md 헤더 검증 선행 파싱 (M1·M7)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.7",
+      "title": "완료 전환 서술 통일 (M3)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.8",
+      "title": "harness.toml 죽은 설정 정리 (M4)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.9",
+      "title": "Plans.md anti-pattern 예시 교정 (M2)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.10",
+      "title": "agents 문서 수행 주체 명시 (M5)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.11",
+      "title": "ci.yml 이름 고정 요약 잡 (M6)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.12",
+      "title": "플러그인 SHA 기록 절차 (M8)",
+      "status": "done",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "4.1",
+      "title": "세분화 기준 표현 정확도 개선 (L1)",
+      "status": "done",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.2",
+      "title": "test-agent pretest 오탐 스택 감지 수정 (L2)",
+      "status": "done",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.3",
+      "title": "CONTEXT_INDEX.md 미존재 파일 인덱스 정리 (L3)",
+      "status": "done",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.4",
+      "title": "rm 위험 패턴 매칭 범위 확대 (L4)",
+      "status": "done",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.5",
+      "title": "grill-me 산출 경로 인자 지원 (L5)",
+      "status": "done",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.6",
+      "title": "grill-me 비대화형 실행 호환 모드 (L5)",
+      "status": "done",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.7",
+      "title": "Codex 호환 진입점 추가",
+      "status": "done",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.8",
+      "title": "Codex harness skills 추가",
+      "status": "done",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.9",
+      "title": "Git workflow helper command/skill 추가",
+      "status": "done",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.10",
+      "title": "Claude/Codex 공용 Quality Gate 문서화",
+      "status": "done",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.11",
+      "title": "rescue-from-main workflow helper 추가",
+      "status": "done",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.12",
+      "title": "Task별 .harness 맥락 디렉토리 도입",
+      "status": "done",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    }
+  ],
+  "rules": {
+    "task_decomposer": "agents/task-decomposer.md",
+    "task_state_source": "tasks/index.json",
+    "readable_plan": "Plans.md"
+  },
+  "outputs": {
+    "run_dir": ".harness/shared/planning/runs/plan-20260708-164729-fdf4d8",
+    "proposal": ".harness/shared/planning/runs/plan-20260708-164729-fdf4d8/proposed-tasks.json",
+    "report": ".harness/shared/planning/runs/plan-20260708-164729-fdf4d8/decomposition-report.md"
+  },
+  "technical": {
+    "schema_version": 1,
+    "proposal_dir": ".harness/shared/planning"
+  }
+}

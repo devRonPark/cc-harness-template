@@ -8,6 +8,85 @@
 
 ---
 
+## 먼저 고를 것
+
+이 템플릿은 두 실행 환경을 모두 지원한다. 처음에는 아래 중 하나만 고르면 된다.
+
+| 내가 쓰는 도구 | 먼저 할 일 | 핵심 진입점 |
+|---|---|---|
+| Claude Code | [Claude Code Setup](#claude-code-setup)으로 플러그인 설치 후 `claude` 실행 | `CLAUDE.md`, `/harness-*`, `/grill-me` |
+| Codex | [Codex CLI Setup](#codex-cli-setup) 확인 후 `codex` 실행 | `AGENTS.md`, `.agents/skills/*`, `$harness-*` |
+| 둘 다 | Claude Code 플러그인을 설치하고 Codex는 repo 규칙을 직접 실행 | `CLAUDE.md`를 기준으로 `AGENTS.md`가 호환 절차 제공 |
+
+새 프로젝트에 바로 적용하려면 아래 Quick Start부터 실행한다. 이미 코드와 README가
+있는 프로젝트라면 [기존 프로젝트에 적용](#기존-프로젝트에-적용)으로 건너뛴다.
+
+## Quick Start
+
+```bash
+# 1. 템플릿 클론
+git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
+
+# 2. 내 프로젝트에 적용
+/tmp/harness-tpl/init.sh /path/to/my-project
+
+# 3. 프로젝트로 이동
+cd /path/to/my-project
+```
+
+이후 사용할 도구를 실행한다.
+
+```bash
+claude  # Claude Code
+codex   # Codex
+```
+
+복사 직후엔 `harness.toml`·`CLAUDE.md`가 플레이스홀더 상태다.
+[커스터마이징 체크리스트](#step-2--커스터마이징-체크리스트)를 먼저 채워야
+AI가 엉뚱한 컨텍스트로 동작하지 않는다.
+
+## Codex CLI Setup
+
+Codex는 Claude Code 플러그인 hook을 자동 실행하지 않는다. 대신 이 저장소의
+루트 `AGENTS.md`와 `.agents/skills/`가 같은 절차를 Codex 방식으로 제공한다.
+
+Codex에서 새 세션을 열면 아래 순서로 시작한다.
+
+```text
+AGENTS.md를 읽어줘.
+tasks/index.json과 Plans.md 기준으로 현재 상태를 확인해줘.
+$harness-progress로 진행 상황을 요약해줘.
+```
+
+작업을 실행할 때는 Claude Code slash command 대신 Codex skill 이름을 쓴다.
+
+| 목적 | Codex에서 호출 | 하는 일 |
+|---|---|---|
+| 기획 인터뷰 | `$grill-me` | PRD 초안과 Open Questions 정리 |
+| Task 추가 | `$harness-plan` | planning context → proposal → 검증 → `tasks/index.json` 반영 |
+| Task 구현 | `$harness-work` | 세분화/scope 게이트 → 구현 → Acceptance/test → 리뷰 |
+| 진행 확인 | `$harness-progress` | `tasks/index.json` 기준 읽기 전용 요약 |
+| Plans sync | `$harness-sync` | `tasks/index.json` 검증과 `Plans.md` 재생성 |
+| Git 작업 | `$branch-checkout`, `$git-push`, `$pr-create`, `$rescue-from-main` | 브랜치, push, PR, main 작업 구조 |
+
+Codex 작업도 항상 `agents/quality-gates.md`를 따른다. ponytail/caveman plugin
+자동 hook이 없으므로 YAGNI, scope check, findings-first 리뷰는 Codex 세션이 직접
+적용한다.
+
+## 작업별 Workflow
+
+| 하고 싶은 일 | 시작 명령 | 완료 전 확인 |
+|---|---|---|
+| 새 기능 기획 | Claude: `/grill-me` / Codex: `$grill-me` | `docs/PRD.md`와 Open Questions가 남았는지 확인 |
+| Task 추가 | Claude: `/harness-plan` / Codex: `$harness-plan` | `validate_task_proposal.py`, `validate_tasks.py`, `sync_plans.py --check` 통과 |
+| Task 구현 | Claude: `/harness-work` / Codex: `$harness-work` | Task Acceptance 명령과 관련 테스트 통과 |
+| 현재 diff 리뷰 | Claude: `/harness-review` / Codex: `$harness-review` | findings-first 리뷰에서 blocker 없음 |
+| 진행률 확인 | Claude: `/harness-progress` / Codex: `$harness-progress` | `tasks/index.json` 기준으로 `wip`/`todo` 확인 |
+| 작업 브랜치 만들기 | Claude: `/branch-checkout` / Codex: `$branch-checkout` | `git status`가 깨끗한지 확인 후 전환 |
+| PR 준비 | Claude: `/git-push`, `/pr-create` / Codex: `$git-push`, `$pr-create` | Acceptance evidence와 리뷰 결과를 PR 본문에 반영 |
+
+---
+
 ## 이 템플릿이 해결하는 문제 (Why)
 
 Claude Code로 새 프로젝트를 시작할 때마다 반복되는 일이 있다.
@@ -55,28 +134,6 @@ Codex용 `AGENTS.md` 진입점 + `.harness/` 상태 문서** 조합으로 해결
 | `.claude/commands/` | 일부 포함 | Git helper custom commands만 포함. `/harness-*` 명령은 로컬 파일이 아니라 설치된 플러그인이 제공 |
 | `scripts/{validate_tasks,report_tasks,sync_plans,build_planning_context,validate_task_proposal,apply_task_proposal}.py` | 포함 | Task JSON 검증·진행률 출력·planning proposal·읽기용 Plans.md snapshot 생성 |
 | `scripts/verify-harness.sh` | **미포함** | 대체 수단: `harness doctor` (설치 상태) + `tasks/index.json`의 Task별 Acceptance 명령 (기능 검증) |
-
----
-
-## Quick Start
-
-```bash
-# 1. 템플릿 클론
-git clone https://github.com/devRonPark/cc-harness-template /tmp/harness-tpl
-
-# 2. 내 프로젝트에 적용 (harness.toml·CLAUDE.md·tasks/index.json·Plans.md·.harness/ 등 전부 복사)
-/tmp/harness-tpl/init.sh /path/to/my-project
-
-# 3-a. Claude Code 실행
-cd /path/to/my-project
-claude
-
-# 3-b. 또는 Codex 실행
-codex
-```
-
-플러그인 설치가 아직 안 됐다면 아래 [Claude Code Setup](#claude-code-setup)을 먼저 본다.
-복사 직후엔 `harness.toml`·`CLAUDE.md`가 플레이스홀더 상태 — [커스터마이징 체크리스트](#커스터마이징-체크리스트)를 채워야 AI가 엉뚱한 컨텍스트로 동작하지 않는다.
 
 ---
 
@@ -730,6 +787,17 @@ cc-harness-template/
 
 로컬 명령이 아니라 플러그인 제공 명령이다. `claude plugin install
 claude-code-harness@claude-code-harness-marketplace` 재실행 후 `harness doctor`로 확인한다.
+
+### Codex에서 `/harness-work`가 안 먹힘
+
+Codex에서는 Claude Code slash command가 아니라 repo-scoped skill을 쓴다.
+`/harness-work` 대신 `$harness-work`처럼 호출하고, 먼저 `AGENTS.md`를 읽게 한다.
+
+### Codex가 ponytail/caveman처럼 동작하지 않음
+
+Codex에는 Claude Code plugin hook이 자동 적용되지 않는다.
+`agents/quality-gates.md`가 Codex용 공통 기준이므로 scope/YAGNI, findings-first 리뷰,
+짧은 검증 중심 보고를 세션에서 직접 적용한다.
 
 ### hooks가 실행되지 않음
 
