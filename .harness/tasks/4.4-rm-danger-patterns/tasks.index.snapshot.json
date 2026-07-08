@@ -343,7 +343,7 @@
       "dod": "harness.toml ask 목록이 rm -fr·rm -R 조합도 포착",
       "acceptance": "[ $(grep -c 'rm -' harness.toml) -gt 1 ]",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },

@@ -18,6 +18,11 @@ deny = [
 ]
 ask = [
   "Bash(rm -r:*)",
+  "Bash(rm -rf:*)",
+  "Bash(rm -fr:*)",
+  "Bash(rm -R:*)",
+  "Bash(rm -Rf:*)",
+  "Bash(rm -fR:*)",
   "Bash(git push --force:*)",
 ]
 
