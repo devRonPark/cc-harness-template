@@ -313,7 +313,7 @@
       "dod": "agents/task-decomposer.md가 정상 연결어와 여러 관심사 열거 표현을 구분하는 기준을 설명",
       "acceptance": "grep -q '여러 관심사' agents/task-decomposer.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
