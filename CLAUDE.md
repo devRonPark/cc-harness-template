@@ -68,22 +68,31 @@
 ## 상태 문서 규칙
 
 - **터미널 세션은 언제든 끊길 수 있다고 가정한다.** 작업 시작 전·작업 단위
-  종료 후마다 `.harness/` 상태 문서를 갱신한다.
+  종료 후마다 해당 Task의 `.harness/tasks/<task-key>/` 상태 문서를 갱신한다.
 - **Task 상태의 단일 출처는 `tasks/index.json`이다.** `Plans.md`는 사람이 필요할 때
   `python3 scripts/sync_plans.py`로 갱신하는 읽기용 snapshot이며 stale일 수 있다.
-  직접 편집하지 않는다. `.harness/`는 `tasks/index.json`이 담지 않는
-  세션 맥락만 담는다 — Task 상태를 `.harness/`에 복제하지 않는다.
-- 세션 재개 시 읽는 순서: `.harness/STATE.md` → `.harness/LESSONS.md`(최근 5개)
-  → `tasks/index.json` → `Plans.md`. 나머지는 `.harness/CONTEXT_INDEX.md`로 필요한 파일만 선별해서
-  읽는다 — 목적 없이 전체 파일을 다시 읽지 않는다.
-- 파일별 역할: `STATE.md`(현재 스냅샷) · `HANDOFF.md`(다음 세션 인수인계) ·
-  `TASKS.md`(현재 Task의 세션 체크리스트) · `LOG.md`(작업·에러 append-only) ·
-  `LESSONS.md`(재발 방지) · `CHECKPOINTS.md`(작업 단위 완료 + 커밋 해시) ·
-  `CONTEXT_INDEX.md`(파일 역할 인덱스) · `.harness/shared/planning/`(planning
-  proposal 작업대) · `.harness/events/planning.jsonl`(planning 단계 감시 로그).
-- 에러는 숨기지 말고 `LOG.md`에 원문 기록, 해결하면 `LESSONS.md`에 재발 방지
-  항목 추가. 항상 지킬 규칙으로 승격되면 이 파일(CLAUDE.md)에도 반영한다.
-- 새 파일을 만들거나 기존 파일 역할이 바뀌면 `CONTEXT_INDEX.md`를 갱신한다.
+  직접 편집하지 않는다. `.harness/tasks/<task-key>/`는 `tasks/index.json`이 담지
+  않는 세션 맥락만 담는다 — Task 상태를 `.harness/`에 단일 출처처럼 복제하지 않는다.
+- 루트 `.harness/STATE.md`, `.harness/HANDOFF.md`, `.harness/TASKS.md`,
+  `.harness/LOG.md`, `.harness/CHECKPOINTS.md`는 **복사용 템플릿**이다. 실제
+  진행 상태를 루트 템플릿에 쓰지 않는다.
+- 새 Task 착수 시 `.harness/tasks/<task-key>/`를 만들고 루트 템플릿을 복사해
+  `STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, `CHECKPOINTS.md`를 둔다. 작업
+  시작 시점의 `tasks/index.json`은 참고본으로
+  `.harness/tasks/<task-key>/tasks.index.snapshot.json`에 저장할 수 있다.
+- 세션 재개 시 읽는 순서: `tasks/index.json`에서 `wip` 또는 사용자가 지정한
+  Task 확인 → `.harness/tasks/<task-key>/STATE.md` → `.harness/LESSONS.md`(최근
+  항목) → `Plans.md`. 나머지는 `.harness/CONTEXT_INDEX.md`로 필요한 파일만
+  선별해서 읽는다 — 목적 없이 전체 파일을 다시 읽지 않는다.
+- Task별 파일 역할: `STATE.md`(해당 Task 현재 스냅샷) · `HANDOFF.md`(다음 세션
+  인수인계) · `TASKS.md`(Task 내부 체크리스트) · `LOG.md`(작업·에러 append-only) ·
+  `CHECKPOINTS.md`(작업 단위 완료 + 커밋 해시) · `tasks.index.snapshot.json`
+  (작업 시작 시점 참고본). 루트 `LESSONS.md`는 전역 재발 방지 기록으로 유지한다.
+  루트 `CONTEXT_INDEX.md`는 파일 역할 인덱스다.
+- 에러는 숨기지 말고 해당 Task의 `LOG.md`에 원문 기록, 해결하면 전역
+  `.harness/LESSONS.md`에 재발 방지 항목 추가. 항상 지킬 규칙으로 승격되면
+  이 파일(CLAUDE.md)에도 반영한다.
+- 새 파일을 만들거나 기존 파일 역할이 바뀌면 `.harness/CONTEXT_INDEX.md`를 갱신한다.
 - 요청이 전제한 파일이 저장소에 없으면 임의 생성하지 않는다 — 스코프 결정이므로
   보고 후 사용자 확인을 받는다.
 

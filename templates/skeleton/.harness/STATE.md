@@ -1,20 +1,22 @@
-# STATE.md — 현재 상태 스냅샷
+# STATE.md — Task 상태 스냅샷 템플릿
 
-> 세션이 언제 끊겨도 이 파일 하나로 "지금 어디까지 왔는지"를 복원한다.
-> 작업 시작 전·작업 단위 종료 후마다 갱신. Task 상태의 단일 출처는 Plans.md —
-> 이 파일은 Plans.md가 담지 않는 세션 맥락(마지막 검증 결과, 차단 요소)만 담는다.
+> 이 루트 파일은 실제 작업 상태가 아니라 템플릿이다.
+> 새 Task를 시작할 때 `.harness/tasks/<task-key>/STATE.md`로 복사해서 사용한다.
+> 실제 최신 작업 맥락은 `.harness/tasks/` 아래 Task별 디렉토리에 기록한다.
 
 ## 현재 목표
 
-[PROJECT_NAME] 초기화 (Week 0)
+[Task 목표를 한 문장으로 기록]
 
 ## 진행 중인 Task
 
-- 없음 (아직 착수 전)
+- Task ID: `[id]`
+- 상태: `[todo|wip|done|blocked]`
+- 기준 문서: `tasks/index.json`
 
 ## 마지막 검증 결과
 
-- 없음 (초기 상태)
+- [아직 없음]
 
 ## 차단 요소
 
@@ -22,8 +24,8 @@
 
 ## 마지막 커밋
 
-- 없음 (초기 상태)
+- 없음
 
 ## 최종 갱신
 
-- YYYY-MM-DD, 초기 생성
+- YYYY-MM-DD HH:MM KST

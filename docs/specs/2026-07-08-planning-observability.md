@@ -84,7 +84,7 @@
 - 실패 처리:
   - JSON 파싱 실패, 필수 파일 누락, validation 실패, apply 전 충돌은 모두
     `planning.jsonl`에 쉬운 메시지로 기록한다.
-  - 원문 에러가 있으면 기존 규칙대로 `.harness/LOG.md`에도 기록한다.
+  - 원문 에러가 있으면 기존 규칙대로 해당 Task의 `.harness/tasks/<task-key>/LOG.md`에도 기록한다.
 
 ## Explicitly Out Of V1
 
@@ -127,5 +127,5 @@
   `allow_inline_fallback = true`일 때만 현재 세션 fallback으로 이어진다.
 - 기존 `tasks/index.json` 필드명은 호환성 때문에 유지한다. 대신 값과 보고서는
   쉬운 표현을 우선한다.
-- `.harness/LOG.md`는 에러 원문과 중요 작업 이력을 남기는 사람이 읽는 로그이며,
+- `.harness/tasks/<task-key>/LOG.md`는 에러 원문과 중요 작업 이력을 남기는 사람이 읽는 로그이며,
   planning 자동 감시는 `.harness/events/planning.jsonl`만 사용한다.

@@ -15,9 +15,9 @@ At the start of a session, read these files before planning or editing:
 
 On resumed work, follow the recovery order in `CLAUDE.md`:
 
-1. `.harness/STATE.md`
-2. latest entries in `.harness/LESSONS.md`
-3. `tasks/index.json`
+1. `tasks/index.json` to identify the `wip` or user-specified Task
+2. `.harness/tasks/<task-key>/STATE.md`
+3. latest entries in `.harness/LESSONS.md`
 4. `Plans.md`
 5. only the extra files listed in `.harness/CONTEXT_INDEX.md` that are needed
 
@@ -88,9 +88,12 @@ branches, pushing, or creating PRs. Never force push or discard local changes.
 
 ## State Documents
 
-- Update `.harness/STATE.md` before risky work and after meaningful work units.
-- Append errors and fixes to `.harness/LOG.md`; add durable prevention rules to
-  `.harness/LESSONS.md`.
+- Root `.harness/STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, and
+  `CHECKPOINTS.md` are templates. Do not write live task state into them.
+- Store live context under `.harness/tasks/<task-key>/` and update that Task's
+  `STATE.md` before risky work and after meaningful work units.
+- Append errors and fixes to `.harness/tasks/<task-key>/LOG.md`; add durable
+  prevention rules to root `.harness/LESSONS.md`.
 - Update `.harness/CONTEXT_INDEX.md` when creating a file or changing a file's
   role.
 
