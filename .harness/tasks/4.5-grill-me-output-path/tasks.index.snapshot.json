@@ -353,7 +353,7 @@
       "dod": "SKILL.md에 대상 디렉토리 인자 규약 명시, 기본값은 현재 프로젝트 docs/",
       "acceptance": "grep -q '산출 경로' .claude/skills/grill-me/SKILL.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
