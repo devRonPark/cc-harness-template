@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "4.11",
+      "title": "rescue-from-main workflow helper 추가",
+      "dod": "Claude custom command와 Codex skill로 rescue-from-main 절차가 제공되고 AGENTS·README·BLUEPRINT·init 복사 경로에 등록됨",
+      "acceptance": "test -f .agents/skills/rescue-from-main/SKILL.md && test -f .claude/commands/rescue-from-main.md && grep -q 'rescue-from-main' AGENTS.md && grep -q 'rescue-from-main' README.md && grep -q 'rescue-from-main' BLUEPRINT.md",
+      "depends": [
+        "4.9",
+        "4.10"
+      ],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    }
+  ]
+}

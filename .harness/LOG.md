@@ -140,6 +140,25 @@
   `python3 scripts/sync_plans.py --check` PASS, skeleton sync check PASS,
   `python3 -m unittest tests.test_tasks tests.test_planning -v` PASS(18),
   `init.sh /tmp/cc-harness-git-helper-test.9j00Yd` smoke test PASS.
+
+## 2026-07-08 — rescue-from-main workflow helper
+
+- planning proposal 절차로 Task `4.11`을 추가하고 완료 처리했다.
+- Claude Code local custom command `.claude/commands/rescue-from-main.md`와
+  Codex repo-scoped skill `.agents/skills/rescue-from-main/SKILL.md`를 추가했다.
+- 절차는 preflight, diff 기반 branch slug 생성, `main`/`master` uncommitted 변경의
+  `git switch -c` 보존, local commit 자동 reset 금지, commit/push/draft PR 본문
+  규칙을 포함한다.
+- `AGENTS.md`, `README.md`, `BLUEPRINT.md`, `.harness/CONTEXT_INDEX.md`에 새 helper를
+  등록했다. `init.sh`는 `.agents/skills/`와 `.claude/commands/` 전체 복사라 새 파일이
+  자동 포함됨을 smoke test로 확인했다.
+- `.agents/skills/rescue-from-main` 디렉터리 생성은 샌드박스 read-only 제한으로
+  최초 `mkdir -p`가 실패했고, 승인된 escalated command로 생성한 뒤 `apply_patch`로
+  파일을 추가해 해결했다.
+- 검증: Task Acceptance PASS, skill frontmatter PASS(10개), `init.sh` smoke test
+  PASS(`/tmp/cc-harness-rescue-test.0oIJCZ`), `python3 scripts/validate_tasks.py` PASS,
+  `python3 scripts/sync_plans.py --check` PASS,
+  `python3 -m unittest tests.test_tasks tests.test_planning -v` PASS(18).
 ## 2026-07-08 12:20 KST — Task status patch target mistake
 
 - 상황: Task `4.10`을 완료 처리하려고 `"status": "todo"` 단일 패턴을 패치했더니

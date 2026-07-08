@@ -41,8 +41,8 @@ Codex용 `AGENTS.md` 진입점 + `.harness/` 상태 문서** 조합으로 해결
 | `BLUEPRINT.md` | 포함 | 플러그인·에이전트 협력 구조 전체 설명 (읽기용) |
 | `agents/task-decomposer.md`, `agents/test-agent.md`, `agents/quality-gates.md` | 포함 | 세분화 게이트·런타임 검증·공통 scope/YAGNI/review/reporting 기준. task-decomposer는 `/harness-plan`에서 외부 명령 계약 기반 proposal 흐름을 기본으로 사용 |
 | `.harness/` (STATE·HANDOFF·TASKS·LOG·LESSONS·CHECKPOINTS·CONTEXT_INDEX) | 포함 | 세션 상태·에러 이력·인수인계 기록 |
-| `.agents/skills/*/SKILL.md` | 포함 | Codex repo-scoped skills (`$grill-me`, `$harness-plan`, `$harness-work`, `$harness-review`, `$harness-progress`, `$harness-sync`, `$branch-checkout`, `$git-push`, `$pr-create`) |
-| `.claude/commands/{branch-checkout,git-push,pr-create}.md` | 포함 | Claude Code custom commands for Git branch checkout, safe push, draft PR creation |
+| `.agents/skills/*/SKILL.md` | 포함 | Codex repo-scoped skills (`$grill-me`, `$harness-plan`, `$harness-work`, `$harness-review`, `$harness-progress`, `$harness-sync`, `$branch-checkout`, `$git-push`, `$pr-create`, `$rescue-from-main`) |
+| `.claude/commands/{branch-checkout,git-push,pr-create,rescue-from-main}.md` | 포함 | Claude Code custom commands for Git branch checkout, safe push, draft PR creation, main/master work rescue |
 | `.claude/skills/grill-me/SKILL.md` | 포함 | 인터뷰 기반 PRD 초안 작성 스킬 (`/grill-me`) |
 | `.claude/agent-memory/*/MEMORY.md` | 포함 | worker·reviewer·advisor 행동 규칙 주입 (caveman/VFF 적용 강도 지정) |
 | `docs/templates/{PRD,UserFlow,DESIGN,Architecture}.md` | 포함 | 기획 산출물 골격 |
@@ -412,6 +412,7 @@ $harness-progress로 현재 상태를 요약해줘.
 | `/branch-checkout` | `$branch-checkout` |
 | `/git-push` | `$git-push` |
 | `/pr-create` | `$pr-create` |
+| `/rescue-from-main` | `$rescue-from-main` |
 
 ---
 
@@ -503,6 +504,7 @@ v1 범위는 planning 단계뿐이다. `work.jsonl`, `review.jsonl`, SQLite, 모
 | `/branch-checkout` | 로컬 custom command | 별도 작업 브랜치 생성·전환 |
 | `/git-push` | 로컬 custom command | 현재 브랜치 안전 push |
 | `/pr-create` | 로컬 custom command | 현재 브랜치에서 draft PR 작성 |
+| `/rescue-from-main` | 로컬 custom command | main/master 변경사항을 작업 브랜치로 옮겨 draft PR 작성 |
 
 Codex용 동등 절차는 `.agents/skills/` 아래 repo-scoped skills로 제공한다.
 Codex에서는 ponytail/caveman plugin 자동 hook을 가정하지 않고
@@ -639,7 +641,8 @@ cc-harness-template/
 │       ├── harness-review/SKILL.md
 │       ├── harness-progress/SKILL.md
 │       ├── harness-sync/SKILL.md
-│       └── pr-create/SKILL.md
+│       ├── pr-create/SKILL.md
+│       └── rescue-from-main/SKILL.md
 │
 ├── templates/skeleton/             # init.sh가 복사하는 tasks/·Plans.md·.harness/ 초기 상태 (dogfood 이력 없음)
 │   ├── Plans.md
@@ -664,7 +667,8 @@ cc-harness-template/
 │   ├── commands/                   # Claude Code local custom commands
 │   │   ├── branch-checkout.md
 │   │   ├── git-push.md
-│   │   └── pr-create.md
+│   │   ├── pr-create.md
+│   │   └── rescue-from-main.md
 │   ├── skills/
 │   │   └── grill-me/SKILL.md       # 인터뷰 기반 PRD 작성 스킬 (기획 단계 진입점)
 │   └── agent-memory/
