@@ -6,8 +6,8 @@
 #   /tmp/harness-tpl/init.sh /path/to/my-new-project
 #
 # README.md "새 프로젝트에 적용" Step 1의 수동 cp 목록을 스크립트로 대체.
-# 감사(H5/2026-07-04)에서 발견된 누락 항목(plans-complete.yml, ci.yml,
-# .harness/ 골격, PR/Issue 템플릿)을 포함한 완전판 복사 목록을 사용한다.
+# 감사(H5/2026-07-04)에서 발견된 누락 항목(ci.yml, .harness/ 골격,
+# PR/Issue 템플릿)을 포함한 복사 목록을 사용한다.
 # Plans.md·tasks/index.json·.harness/는 이 저장소 자신의 dogfood 이력이 아니라
 # templates/skeleton/의 초기 상태 버전에서 복사한다.
 
@@ -50,9 +50,8 @@ cp "$SRC_DIR/scripts/run_task_decomposer.py" "$TARGET_DIR/scripts/"
 # companion 에이전트
 cp -r "$SRC_DIR/agents/." "$TARGET_DIR/agents/"
 
-# CI 워크플로 (plans-guard·plans-complete·ci 전부 — README 누락분 포함)
+# CI 워크플로 (검증 전용 plans-guard + ci)
 cp "$SRC_DIR/.github/workflows/plans-guard.yml" "$TARGET_DIR/.github/workflows/"
-cp "$SRC_DIR/.github/workflows/plans-complete.yml" "$TARGET_DIR/.github/workflows/"
 cp "$SRC_DIR/.github/workflows/ci.yml" "$TARGET_DIR/.github/workflows/"
 
 # PR/Issue 템플릿

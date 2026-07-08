@@ -193,12 +193,12 @@ harness sync
 ### 3-3. CI 스택 블록 활성화
 
 `.github/workflows/ci.yml`에서 프로젝트 기술 스택 블록 주석 해제.
-`placeholder` job 삭제 후 GitHub branch protection 상태 체크 업데이트.
+`placeholder` job 삭제 후 `ci-ok`의 `needs:`를 활성화한 스택 잡으로 업데이트.
 
 ### 3-4. Branch Protection 설정
 
 GitHub → Settings → Branches → main:
-- Require status checks: `ci job명`, `plans-guard / WIP↔Branch`, `plans-guard / Acceptance Oracle`
+- Require status checks: `ci-ok`, `plans-guard / tasks/index.json 검증`, `plans-guard / Plans.md sync 검증`
 - Require pull request before merging
 
 > 상세 가이드: `docs/github-integration.md`

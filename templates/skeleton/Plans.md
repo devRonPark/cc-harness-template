@@ -35,7 +35,7 @@ GH 컬럼:
 Acceptance 컬럼:
   -         — 기계 검증 없음 (skip). "|| echo skip"처럼 항상 성공하는
               패턴은 oracle을 무력화하므로 금지 — 검증 안 할 거면 "-"로 명시.
-  명령어     — PR 오픈 시 plans-guard CI가 실행, 실패하면 PR 차단.
+  명령어     — 세션 에이전트가 완료 전 실행, 실패하면 done 전환 금지.
               CI checkout 범위 밖 경로(예: ../다른-repo/)는 실행 불가 — 금지.
               Given=repo checkout/Depends 산출물, When=명령 실행, Then=exit 0
               또는 출력·파일·응답 검증이 되도록 쓴다.
@@ -49,7 +49,7 @@ Acceptance 컬럼:
     출력 포함: go test ./... | grep -v SKIP
   escaped pipe(예: grep 'a\|b')는 Acceptance 컬럼에서만 사용 — DoD 등 다른
   컬럼에 쓰면 파서가 열 개수를 오인식한다.
-  * 스택 설치(npm ci 등)는 .github/workflows/plans-guard.yml 상단 주석 해제
+  * GitHub CI 스택 설치(npm ci 등)는 .github/workflows/ci.yml에서 설정
 
 DoD (Definition of Done) 작성 원칙:
   - 검증 가능한 파일·명령·출력으로 기술

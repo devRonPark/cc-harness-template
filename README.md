@@ -46,7 +46,7 @@ Codex용 `AGENTS.md` 진입점 + `.harness/` 상태 문서** 조합으로 해결
 | `.claude/skills/grill-me/SKILL.md` | 포함 | 인터뷰 기반 PRD 초안 작성 스킬 (`/grill-me`) |
 | `.claude/agent-memory/*/MEMORY.md` | 포함 | worker·reviewer·advisor 행동 규칙 주입 (caveman/VFF 적용 강도 지정) |
 | `docs/templates/{PRD,UserFlow,DESIGN,Architecture}.md` | 포함 | 기획 산출물 골격 |
-| `.github/workflows/{ci,plans-guard,plans-complete}.yml` | 포함 | CI·PR 게이트·완료 자동 전환 (GitHub 연동 시) |
+| `.github/workflows/{ci,plans-guard}.yml` | 포함 | 기술 스택 CI + Task manifest/snapshot 검증 (GitHub 연동 시) |
 | `init.sh` | 포함 | 위 전체를 새 프로젝트 디렉토리에 한 번에 복사 |
 | `scripts/setup-plugins.sh` | 포함 | `~/.claude/settings.json` 플러그인 등록·설치 자동화 (Step 1 수동 JSON 편집 대체) |
 | `.claude/settings.local.json.example` | 포함(예시) | 프로젝트 전용 권한 설정 — 복사 후 `settings.local.json`으로 rename |
@@ -255,7 +255,7 @@ CLAUDE.md의 harness 규칙을 따라줘 — Task 작성 전 task-decomposer 세
 
 ### Step 1 — 템플릿 파일 복사
 
-`init.sh`가 아래 모든 파일(CI 워크플로 3종, PR/Issue 템플릿, `.harness/` 골격
+`init.sh`가 아래 모든 파일(CI 워크플로 2종, PR/Issue 템플릿, `.harness/` 골격
 7종 포함)을 한 번에 복사한다. `tasks/index.json`·`Plans.md`·`.harness/`는 이 템플릿 저장소
 자신의 작업 이력이 아니라 `templates/skeleton/`의 깨끗한 초기 상태에서
 복사되므로, 새 프로젝트가 남의 완료 Task를 물려받지 않는다.
@@ -280,12 +280,14 @@ description = "한 줄 설명"    # ← 변경
 `[PROJECT_NAME]`, 기술 스택, 디렉토리 구조, 코딩 규칙 섹션을 실제 프로젝트에 맞게 채운다.
 
 **`tasks/index.json`**
-Week 구조와 Task를 정의한다. DoD는 **검증 가능한 형태**로, Acceptance는 **CI가 직접 실행하는 명령어**로 쓴다. 사람이 읽는 로드맵이 필요하면 `python3 scripts/sync_plans.py`로 `Plans.md` snapshot을 갱신한다.
+Week 구조와 Task를 정의한다. DoD는 **검증 가능한 형태**로, Acceptance는
+**세션 에이전트가 완료 전 실행할 명령어**로 쓴다. 사람이 읽는 로드맵이 필요하면
+`python3 scripts/sync_plans.py`로 `Plans.md` snapshot을 갱신한다.
 
 ```markdown
 # 좋은 DoD / Acceptance 예시
 DoD: `npm run build` 에러 0, dist/index.js 존재
-Acceptance: npm run build 2>&1 | grep -v error   ← CI가 실행, 실패 시 PR 차단
+Acceptance: npm run build 2>&1 | grep -v error   ← 세션 에이전트가 실행, 실패 시 done 전환 금지
 
 # 성공 판단 기준
 - Task는 INVEST 기준으로 독립 검증 가능, 관찰 가능한 가치, 1 PR 이내, 테스트 가능해야 한다.
@@ -450,18 +452,18 @@ claude
 4. **test-agent**가 런타임 검증 — Acceptance 명령 + 프로젝트 테스트 스위트 실행.
    FAIL 시 worker에 재위임, PASS 시에만 다음 단계 진행
 5. **reviewer**에게 검토 요청 (VFF v2 전체 + quality gate — findings와 검증 근거 먼저)
-6. 완료 반영: **GitHub 연동 시** PR 안에서 세션이 직접 `done`으로 바꾸지
-   않는다 — 머지 후 `plans-complete.yml` 봇이 `tasks/index.json`만 자동 커밋으로 전환한다.
-   **GitHub 미연동 시**는 세션이 Task 완료 시점에 `tasks/index.json`을 갱신하고
-   `python3 scripts/sync_plans.py`를 실행한다.
+6. 완료 반영: Acceptance와 관련 테스트가 통과하면 세션이
+   `tasks/index.json`의 대상 Task를 `done`으로 갱신하고
+   `python3 scripts/sync_plans.py`를 실행한다. GitHub Actions는 Task 상태를
+   바꾸지 않는다.
 
 > **동작 원리 주의**: 위 흐름 중 task-decomposer/quality gate(1-a)와 test-agent 실행(4),
 > GitHub Issue/PR 자동화는 harness 플러그인 내장 기능이 아니라 **CLAUDE.md의 지시를
 > Claude가 세션에서 직접 수행**하는 규약이다. `harness.toml`의
 > `[github]`·`[review]`·`[test]`·`[plan]` 섹션은 `harness sync`가 파싱하지 않으며
-> 규약의 SSOT 요약 인덱스 역할만 한다. task-decomposer 게이트는
-> `plans-guard.yml`의 `granularity-check` CI 잡으로 세션 확인이 생략돼도
-> PR 단계에서 기계적으로 재차 막힌다. 상세: [BLUEPRINT.md](./BLUEPRINT.md).
+> 규약의 SSOT 요약 인덱스 역할만 한다. `plans-guard.yml`은 Task manifest와
+> `Plans.md` snapshot이 유효한지만 확인한다. 세분화·scope/YAGNI·Acceptance 실행은
+> 세션 에이전트의 책임이다. 상세: [BLUEPRINT.md](./BLUEPRINT.md).
 
 ### `/harness-plan` 감시 로그
 
@@ -512,7 +514,7 @@ Codex에서는 ponytail/caveman plugin 자동 hook을 가정하지 않고
 |------|------|------|
 | `todo` | `cc:TODO` | 미시작. harness가 선택 대상으로 봄 |
 | `wip` | `cc:WIP` | 진행 중. task 브랜치 착수 시 세션이 설정 |
-| `done` | `cc:완료` | 완료. **GitHub 연동**: `plans-complete.yml` 봇이 `tasks/index.json`을 머지 후 자동 커밋. **미연동**: 세션이 직접 갱신 |
+| `done` | `cc:완료` | 완료. Acceptance와 관련 테스트 통과 후 세션이 직접 갱신 |
 | `blocked` | `cc:BLOCKED` | 차단됨. `blocked_reason` 필수 |
 
 ---
@@ -653,8 +655,7 @@ cc-harness-template/
 ├── .github/                        # GitHub 연동 시 사용 (harness.toml enabled = true)
 │   ├── workflows/
 │   │   ├── ci.yml                  # 빌드·테스트 CI + ci-ok 요약 잡(required check 이름 고정용)
-│   │   ├── plans-guard.yml         # PR 시 validate·diff·WIP branch·depends·acceptance·granularity 실행
-│   │   └── plans-complete.yml      # 머지 시 tasks/index.json wip→done 자동 커밋
+│   │   └── plans-guard.yml         # PR 시 tasks/index.json 검증 + Plans.md sync 확인
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── ISSUE_TEMPLATE/
 │
@@ -778,7 +779,7 @@ worker/reviewer/advisor 분리가, 상태 유실은 `.harness/`가 각각 담당
 |------|------|
 | [BLUEPRINT.md](./BLUEPRINT.md) | Plugin 간 협력 관계, 세션 타임라인, 에이전트 매트릭스 전체 설명 |
 | [docs/setup-guide.md](./docs/setup-guide.md) | 설치 상세 절차, OS별 경로, 재설치 방법 |
-| [docs/github-integration.md](./docs/github-integration.md) | GitHub Issues·CI·Acceptance Oracle 연동 상세 가이드 |
+| [docs/github-integration.md](./docs/github-integration.md) | GitHub Issues·PR·검증 CI 연동 상세 가이드 |
 | [docs/global-settings-reference.md](./docs/global-settings-reference.md) | `~/.claude/settings.json` 전체 항목 설명 |
 
 ## 추가 권장 문서

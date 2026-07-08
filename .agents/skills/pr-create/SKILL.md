@@ -21,4 +21,5 @@ description: 현재 작업 브랜치에서 GitHub PR을 작성한다. PR 생성,
 ## 제한
 
 - Acceptance evidence가 없거나 리뷰가 `REQUEST_CHANGES`면 PR 생성 전 중단한다.
-- GitHub 모드에서는 PR 안에서 Task를 `done`으로 바꾸지 않는다.
+- Task 상태 변경은 PR 생성 전에 Acceptance evidence와 함께 이미 반영돼 있어야 한다.
+  GitHub Actions가 상태를 대신 전환하지 않는다.

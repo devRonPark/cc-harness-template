@@ -103,9 +103,9 @@ CLAUDE.md 테스트 규칙(`worker 구현 완료 후, reviewer 검토 전에
 agents/test-agent.md 절차를 실행한다`)은 세션 규약이지 훅이 아니다. 기계적으로
 강제하려면 Plans.md에서 Task를 `cc:완료`로 바꾸는 Edit를 `PreToolUse`로
 가로채 `.harness/LOG.md`에 최근 Acceptance 실행 기록이 있는지 확인하는 훅을
-붙일 수 있다 — 다만 이 검증 로직은 프로젝트마다 Plans.md 포맷이 다르므로
-직접 짜야 한다. 없다고 이 템플릿이 부족한 것은 아니다: `plans-guard.yml`의
-`acceptance-check` CI 잡이 GitHub 연동 시 PR 단계에서 같은 역할을 기계적으로 대신한다.
+붙일 수 있다 — 다만 이 검증 로직은 프로젝트마다 Task 완료 절차가 다르므로
+직접 짜야 한다. 현재 GitHub Actions는 Acceptance 실행을 대신하지 않고
+`tasks/index.json`과 `Plans.md`의 검증만 수행한다.
 
 ---
 

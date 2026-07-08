@@ -77,9 +77,9 @@
     },
     {
       "id": "1.3",
-      "title": "task-decomposer + 세분화 게이트 추가",
-      "dod": "agents/task-decomposer.md 존재, harness.toml [plan] 섹션, plans-guard.yml granularity-check 잡, CLAUDE.md 구현 규칙",
-      "acceptance": "test -f agents/task-decomposer.md && grep -q 'granularity-check' .github/workflows/plans-guard.yml",
+      "title": "task-decomposer + 세션 세분화 게이트 추가",
+      "dod": "agents/task-decomposer.md 존재, harness.toml [plan] 섹션, CLAUDE.md 구현 규칙에 세분화 게이트 명시",
+      "acceptance": "test -f agents/task-decomposer.md && grep -q '세분화 게이트' CLAUDE.md",
       "depends": [
         "1.1"
       ],
@@ -169,9 +169,9 @@
     },
     {
       "id": "2.7",
-      "title": "GitHub 연동 E2E 검증 + plans-complete 워크플로",
-      "dod": "harness-gh-test repo에서 plans-guard 3잡 시나리오 4종 검증, 빈틈 7건 도출, plans-complete.yml 신설 검증, CLAUDE.md GitHub 플로우 명문화",
-      "acceptance": "test -f .github/workflows/plans-complete.yml && grep -q 'plans-complete' CLAUDE.md",
+      "title": "GitHub 연동 E2E 검증",
+      "dod": "harness-gh-test repo에서 GitHub 연동 시나리오를 검증하고 발견한 빈틈을 문서화",
+      "acceptance": "grep -q 'GitHub 플로우' CLAUDE.md",
       "depends": [
         "2.5"
       ],
@@ -181,9 +181,9 @@
     },
     {
       "id": "3.1",
-      "title": "plans-complete branch protection 호환 (H1)",
+      "title": "GitHub branch protection 호환 (H1)",
       "dod": "protection 활성 테스트 repo에서 자동 flip 실증, 선택한 방식(bypass/PR)의 근거를 워크플로 주석에 기록",
-      "acceptance": "grep -qi 'protection' .github/workflows/plans-complete.yml",
+      "acceptance": "grep -qi 'branch protection' docs/github-integration.md",
       "depends": [],
       "status": "done",
       "gh": "-",
@@ -202,8 +202,8 @@
     {
       "id": "3.3",
       "title": "init.sh 초기화 스크립트 (H5)",
-      "dod": "init.sh가 plans-complete.yml·ci.yml·.harness/ 골격 포함 복사, README 수동 cp 절차를 스크립트 안내로 교체",
-      "acceptance": "test -x init.sh && grep -q 'plans-complete.yml' init.sh",
+      "dod": "init.sh가 ci.yml·plans-guard.yml·.harness/ 골격 포함 복사, README 수동 cp 절차를 스크립트 안내로 교체",
+      "acceptance": "test -x init.sh && grep -q 'plans-guard.yml' init.sh && grep -q 'ci.yml' init.sh",
       "depends": [
         "3.2"
       ],
@@ -213,9 +213,9 @@
     },
     {
       "id": "3.4",
-      "title": "plans-guard diff 보호 잡 (H2)",
-      "dod": "비-task 브랜치의 Status 변경 PR 차단, task 브랜치의 타 행 Status 변경 차단 — 시나리오 2종 테스트 repo 검증",
-      "acceptance": "grep -q 'plans-diff-check' .github/workflows/plans-guard.yml",
+      "title": "plans-guard 상태 변경 보호 검토 기록 (H2)",
+      "dod": "Task 상태 변경 보호를 CI가 아닌 세션 에이전트 책임으로 둘지 검토하고 결정을 문서화",
+      "acceptance": "-",
       "depends": [
         "3.6"
       ],
@@ -225,9 +225,9 @@
     },
     {
       "id": "3.5",
-      "title": "plans-guard depends-check 잡 (H3)",
-      "dod": "WIP Task의 Depends 대상이 cc:완료 아니면 FAIL — 시나리오 검증",
-      "acceptance": "grep -q 'depends-check' .github/workflows/plans-guard.yml",
+      "title": "Depends 검증 경로 정리 (H3)",
+      "dod": "Depends 존재 여부와 WIP 선행 완료 검증 경로가 validate_tasks.py 기준으로 정리됨",
+      "acceptance": "python3 scripts/validate_tasks.py",
       "depends": [
         "3.6"
       ],
@@ -238,8 +238,8 @@
     {
       "id": "3.6",
       "title": "Plans.md 헤더 검증 선행 파싱 (M1·M7)",
-      "dod": "헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard·plans-complete에 공통 적용",
-      "acceptance": "grep -q 'header-check' .github/workflows/plans-guard.yml",
+      "dod": "헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard에 적용",
+      "acceptance": "python3 scripts/sync_plans.py --check",
       "depends": [],
       "status": "done",
       "gh": "-",
@@ -248,8 +248,8 @@
     {
       "id": "3.7",
       "title": "완료 전환 서술 통일 (M3)",
-      "dod": "README·BLUEPRINT의 세션 직접 flip 서술을 CLAUDE.md 기준(plans-complete 자동 전환)으로 교체",
-      "acceptance": "grep -q 'plans-complete' README.md && grep -q 'plans-complete' BLUEPRINT.md",
+      "dod": "README·BLUEPRINT의 Task 상태 전환 서술을 CLAUDE.md 기준과 일치시킴",
+      "acceptance": "grep -q 'GitHub Actions는 Task 상태를 바꾸지 않는다' README.md && grep -q 'Actions는 Task 상태를 쓰지 않고' BLUEPRINT.md",
       "depends": [
         "3.1"
       ],
@@ -309,9 +309,9 @@
     },
     {
       "id": "4.1",
-      "title": "granularity 오탐지 정규식 정확도 개선 (L1)",
-      "dod": "vague_re가 \"그리고\" 포함 정상 문장은 통과시키고 쉼표 나열·\"와\"/\"과\" 열거 표현은 미달로 탐지",
-      "acceptance": "! grep -q \"vague_re='(전체|모든| 및 |그리고)'\" .github/workflows/plans-guard.yml",
+      "title": "세분화 기준 표현 정확도 개선 (L1)",
+      "dod": "agents/task-decomposer.md가 정상 연결어와 여러 관심사 열거 표현을 구분하는 기준을 설명",
+      "acceptance": "grep -q '여러 관심사' agents/task-decomposer.md",
       "depends": [],
       "status": "todo",
       "gh": "-",

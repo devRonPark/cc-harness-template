@@ -81,8 +81,9 @@ branches, pushing, or creating PRs. Never force push or discard local changes.
   the task Acceptance command and the relevant project test suite.
 - During review, apply `agents/quality-gates.md`: findings first, verification
   evidence first, and only useful residual risk after approval.
-- Do not mark a task `done` unless the Acceptance evidence has passed. In
-  GitHub mode, leave WIP-to-done conversion to `plans-complete.yml` after merge.
+- Do not mark a task `done` unless the Acceptance evidence has passed. GitHub
+  Actions must not convert task status; the active agent updates
+  `tasks/index.json` and regenerates `Plans.md`.
 
 ## State Documents
 

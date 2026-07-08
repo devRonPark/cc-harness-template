@@ -101,11 +101,11 @@
 - **Implementation**: Task당 브랜치 생성 → **브랜치에서 해당 Task를 `wip`로 마킹**
   → 구현 → reviewer APPROVE 후 PR 오픈. PR 본문에 `Closes #{이슈번호}` 필수
   (누락 시 머지돼도 이슈가 안 닫힌다)
-- **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
-- **완료 전환**: 머지 시 `plans-complete.yml`이 해당 Task를 `wip` → `done`으로
-  `tasks/index.json`에 자동 커밋한다. PR 안에서 미리 완료로 바꾸지 말 것 — wip-branch-check가 cc:WIP를
-  요구하므로 모순. stale WIP가 main에 남으면 이후 모든 PR이 그 Task의 acceptance를
-  재실행하므로 이 자동 전환이 꼭 필요하다
+- **Merge 조건**: CI 통과 (`ci-ok` + `plans-guard`) + PR 승인 후 main 머지
+- **완료 전환**: Acceptance와 관련 테스트가 통과하면 세션 에이전트가
+  `tasks/index.json`의 대상 Task를 `done`으로 직접 갱신하고
+  `python3 scripts/sync_plans.py`로 snapshot을 재생성한다. GitHub Actions는
+  Task 상태를 쓰지 않는다.
 - **Task 상태 충돌 주의**: 여러 task 브랜치가 `tasks/index.json` 상태를 동시에 고치면 머지
   충돌이 잦다 — PR 오픈 전 main을 머지해 최신화할 것
 - **branch protection**: plans-guard는 PR에만 걸린다. main 직접 push를 막으려면
@@ -123,10 +123,10 @@
   하나라도 미달(DoD·Acceptance 미기재, "전체/모든/및"으로 뭉뚱그린 표현,
   여러 관심사 혼재 등)이면 worker에게 위임하지 않는다 — task-decomposer를
   먼저 실행해 하위 Task로 쪼갠 뒤에만 `/harness-work`를 진행한다.
-- 이 게이트는 `.github/workflows/plans-guard.yml`의 `granularity-check` 잡으로도
-  기계적으로 강제된다 — PR 단계에서도 동일 기준 미달 Task가 있으면 CI가 막는다.
-  세션 중 수동 확인과 CI 게이트를 이중으로 둔 이유: 세션 확인은 worker 호출
-  *전에* 낭비를 막고, CI는 그 확인이 생략됐을 때의 최종 방어선이다.
+- 이 게이트는 세션 중 수동 확인으로 강제한다. `plans-guard.yml`은
+  `tasks/index.json` 구조와 `Plans.md` sync만 검증하며, 세분화·scope/YAGNI
+  판단은 `agents/task-decomposer.md`와 `agents/quality-gates.md`를 읽은
+  에이전트 책임이다.
 - **worker가 작업 도중 범위가 예상보다 크다는 걸 발견하면**(관련 없는 파일
   3개 이상을 동시에 고쳐야 하거나, 서로 다른 관심사가 뒤섞여 있음을 인지하면)
   즉시 구현을 멈추고 `agents/task-decomposer.md`를 다시 호출한다. 남은 작업을
