@@ -12,7 +12,7 @@
 | 0.1 | PRD 작성 (`/grill-me` 인터뷰) | docs/PRD.md v0.1 존재, Open Questions 정리됨 | test -f docs/PRD.md | - | cc:TODO | - |
 | 0.2 | 기획 보완 문서 | UserFlow.md·Architecture.md 작성 (docs/templates/ 골격 사용) | test -f docs/UserFlow.md && test -f docs/Architecture.md | 0.1 | cc:TODO | - |
 | 0.3 | Harness 초기화 | harness doctor 전체 통과, CLAUDE.md·Plans.md 존재 | test -f CLAUDE.md && test -f Plans.md && test -f harness.toml | - | cc:TODO | - |
-| 0.4 | Plugin 설정 | ponytail·caveman 등 필요한 플러그인 설치 확인 | test -f ~/.claude/settings.json | 0.3 | cc:TODO | - |
+| 0.4 | Plugin 설정 | 프로젝트 전용 Claude 권한 설정 예시가 복사되고, 전역 플러그인 설치는 README 절차로 확인 | test -f .claude/settings.local.json | 0.3 | cc:TODO | - |
 
 ---
 

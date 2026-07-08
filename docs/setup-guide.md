@@ -108,10 +108,17 @@ cd /path/to/my-new-project
 # 템플릿 파일 복사
 cp /path/to/cc-harness-template/harness.toml .
 cp /path/to/cc-harness-template/CLAUDE.md .
+cp /path/to/cc-harness-template/AGENTS.md .
 cp /path/to/cc-harness-template/templates/skeleton/Plans.md .
 cp -r /path/to/cc-harness-template/templates/skeleton/tasks .
 cp -r /path/to/cc-harness-template/scripts .
 cp /path/to/cc-harness-template/BLUEPRINT.md .
+mkdir -p .agents
+cp -r /path/to/cc-harness-template/.agents/skills .agents/
+mkdir -p .claude
+cp -r /path/to/cc-harness-template/.claude/commands .claude/
+mkdir -p .claude/skills
+cp -r /path/to/cc-harness-template/.claude/skills/grill-me .claude/skills/
 mkdir -p .claude/agent-memory/claude-code-harness-worker
 mkdir -p .claude/agent-memory/claude-code-harness-reviewer
 mkdir -p .claude/agent-memory/claude-code-harness-advisor
@@ -134,6 +141,15 @@ description = "프로젝트 설명"      # ← 변경
 ```
 
 **CLAUDE.md** — `[PROJECT_NAME]`, 기술 스택, 코딩 규칙 섹션 채우기.
+
+**AGENTS.md** — Codex가 같은 규약을 읽는 진입점. `[PROJECT_NAME]`을 확인하고,
+프로젝트별로 Codex에만 필요한 예외가 있으면 `CLAUDE.md`와 드리프트 없이 함께 기록한다.
+
+**.agents/skills/** — Codex repo-scoped skills. `$harness-work`, `$branch-checkout`,
+`$git-push`, `$pr-create` 등으로 호출한다.
+
+**.claude/commands/** — Claude Code local custom commands. `/branch-checkout`,
+`/git-push`, `/pr-create`를 제공한다.
 
 **tasks/index.json** — Week 구조와 Task 상태 단일 출처. DoD는 검증 가능한 기준으로 작성.
 사람이 읽는 로드맵이 필요하면 `python3 scripts/sync_plans.py`로 **Plans.md** snapshot을 갱신한다.

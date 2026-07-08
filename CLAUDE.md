@@ -114,6 +114,10 @@
 
 ## 구현 규칙 (세분화 게이트)
 
+- **구현 전 `agents/quality-gates.md`를 scope/YAGNI 게이트로 함께 적용한다.**
+  ponytail이 설치된 Claude Code 세션에서는 plugin enhancement가 같은 원칙을
+  보강할 수 있지만, 저장소 기준은 이 파일이다. Codex는 ponytail/caveman 자동
+  hook을 가정하지 않고 `AGENTS.md`와 `.agents/skills/*`에서 이 문서를 직접 참조한다.
 - **`/harness-work` 실행 전, `tasks/index.json`의 대상 `todo` Task가 전부
   `agents/task-decomposer.md`의 세분화 기준을 통과했는지 먼저 확인한다.**
   하나라도 미달(DoD·Acceptance 미기재, "전체/모든/및"으로 뭉뚱그린 표현,
@@ -144,6 +148,8 @@
 ## 리뷰 규칙
 
 - **worker 완료 후 PR 오픈 전에 반드시 `/harness-review`를 실행한다.**
+- 리뷰는 `agents/quality-gates.md`의 review/reporting gate를 따른다. findings를
+  먼저 보고하고, Acceptance·테스트 evidence와 잔여 risk를 짧게 남긴다.
 - `harness.toml`의 `[review] require_before_pr = true` 설정 시 harness가 자동 강제.
 - `/harness-work` 사용 시 step 9(자동 리뷰 스테이지)가 내장 실행됨 — 별도 호출 불필요.
 - `/harness-work` 없이 직접 구현한 경우: 커밋 후 PR 오픈 전 `/harness-review` 수동 실행.

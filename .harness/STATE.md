@@ -6,20 +6,32 @@
 
 ## 현재 목표
 
-Planning observability v1 적용: 독립 task-decomposer proposal 기본 흐름,
-비개발자 친화 planning JSONL 로그, proposal 검증/적용 스크립트, 문서 규약 반영.
+Claude/Codex 공용 Quality Gate 정리 완료: ponytail/caveman의 핵심 원칙을
+`agents/quality-gates.md`로 흡수하고, Codex skill·Claude/Codex 문서·init
+골격·Task snapshot에 같은 기준을 연결한다.
 
 ## 진행 중인 Task
 
-- 사용자 요청 기반 직접 작업. `tasks/index.json`의 기존 Week 4 TODO 상태는 변경하지 않음.
+- Task `4.10` 완료. GitHub 미연동 모드 기준으로 `tasks/index.json` status를 `done`으로 전환하고 `Plans.md` 재생성 완료.
 
 ## 마지막 검증 결과
 
+- Task `4.10` Acceptance **PASS**:
+  `test -f docs/specs/2026-07-08-codex-claude-quality-gates.md && test -f agents/quality-gates.md && grep -q 'YAGNI' agents/quality-gates.md && grep -q 'caveman' README.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-work/SKILL.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-review/SKILL.md`
 - `python3 -m unittest tests.test_tasks tests.test_planning -v` **PASS** (18 tests)
 - `python3 scripts/validate_tasks.py` **PASS** (`tasks/index.json valid`)
+- `python3 scripts/validate_tasks.py --root templates/skeleton` **PASS** (`tasks/index.json valid`)
 - `python3 scripts/sync_plans.py --check` **PASS** (`Plans.md in sync`)
-- `init.sh` smoke test **PASS**: `/tmp/harness-init-test.cZ7eqd`에 새 `.harness/shared/planning/runs/`
-  및 `.harness/events/` 골격 복사 확인
+- `python3 scripts/sync_plans.py --root templates/skeleton --check` **PASS** (`Plans.md in sync`)
+- init smoke test **PASS**: `/tmp/cc-harness-quality-gate-test.G576HW`에
+  `agents/quality-gates.md`, `.agents/skills/{harness-work,harness-review}/SKILL.md`,
+  `AGENTS.md`, `CLAUDE.md` 복사 확인
+- `.agents/skills` frontmatter check **PASS** (9개 `SKILL.md`)
+- Claude command existence check **PASS** (`branch-checkout`, `git-push`, `pr-create`)
+- Codex Git skill existence check **PASS** (`branch-checkout`, `git-push`, `pr-create`)
+- `init.sh` smoke test **PASS**: `/tmp/cc-harness-git-helper-test.9j00Yd`에
+  `.claude/commands/*`, `.agents/skills/{branch-checkout,git-push,pr-create}/SKILL.md`,
+  `AGENTS.md`, `CLAUDE.md` 복사 확인
 
 ## 차단 요소
 
@@ -32,8 +44,8 @@ Planning observability v1 적용: 독립 task-decomposer proposal 기본 흐름,
   `603fcc0`(3.6) → `0c8ea99`(3.4) → `03d185f`(3.5) → `2594119`(3.7) →
   `2dd1d8b`(3.8) → `11aa504`(3.9) → `d5117bc`(3.10) → `2b9a6d8`(3.11) →
   `6667307`(3.12)
-- 현재 planning observability 변경분은 **아직 커밋 안 됨**.
+- 현재 planning observability, Codex skill, Git helper command/skill 변경분은 **아직 커밋 안 됨**.
 
 ## 최종 갱신
 
-- 2026-07-08, planning observability v1 구현 및 검증 완료
+- 2026-07-08 12:22 KST, Quality Gate 작업 구현·검증·리뷰 완료

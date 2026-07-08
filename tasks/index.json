@@ -366,6 +366,52 @@
       "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.7",
+      "title": "Codex 호환 진입점 추가",
+      "dod": "AGENTS.md가 Codex 진입점으로 존재하고 init.sh가 새 프로젝트에 복사하며 README·BLUEPRINT에 Codex 동작 경로가 명시됨",
+      "acceptance": "test -f AGENTS.md && grep -q 'AGENTS.md' init.sh && grep -q 'Recommended Codex Workflow' README.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.8",
+      "title": "Codex harness skills 추가",
+      "dod": ".agents/skills 아래 harness 흐름 6종 SKILL.md가 존재하고 init.sh가 새 프로젝트에 복사함",
+      "acceptance": "test -f .agents/skills/grill-me/SKILL.md && test -f .agents/skills/harness-plan/SKILL.md && test -f .agents/skills/harness-work/SKILL.md && test -f .agents/skills/harness-review/SKILL.md && test -f .agents/skills/harness-progress/SKILL.md && test -f .agents/skills/harness-sync/SKILL.md && grep -q '.agents/skills' init.sh",
+      "depends": [
+        "4.7"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.9",
+      "title": "Git workflow helper command/skill 추가",
+      "dod": "Claude custom command와 Codex skill로 branch-checkout·git-push·pr-create 절차가 제공되고 init.sh가 복사함",
+      "acceptance": "test $(find .claude/commands -name '*.md' | wc -l) -ge 3 && test -f .agents/skills/branch-checkout/SKILL.md && test -f .agents/skills/git-push/SKILL.md && test -f .agents/skills/pr-create/SKILL.md && grep -q '.claude/commands' init.sh",
+      "depends": [
+        "4.8"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.10",
+      "title": "Claude/Codex 공용 Quality Gate 문서화",
+      "dod": "docs/specs/2026-07-08-codex-claude-quality-gates.md와 agents/quality-gates.md가 존재하고 Codex skill, README, BLUEPRINT, AGENTS, init skeleton이 quality gate 기준을 참조함",
+      "acceptance": "test -f docs/specs/2026-07-08-codex-claude-quality-gates.md && test -f agents/quality-gates.md && grep -q 'YAGNI' agents/quality-gates.md && grep -q 'caveman' README.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-work/SKILL.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-review/SKILL.md",
+      "depends": [
+        "4.8"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Codex 호환 환경 구성"
     }
   ]
 }

@@ -74,6 +74,17 @@
 
 ---
 
+## Week 4 — Codex 호환 환경 구성
+
+| Task | 내용 | DoD | Acceptance | Depends | Status | GH |
+|------|------|-----|------------|---------|--------|----|
+| 4.7 | Codex 호환 진입점 추가 | AGENTS.md가 Codex 진입점으로 존재하고 init.sh가 새 프로젝트에 복사하며 README·BLUEPRINT에 Codex 동작 경로가 명시됨 | test -f AGENTS.md && grep -q 'AGENTS.md' init.sh && grep -q 'Recommended Codex Workflow' README.md | - | cc:완료 | - |
+| 4.8 | Codex harness skills 추가 | .agents/skills 아래 harness 흐름 6종 SKILL.md가 존재하고 init.sh가 새 프로젝트에 복사함 | test -f .agents/skills/grill-me/SKILL.md && test -f .agents/skills/harness-plan/SKILL.md && test -f .agents/skills/harness-work/SKILL.md && test -f .agents/skills/harness-review/SKILL.md && test -f .agents/skills/harness-progress/SKILL.md && test -f .agents/skills/harness-sync/SKILL.md && grep -q '.agents/skills' init.sh | 4.7 | cc:완료 | - |
+| 4.9 | Git workflow helper command/skill 추가 | Claude custom command와 Codex skill로 branch-checkout·git-push·pr-create 절차가 제공되고 init.sh가 복사함 | test $(find .claude/commands -name '*.md' \| wc -l) -ge 3 && test -f .agents/skills/branch-checkout/SKILL.md && test -f .agents/skills/git-push/SKILL.md && test -f .agents/skills/pr-create/SKILL.md && grep -q '.claude/commands' init.sh | 4.8 | cc:완료 | - |
+| 4.10 | Claude/Codex 공용 Quality Gate 문서화 | docs/specs/2026-07-08-codex-claude-quality-gates.md와 agents/quality-gates.md가 존재하고 Codex skill, README, BLUEPRINT, AGENTS, init skeleton이 quality gate 기준을 참조함 | test -f docs/specs/2026-07-08-codex-claude-quality-gates.md && test -f agents/quality-gates.md && grep -q 'YAGNI' agents/quality-gates.md && grep -q 'caveman' README.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-work/SKILL.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-review/SKILL.md | 4.8 | cc:완료 | - |
+
+---
+
 <!--
 Task 상태의 단일 출처는 tasks/index.json이다.
 Plans.md는 사람이 필요할 때 python3 scripts/sync_plans.py로 갱신하는
