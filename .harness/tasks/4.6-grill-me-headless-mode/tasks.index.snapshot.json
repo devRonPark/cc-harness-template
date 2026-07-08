@@ -363,7 +363,7 @@
       "dod": "무응답·headless 환경에서 질문마다 권장값으로 자동 확정 후 진행하는 대안 경로 명시",
       "acceptance": "grep -q 'headless' .claude/skills/grill-me/SKILL.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },

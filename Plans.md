@@ -70,7 +70,7 @@
 | 4.3 | CONTEXT_INDEX.md 미존재 파일 인덱스 정리 (L3) | 이 저장소에 없는 docs/PRD.md·UserFlow.md·Architecture.md 인덱스 항목 제거 | ! grep -q 'docs/PRD.md' .harness/CONTEXT_INDEX.md | - | cc:완료 | - |
 | 4.4 | rm 위험 패턴 매칭 범위 확대 (L4) | harness.toml ask 목록이 rm -fr·rm -R 조합도 포착 | [ $(grep -c 'rm -' harness.toml) -gt 1 ] | - | cc:완료 | - |
 | 4.5 | grill-me 산출 경로 인자 지원 (L5) | SKILL.md에 대상 디렉토리 인자 규약 명시, 기본값은 현재 프로젝트 docs/ | grep -q '산출 경로' .claude/skills/grill-me/SKILL.md | - | cc:완료 | - |
-| 4.6 | grill-me 비대화형 실행 호환 모드 (L5) | 무응답·headless 환경에서 질문마다 권장값으로 자동 확정 후 진행하는 대안 경로 명시 | grep -q 'headless' .claude/skills/grill-me/SKILL.md | - | cc:TODO | - |
+| 4.6 | grill-me 비대화형 실행 호환 모드 (L5) | 무응답·headless 환경에서 질문마다 권장값으로 자동 확정 후 진행하는 대안 경로 명시 | grep -q 'headless' .claude/skills/grill-me/SKILL.md | - | cc:완료 | - |
 
 ---
 
