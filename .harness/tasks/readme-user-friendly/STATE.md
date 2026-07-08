@@ -6,17 +6,22 @@
 
 ## 진행 중인 Task
 
-- 현재 `tasks/index.json`에는 이 README 개편 전용 Task가 없다.
-- 상태: 후순위로 미룸
-- 이번 `4.12`에서는 README 개편 자체를 구현하지 않는다.
+- Task: `4.13` README 사용자 친화 개편
+- 상태: `done`
+- 세분화 게이트: 통과. 단일 문서 산출물이며 Acceptance가 주요 README 섹션 존재를 확인한다.
+- scope/YAGNI 게이트: 통과. `README.md`와 Task 상태 문서/계획 산출물만 변경한다.
 
 ## 마지막 검증 결과
 
-- 없음. 작업 착수 직후 중단된 상태다.
+- `python3 scripts/validate_task_proposal.py --proposal .harness/shared/planning/runs/plan-20260708-164729-fdf4d8/proposed-tasks.json` 통과
+- `python3 scripts/apply_task_proposal.py --proposal .harness/shared/planning/runs/plan-20260708-164729-fdf4d8/proposed-tasks.json` 통과
+- `python3 scripts/validate_tasks.py && python3 scripts/sync_plans.py --check` 통과
+- Acceptance 통과: `grep -q '## 먼저 고를 것' README.md && grep -q '## Quick Start' README.md && grep -q '## Codex CLI Setup' README.md && grep -q '## 작업별 Workflow' README.md && grep -q '## Troubleshooting' README.md`
+- 프로젝트 테스트 스위트: 감지된 스택 없음, skip
 
 ## 차단 요소
 
-- 별도 Task가 필요하다.
+- 없음
 
 ## 마지막 커밋
 
@@ -24,4 +29,4 @@
 
 ## 최종 갱신
 
-- 2026-07-08 15:50 KST
+- 2026-07-08 17:05 KST
