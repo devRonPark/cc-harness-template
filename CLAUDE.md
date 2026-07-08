@@ -45,10 +45,22 @@
   프로젝트(CLI·라이브러리)는 DESIGN.md 생략.
 - 기획 중 확정된 결정은 PRD의 Decisions 섹션에 근거와 함께 기록한다.
   ADR 별도 파일은 만들지 않는다 — 큰 결정이 쌓이면 그때 `docs/adr/`로 분리.
-- **`/harness-plan`이 `tasks/index.json`에 Task를 쓰기 전, 반드시 `agents/task-decomposer.md`를
-  먼저 실행한다.** PRD 핵심 기능을 바로 Task 행으로 옮기지 않는다 — 세분화 기준
-  (agents/task-decomposer.md 참고)을 통과한 Task 단위로만 `tasks/index.json`에 적고,
-  `python3 scripts/sync_plans.py`로 `Plans.md`를 재생성한다.
+- **`/harness-plan`이 `tasks/index.json`에 Task를 쓰기 전, 반드시 planning proposal
+  단계를 거친다.** `scripts/build_planning_context.py`로
+  `.harness/shared/planning/runs/{run_id}/context.json`을 만들고,
+  독립 task-decomposer 명령(`harness.toml [plan].decomposer_command`)이
+  `proposed-tasks.json`과 `decomposition-report.md`를 생성하게 한다. 명령이
+  비어 있거나 실패하면 `.harness/events/planning.jsonl`에 쉬운 실패 메시지를
+  남기고, `allow_inline_fallback = true`일 때만 현재 세션이 같은 proposal 파일
+  계약을 채운다.
+- decomposer proposal은 확정본이 아니다. `scripts/validate_task_proposal.py`로
+  기존 `tasks/index.json`과 합쳐 검증하고, 통과한 경우에만
+  `scripts/apply_task_proposal.py`로 `tasks/index.json`에 반영한다. 반영 후
+  `Plans.md`는 자동 재생성된다.
+- planning 로그는 개발자가 아닌 사용자도 이해할 수 있어야 한다.
+  `.harness/events/planning.jsonl`의 최상위 `step`·`result`·`message`·
+  `next_action`은 쉬운 문장으로 쓰고, 내부 이벤트명·run_id·파일 목록은
+  `technical` 하위에만 둔다.
   이 순서를 건너뛰고 뭉뚱그린 Task를 바로 적으면 안 된다.
 - 이 단계는 harness 플러그인이 자동 실행하지 않는다 — Claude가 이 규칙에 따라
   세션에서 직접 수행한다 (테스트 규칙과 동일 패턴).
@@ -67,7 +79,8 @@
 - 파일별 역할: `STATE.md`(현재 스냅샷) · `HANDOFF.md`(다음 세션 인수인계) ·
   `TASKS.md`(현재 Task의 세션 체크리스트) · `LOG.md`(작업·에러 append-only) ·
   `LESSONS.md`(재발 방지) · `CHECKPOINTS.md`(작업 단위 완료 + 커밋 해시) ·
-  `CONTEXT_INDEX.md`(파일 역할 인덱스).
+  `CONTEXT_INDEX.md`(파일 역할 인덱스) · `.harness/shared/planning/`(planning
+  proposal 작업대) · `.harness/events/planning.jsonl`(planning 단계 감시 로그).
 - 에러는 숨기지 말고 `LOG.md`에 원문 기록, 해결하면 `LESSONS.md`에 재발 방지
   항목 추가. 항상 지킬 규칙으로 승격되면 이 파일(CLAUDE.md)에도 반영한다.
 - 새 파일을 만들거나 기존 파일 역할이 바뀌면 `CONTEXT_INDEX.md`를 갱신한다.

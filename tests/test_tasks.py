@@ -52,6 +52,21 @@ class TaskValidationTest(unittest.TestCase):
         errors = validate_tasks([task(status="wip", acceptance="")])
         self.assertTrue(any("requires acceptance" in error for error in errors))
 
+    def test_acceptance_must_not_mask_failures(self):
+        errors = validate_tasks([task(acceptance="pytest tests || echo skip")])
+        self.assertTrue(any("mask failures" in error for error in errors))
+
+    def test_acceptance_must_not_be_noop(self):
+        errors = validate_tasks([task(acceptance="true")])
+        self.assertTrue(any("not a no-op" in error for error in errors))
+
+    def test_acceptance_must_stay_inside_repo(self):
+        errors = validate_tasks([task(acceptance="test -f ../other-repo/Plans.md")])
+        self.assertTrue(any("outside the repo" in error for error in errors))
+
+    def test_dash_acceptance_is_allowed_for_non_wip_tasks(self):
+        self.assertEqual(validate_tasks([task(acceptance="-")]), [])
+
 
 class SyncPlansTest(unittest.TestCase):
     def test_render_is_deterministic(self):

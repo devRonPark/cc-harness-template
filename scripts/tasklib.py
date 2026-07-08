@@ -21,6 +21,22 @@ STATUS_LABELS = {
 REVERSE_STATUS_LABELS = {v: k for k, v in STATUS_LABELS.items()}
 TASK_ID_RE = re.compile(r"^[0-9]+\.[0-9]+(\.[0-9]+)?$")
 BRANCH_TASK_RE = re.compile(r"^task/([0-9]+\.[0-9]+(\.[0-9]+)?)-")
+ACCEPTANCE_SKIP = "-"
+ACCEPTANCE_WEAK_RE = re.compile(
+    r"(^|\s|[;&|])("
+    r"true|"
+    r":|"
+    r"exit\s+0|"
+    r"echo\s+(skip|pass|ok|done|success)"
+    r")(\s|$|[;&|])",
+    re.IGNORECASE,
+)
+ACCEPTANCE_MASKING_RE = re.compile(
+    r"(\|\|\s*(true|:|exit\s+0|echo\s+(skip|pass|ok|done|success)))|"
+    r"([;&]\s*exit\s+0\s*$)",
+    re.IGNORECASE,
+)
+ACCEPTANCE_OUTSIDE_RE = re.compile(r"(^|\s)(\.\./|~|\$HOME/)")
 
 
 class TaskError(Exception):
@@ -138,6 +154,13 @@ def validate_tasks(tasks: list[Task]) -> list[str]:
             errors.append(f"{task.id}: invalid status '{task.status}'")
         if task.status == "wip" and not task.acceptance:
             errors.append(f"{task.id}: wip task requires acceptance ('-' if intentionally skipped)")
+        if task.acceptance and task.acceptance != ACCEPTANCE_SKIP:
+            if ACCEPTANCE_OUTSIDE_RE.search(task.acceptance):
+                errors.append(f"{task.id}: acceptance must not reference paths outside the repo checkout")
+            if ACCEPTANCE_MASKING_RE.search(task.acceptance):
+                errors.append(f"{task.id}: acceptance must not mask failures with always-success commands")
+            elif ACCEPTANCE_WEAK_RE.fullmatch(task.acceptance.strip()):
+                errors.append(f"{task.id}: acceptance must be an evidence-producing command, not a no-op")
         if task.status == "blocked" and not task.blocked_reason:
             errors.append(f"{task.id}: blocked task requires blocked_reason")
 
@@ -237,6 +260,8 @@ def render_plans(root: Path, tasks: list[Task]) -> str:
             "              패턴은 oracle을 무력화하므로 금지 — 검증 안 할 거면 \"-\"로 명시.",
             "  명령어     — PR 오픈 시 plans-guard CI가 실행, 실패하면 PR 차단.",
             "              CI checkout 범위 밖 경로(예: ../다른-repo/)는 실행 불가 — 금지.",
+            "              Given=repo checkout/Depends 산출물, When=명령 실행, Then=exit 0",
+            "              또는 출력·파일·응답 검증이 되도록 쓴다.",
             "  예시: pytest tests/test_auth.py -k login",
             "  예시: curl -sf http://localhost/health | grep '\"status\":\"ok\"'",
             "  패턴별 예시:",
@@ -253,6 +278,7 @@ def render_plans(root: Path, tasks: list[Task]) -> str:
             "  - 검증 가능한 파일·명령·출력으로 기술",
             "  - \"존재한다\", \"성공한다\", \"에러 0\"처럼 객관적 기준",
             "  - \"잘 작성된다\", \"좋다\"처럼 주관적 기준 금지",
+            "  - INVEST 기준: 독립 검증 가능, 관찰 가능한 가치, 1 PR 이내, 테스트 가능",
             "-->",
             "",
         ]
