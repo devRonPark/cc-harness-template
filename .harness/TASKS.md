@@ -1,9 +1,14 @@
-# TASKS.md — 세션 체크리스트
+# TASKS.md — Task 내부 체크리스트 템플릿
 
-> **Task 상태의 단일 출처는 Plans.md다.** 이 파일은 Plans.md Task 하나를
-> 세션 안에서 수행할 때의 세부 체크리스트(Task보다 작은 단위)만 기록한다.
-> Task 완료 시 해당 섹션을 비우고 Plans.md 상태만 갱신한다.
+> 이 루트 파일은 실제 체크리스트가 아니라 템플릿이다.
+> 새 Task를 시작할 때 `.harness/tasks/<task-key>/TASKS.md`로 복사해서 사용한다.
 
-## 현재 Task: 없음
+## 현재 Task: [id] [title]
 
-(Week 3 전 Task(3.1~3.12) 완료 — 체크리스트 비움. 다음 Task 착수 시 여기에 새로 작성.)
+- [ ] 세분화 기준 확인
+- [ ] scope/YAGNI 기준 확인
+- [ ] 구현
+- [ ] Acceptance 실행
+- [ ] 관련 테스트 실행
+- [ ] 리뷰
+- [ ] `tasks/index.json`/`Plans.md` 갱신

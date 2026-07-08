@@ -434,7 +434,7 @@
       "depends": [
         "4.11"
       ],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — Codex 호환 환경 구성"
     }
