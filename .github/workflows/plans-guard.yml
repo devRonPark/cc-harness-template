@@ -35,12 +35,21 @@ jobs:
           HEAD_REF: ${{ github.head_ref }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          git show "$BASE_SHA:tasks/index.json" > /tmp/base-tasks.json 2>/dev/null || echo '{"tasks":[]}' > /tmp/base-tasks.json
+          if git show "$BASE_SHA:tasks/index.json" > /tmp/base-tasks.json 2>/dev/null; then
+            export BASE_TASKS_EXISTS=1
+          else
+            export BASE_TASKS_EXISTS=0
+            echo '{"tasks":[]}' > /tmp/base-tasks.json
+          fi
           python3 - <<'PY'
           import json
           import os
           import re
           import sys
+
+          if os.environ["BASE_TASKS_EXISTS"] == "0":
+              print("base에 tasks/index.json 없음 — 초기 bootstrap PR로 보고 status diff 보호 skip")
+              raise SystemExit(0)
 
           with open("/tmp/base-tasks.json", encoding="utf-8") as fh:
               base = {task["id"]: task for task in json.load(fh).get("tasks", [])}
