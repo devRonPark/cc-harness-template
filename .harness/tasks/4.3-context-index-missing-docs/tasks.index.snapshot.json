@@ -333,7 +333,7 @@
       "dod": "이 저장소에 없는 docs/PRD.md·UserFlow.md·Architecture.md 인덱스 항목 제거",
       "acceptance": "! grep -q 'docs/PRD.md' .harness/CONTEXT_INDEX.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
