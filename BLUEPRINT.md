@@ -249,7 +249,7 @@ harness sync           # toml → plugin 파일 동기화
 |------|-------------|-------------|
 | section 값 | `Week 1 — [주제]` | Milestone `Week 1` 생성 |
 | Task 객체 | `{ "id": "1.1", "title": "...", ... }` | Issue `[1.1] 내용` 생성, Milestone 연결 |
-| Issue 번호 기록 | `gh: "#N"` | Plans.md `GH` 컬럼은 동기화 산출물로 갱신 |
+| Issue 번호 기록 | `gh: "#N"` | `tasks/index.json`에 연결된 Issue 번호 보관 |
 
 ### Implementation 단계 (`/harness-work`)
 
@@ -260,8 +260,7 @@ Task 선택 (todo)
   → reviewer 검토
   → gh pr create --title "[{task-id}] ..." --body "Closes #{issue}"
   → CI 통과 + 승인 후 main 머지
-  → 머지 이벤트에서 plans-complete.yml 봇이 tasks/index.json wip → done,
-    Plans.md 재생성 자동 커밋
+  → 머지 이벤트에서 plans-complete.yml 봇이 tasks/index.json wip → done 자동 커밋
     (세션·worker가 PR 안에서 직접 바꾸지 않음 — wip-branch-check와 모순되므로 금지)
 ```
 
@@ -339,7 +338,7 @@ GitHub → Settings → Branches → main:
 9. test-agent 검증 (Acceptance 명령 + 프로젝트 테스트 스위트) — FAIL 시 worker에 재위임
 10. reviewer에게 검토 요청 (caveman OFF + VFF v2)
 11. PR 오픈·머지. **GitHub 연동 시** 완료 반영은 세션이 아니라 머지 이벤트의
-    plans-complete.yml 봇이 수행(`wip → done` + Plans.md 동기화 자동 커밋) — PR 안에서
+    plans-complete.yml 봇이 `tasks/index.json`에 수행(`wip → done`) — PR 안에서
     세션이 직접 바꾸면 wip-branch-check와 모순되므로 금지. **미연동 시**는
     세션이 이 시점에 `tasks/index.json`을 직접 갱신하고 `scripts/sync_plans.py`를 실행한다.
 ```
@@ -354,7 +353,7 @@ GitHub → Settings → Branches → main:
 | 명령어 | 역할 |
 |--------|------|
 | `/grill-me` | 인터뷰 기반 PRD 작성 — 기획 단계 진입점 (프로젝트 스코프 스킬, `.claude/skills/grill-me/`) |
-| `/harness-plan` | tasks/index.json Task 추가·관리 + Plans.md 동기화 |
+| `/harness-plan` | tasks/index.json Task 추가·관리 + 읽기용 Plans.md snapshot 갱신 |
 | `/harness-work` | tasks/index.json Task 실행 (worker 팀 가동) |
 | `/harness-review` | 코드·계획 리뷰 |
 | `/harness-sync` | tasks/index.json ↔ Plans.md ↔ 구현 상태 동기화 확인 |

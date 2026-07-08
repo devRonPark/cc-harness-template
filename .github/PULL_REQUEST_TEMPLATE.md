@@ -13,5 +13,5 @@
 ---
 
 - [ ] CI 통과
-- [ ] DoD 항목 충족 (Plans.md 참고)
+- [ ] DoD 항목 충족 (tasks/index.json 참고)
 - [ ] 관련 이슈 연결 (`Closes #N` 포함)

@@ -57,8 +57,9 @@
 
 - **터미널 세션은 언제든 끊길 수 있다고 가정한다.** 작업 시작 전·작업 단위
   종료 후마다 `.harness/` 상태 문서를 갱신한다.
-- **Task 상태의 단일 출처는 `tasks/index.json`이다.** `Plans.md`는 사람이 읽는
-  동기화 산출물이고 직접 편집하지 않는다. `.harness/`는 `tasks/index.json`이 담지 않는
+- **Task 상태의 단일 출처는 `tasks/index.json`이다.** `Plans.md`는 사람이 필요할 때
+  `python3 scripts/sync_plans.py`로 갱신하는 읽기용 snapshot이며 stale일 수 있다.
+  직접 편집하지 않는다. `.harness/`는 `tasks/index.json`이 담지 않는
   세션 맥락만 담는다 — Task 상태를 `.harness/`에 복제하지 않는다.
 - 세션 재개 시 읽는 순서: `.harness/STATE.md` → `.harness/LESSONS.md`(최근 5개)
   → `tasks/index.json` → `Plans.md`. 나머지는 `.harness/CONTEXT_INDEX.md`로 필요한 파일만 선별해서
@@ -83,13 +84,13 @@
 - **Planning**: Week → Milestone은 `gh api repos/{owner}/{repo}/milestones -f title="..."`
   (gh CLI에 milestone 기본 명령 없음). Task → Issue는
   `gh issue create --title "[{task-id}] {내용}" --milestone "..."` — 본문에
-  DoD·Acceptance·Depends 기재. 생성된 이슈 번호를 `tasks/index.json`의 `gh` 값에 `#N`으로 기입 후 `Plans.md` 동기화
+  DoD·Acceptance·Depends 기재. 생성된 이슈 번호를 `tasks/index.json`의 `gh` 값에 `#N`으로 기입
 - **Implementation**: Task당 브랜치 생성 → **브랜치에서 해당 Task를 `wip`로 마킹**
   → 구현 → reviewer APPROVE 후 PR 오픈. PR 본문에 `Closes #{이슈번호}` 필수
   (누락 시 머지돼도 이슈가 안 닫힌다)
 - **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
 - **완료 전환**: 머지 시 `plans-complete.yml`이 해당 Task를 `wip` → `done`으로
-  자동 커밋한다. PR 안에서 미리 완료로 바꾸지 말 것 — wip-branch-check가 cc:WIP를
+  `tasks/index.json`에 자동 커밋한다. PR 안에서 미리 완료로 바꾸지 말 것 — wip-branch-check가 cc:WIP를
   요구하므로 모순. stale WIP가 main에 남으면 이후 모든 PR이 그 Task의 acceptance를
   재실행하므로 이 자동 전환이 꼭 필요하다
 - **Task 상태 충돌 주의**: 여러 task 브랜치가 `tasks/index.json` 상태를 동시에 고치면 머지

@@ -89,7 +89,7 @@ check:
 GitHub 연동 시 추가 동작:
 1. `tasks/index.json`의 `section` → GitHub Milestone 생성
 2. 각 Task 객체 → GitHub Issue 생성 (`[1.1] 내용` 형식)
-3. `tasks/index.json`의 `gh` 값에 `#N` 자동 기입 후 `Plans.md` 동기화
+3. `tasks/index.json`의 `gh` 값에 `#N` 자동 기입
 
 직접 생성 시:
 ```bash
@@ -113,8 +113,8 @@ GitHub 연동 시 추가 동작:
 2. 구현 완료 → PR 자동 오픈 (`Closes #{issue}` 포함)
 3. CI 통과 + 승인 → main 머지
 4. 머지 이벤트에서 `plans-complete.yml` 봇이 `tasks/index.json`의 `wip → done`을
-   반영하고 `Plans.md`를 재생성해 자동 커밋(세션·worker가 PR 안에서 직접 바꾸지
-   않는다 — `wip-branch-check`와 모순되므로 금지)
+   반영해 자동 커밋(세션·worker가 PR 안에서 직접 바꾸지 않는다 —
+   `wip-branch-check`와 모순되므로 금지)
 
 직접 브랜치/PR 생성 시:
 ```bash
@@ -131,14 +131,13 @@ gh pr create \
 
 ## plans-guard 동작 원리
 
-PR → main 시 `plans-guard.yml`이 `tasks/index.json` 검증과 `Plans.md` 동기화
-확인 후 나머지 게이트를 실행한다:
+PR → main 시 `plans-guard.yml`이 `tasks/index.json`만 기준으로 나머지 게이트를 실행한다.
+`Plans.md` 동기화는 CI 조건이 아니다:
 
 ```
 tasks/index.json 검증 (validate-tasks):
   JSON 스키마, 중복 ID, Depends 존재 여부, WIP Depends 완료 여부,
   Acceptance 누락 여부를 검증
-  → scripts/sync_plans.py --check 로 Plans.md 동기화 여부도 확인
 
 WIP↔Branch (wip-branch-check):
   PR 브랜치명에서 task-id 추출 (task/{X.Y}-*)
@@ -168,7 +167,7 @@ Task Granularity (granularity-check):
 PR 브랜치의 Task가 `wip`이 아닌 경우 → `/harness-work`가 `tasks/index.json`을 갱신했는지 확인.
 
 > **done은 PR 안에서 바꾸지 않는다.** 머지 이벤트에서 `plans-complete.yml`
-> 봇이 `wip → done`으로 전환하고 `Plans.md`를 재생성한다(직접 main push 시도
+> 봇이 `tasks/index.json`을 `wip → done`으로 전환한다(직접 main push 시도
 > → branch protection에 막히면 PR 자동 생성 + auto-merge로 폴백). 세션이 PR
 > 안에서 미리 done으로 바꾸면 `tasks-diff-check`가 차단한다.
 

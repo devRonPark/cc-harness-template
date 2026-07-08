@@ -136,7 +136,7 @@ description = "프로젝트 설명"      # ← 변경
 **CLAUDE.md** — `[PROJECT_NAME]`, 기술 스택, 코딩 규칙 섹션 채우기.
 
 **tasks/index.json** — Week 구조와 Task 상태 단일 출처. DoD는 검증 가능한 기준으로 작성.
-수정 후 `python3 scripts/sync_plans.py`로 **Plans.md**를 재생성한다.
+사람이 읽는 로드맵이 필요하면 `python3 scripts/sync_plans.py`로 **Plans.md** snapshot을 갱신한다.
 
 **agent-memory/*.md** — `## Project Context` 섹션에 프로젝트 이름과 PRD 경로 입력.
 
