@@ -387,11 +387,12 @@ GitHub → Settings → Branches → main:
 | `/branch-checkout` | 별도 작업 브랜치 생성·전환 (로컬 custom command) |
 | `/git-push` | 현재 브랜치 안전 push (로컬 custom command) |
 | `/pr-create` | 현재 브랜치에서 draft PR 작성 (로컬 custom command) |
+| `/rescue-from-main` | main/master 변경사항을 작업 브랜치로 옮겨 draft PR 작성 (로컬 custom command) |
 
 Codex에서는 `/grill-me`와 `/harness-*` top-level slash command 대신
 `.agents/skills/`의 `$grill-me`, `$harness-plan`, `$harness-work`,
 `$harness-review`, `$harness-progress`, `$harness-sync`를 사용한다. Git helper는
-`$branch-checkout`, `$git-push`, `$pr-create`를 사용한다.
+`$branch-checkout`, `$git-push`, `$pr-create`, `$rescue-from-main`를 사용한다.
 Codex용 별도 `$ponytail`/`$caveman` skill은 제공하지 않는다. 해당 원칙은
 `agents/quality-gates.md`에서 공통 gate로 적용한다.
 

@@ -24,8 +24,8 @@
 | `.harness/shared/planning/runs/` | run별 context.json·proposed-tasks.json·decomposition-report.md 작업대 | 특정 planning run 감사 시 |
 | `CLAUDE.md` | 프로젝트 규칙 (기획·구현·테스트·리뷰·상태 문서) | 규칙 확인 시 |
 | `AGENTS.md` | Codex 진입점. CLAUDE.md 규칙을 Codex 세션에서 동일 절차로 실행하기 위한 호환 지침 | Codex 환경 구성·규칙 확인 시 |
-| `.agents/skills/` | Codex repo-scoped skills (`$grill-me`, `$harness-plan`, `$harness-work`, `$harness-review`, `$harness-progress`, `$harness-sync`, `$branch-checkout`, `$git-push`, `$pr-create`) | Codex skill 호출 UX·절차 수정 시 |
-| `.claude/commands/` | Claude Code local custom commands (`/branch-checkout`, `/git-push`, `/pr-create`) | Claude command 호출 UX·절차 수정 시 |
+| `.agents/skills/` | Codex repo-scoped skills (`$grill-me`, `$harness-plan`, `$harness-work`, `$harness-review`, `$harness-progress`, `$harness-sync`, `$branch-checkout`, `$git-push`, `$pr-create`, `$rescue-from-main`) | Codex skill 호출 UX·절차 수정 시 |
+| `.claude/commands/` | Claude Code local custom commands (`/branch-checkout`, `/git-push`, `/pr-create`, `/rescue-from-main`) | Claude command 호출 UX·절차 수정 시 |
 | `harness.toml` | harness 플러그인 설정 ([plan]·[test]·[review]) | 설정 변경 시 |
 | `BLUEPRINT.md` | 시스템 전체 아키텍처 설명 (읽기용) | 구조 이해 필요 시 |
 | `README.md` | 템플릿 사용법 (외부 사용자용) | 문서 갱신 시 |

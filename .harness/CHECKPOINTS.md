@@ -5,6 +5,7 @@
 
 | 일시 | Task | 내용 | 커밋 | 검증 |
 |------|------|------|------|------|
+| 2026-07-08 | 4.11 | rescue-from-main workflow helper 추가 | 미커밋 | Acceptance·frontmatter·init smoke·unittest PASS |
 | 2026-07-04 | - | README·github-integration.md Week 3 반영 갱신 | 930e404 | grep 확인 |
 | 2026-07-04 | 3.12 | 플러그인 SHA 기록 절차 (M8) | 6667307 | Acceptance PASS |
 | 2026-07-04 | 3.11 | ci.yml ci-ok 요약 잡 (M6) | 2b9a6d8 | harness-gh-test 실PR PASS |

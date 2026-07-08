@@ -64,6 +64,7 @@ relies on those plugins for scope control or terse reporting, use
 | `/branch-checkout` | `$branch-checkout` from `.agents/skills/branch-checkout/SKILL.md` |
 | `/git-push` | `$git-push` from `.agents/skills/git-push/SKILL.md` |
 | `/pr-create` | `$pr-create` from `.agents/skills/pr-create/SKILL.md` |
+| `/rescue-from-main` | `$rescue-from-main` from `.agents/skills/rescue-from-main/SKILL.md` |
 
 These helpers must inspect `git status` and the current branch before changing
 branches, pushing, or creating PRs. Never force push or discard local changes.
