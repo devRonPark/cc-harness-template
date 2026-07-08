@@ -8,7 +8,7 @@
 # README.md "새 프로젝트에 적용" Step 1의 수동 cp 목록을 스크립트로 대체.
 # 감사(H5/2026-07-04)에서 발견된 누락 항목(plans-complete.yml, ci.yml,
 # .harness/ 골격, PR/Issue 템플릿)을 포함한 완전판 복사 목록을 사용한다.
-# Plans.md·.harness/는 이 저장소 자신의 dogfood 이력이 아니라
+# Plans.md·tasks/index.json·.harness/는 이 저장소 자신의 dogfood 이력이 아니라
 # templates/skeleton/의 초기 상태 버전에서 복사한다.
 
 set -euo pipefail
@@ -23,16 +23,23 @@ fi
 
 echo "복사: $SRC_DIR → $TARGET_DIR"
 
-mkdir -p "$TARGET_DIR"/{agents,.github/workflows,.github/ISSUE_TEMPLATE,.harness,docs/templates,.claude/skills,.claude/agent-memory/claude-code-harness-worker,.claude/agent-memory/claude-code-harness-reviewer,.claude/agent-memory/claude-code-harness-advisor}
+mkdir -p "$TARGET_DIR"/{agents,scripts,tasks,.github/workflows,.github/ISSUE_TEMPLATE,.harness,docs/templates,.claude/skills,.claude/agent-memory/claude-code-harness-worker,.claude/agent-memory/claude-code-harness-reviewer,.claude/agent-memory/claude-code-harness-advisor}
 
 # 최상위 설정
 cp "$SRC_DIR/harness.toml" "$TARGET_DIR/"
 cp "$SRC_DIR/CLAUDE.md" "$TARGET_DIR/"
 cp "$SRC_DIR/BLUEPRINT.md" "$TARGET_DIR/"
 
-# Plans.md·.harness/ — dogfood 이력 없는 초기 상태 버전 (templates/skeleton/)
+# Plans.md·tasks/index.json·.harness/ — dogfood 이력 없는 초기 상태 버전 (templates/skeleton/)
 cp "$SRC_DIR/templates/skeleton/Plans.md" "$TARGET_DIR/Plans.md"
+cp -r "$SRC_DIR/templates/skeleton/tasks/." "$TARGET_DIR/tasks/"
 cp -r "$SRC_DIR/templates/skeleton/.harness/." "$TARGET_DIR/.harness/"
+
+# Task 상태 관리 스크립트
+cp "$SRC_DIR/scripts/tasklib.py" "$TARGET_DIR/scripts/"
+cp "$SRC_DIR/scripts/validate_tasks.py" "$TARGET_DIR/scripts/"
+cp "$SRC_DIR/scripts/report_tasks.py" "$TARGET_DIR/scripts/"
+cp "$SRC_DIR/scripts/sync_plans.py" "$TARGET_DIR/scripts/"
 
 # companion 에이전트
 cp -r "$SRC_DIR/agents/." "$TARGET_DIR/agents/"
@@ -64,7 +71,8 @@ cat <<'EOF'
 복사 완료. 다음 단계 (README.md "커스터마이징 체크리스트" 참고):
   1. harness.toml  — [project] name·description 실제 값으로 변경
   2. CLAUDE.md     — [PROJECT_NAME], 기술 스택, 디렉토리 구조, 코딩 규칙 채우기
-  3. Plans.md      — Week 0 부트스트랩 Task부터 시작 (DoD/Acceptance 실제 값)
+  3. tasks/index.json — Week 0 부트스트랩 Task부터 시작 (DoD/Acceptance 실제 값)
+     python3 scripts/sync_plans.py 로 Plans.md 재생성
   4. .claude/agent-memory/*/MEMORY.md — Project Context 섹션 채우기
-  5. cd 대상-디렉토리 && harness sync && harness doctor
+  5. cd 대상-디렉토리 && python3 scripts/validate_tasks.py && harness sync && harness doctor
 EOF

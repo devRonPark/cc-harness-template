@@ -19,6 +19,9 @@
 | `.harness/TASKS.md` | 현재 Task의 세션 체크리스트 | Task 진행 중 |
 | `.harness/LOG.md` | 작업·에러 로그 | 에러 이력 조회 시 |
 | `.harness/CHECKPOINTS.md` | 작업 단위 완료 기록 | 이력 추적 시 |
+| `.harness/events/planning.jsonl` | `/harness-plan` 단계별 감시 로그 (사용자 친화 JSONL) | planning 실패·반영 흐름 추적 시 |
+| `.harness/shared/planning/latest.json` | 최신 planning run의 context/proposal/report 위치 | 최신 task-decomposer proposal 확인 시 |
+| `.harness/shared/planning/runs/` | run별 context.json·proposed-tasks.json·decomposition-report.md 작업대 | 특정 planning run 감사 시 |
 | `CLAUDE.md` | 프로젝트 규칙 (기획·구현·테스트·리뷰·상태 문서) | 규칙 확인 시 |
 | `harness.toml` | harness 플러그인 설정 ([plan]·[test]·[review]) | 설정 변경 시 |
 | `BLUEPRINT.md` | 시스템 전체 아키텍처 설명 (읽기용) | 구조 이해 필요 시 |

@@ -6,28 +6,20 @@
 
 ## 현재 목표
 
-cc-harness-template README/문서 고도화 + L1~L5 백로그를 Week 4 Task로 전환 (진행 중)
+Planning observability v1 적용: 독립 task-decomposer proposal 기본 흐름,
+비개발자 친화 planning JSONL 로그, proposal 검증/적용 스크립트, 문서 규약 반영.
 
 ## 진행 중인 Task
 
-- 없음 착수 전 (Week 4 Task 4.1~4.6은 방금 cc:TODO로 등록만 됨 — 구현은
-  아직 /harness-work를 거치지 않았다)
+- 사용자 요청 기반 직접 작업. `tasks/index.json`의 기존 Week 4 TODO 상태는 변경하지 않음.
 
 ## 마지막 검증 결과
 
-- Task 3.1(H1): harness-gh-test repo public 임시 전환 + branch protection
-  활성 상태에서 push 실패 → PR 자동 생성(#9) → cc:완료 flip 전 과정 실증 **PASS**
-- Task 3.4(H2): 비-task 브랜치 Status 변경, task 브랜치 타 행 변경 2종
-  시나리오 실제 PR로 재현 **PASS** (둘 다 FAIL 확인)
-- Task 3.5(H3): 미완료 Task(1.3, cc:TODO) 의존 WIP 행 실제 PR 재현 **PASS**
-- Task 3.6(M1·M7): 헤더 정상/컬럼 누락 케이스 양쪽 로컬 검증 **PASS**
-- Task 3.11(M6): ci-ok + placeholder 조합 실제 PR로 실행 **PASS**
-- harness doctor: All checks passed (2026-07-04)
-- README.md 전면 개편(Why·What You Get·Quick Start·Setup·Existing Project
-  Adoption·Hooks·Session Recovery·Error Memory 등 신규 섹션) + docs/
-  claude-code-hooks.md·session-recovery.md·error-memory.md 3개 신설 —
-  test-agent 실행 대상 아님(문서 변경, Acceptance 없음), 세션 내 리뷰만 거침.
-  **미커밋** (사용자 승인 대기).
+- `python3 -m unittest tests.test_tasks tests.test_planning -v` **PASS** (18 tests)
+- `python3 scripts/validate_tasks.py` **PASS** (`tasks/index.json valid`)
+- `python3 scripts/sync_plans.py --check` **PASS** (`Plans.md in sync`)
+- `init.sh` smoke test **PASS**: `/tmp/harness-init-test.cZ7eqd`에 새 `.harness/shared/planning/runs/`
+  및 `.harness/events/` 골격 복사 확인
 
 ## 차단 요소
 
@@ -40,10 +32,8 @@ cc-harness-template README/문서 고도화 + L1~L5 백로그를 Week 4 Task로 
   `603fcc0`(3.6) → `0c8ea99`(3.4) → `03d185f`(3.5) → `2594119`(3.7) →
   `2dd1d8b`(3.8) → `11aa504`(3.9) → `d5117bc`(3.10) → `2b9a6d8`(3.11) →
   `6667307`(3.12)
-- README.md 대개편 + docs 3개 신설은 **아직 커밋 안 됨** (`git status` 기준
-  README.md modified, docs/claude-code-hooks.md·session-recovery.md·
-  error-memory.md untracked)
+- 현재 planning observability 변경분은 **아직 커밋 안 됨**.
 
 ## 최종 갱신
 
-- 2026-07-04, README/문서 개편 + Week 4 백로그(L1~L5→4.1~4.6) 등록 시점
+- 2026-07-08, planning observability v1 구현 및 검증 완료

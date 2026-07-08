@@ -88,3 +88,20 @@
   진행, 실제 수정은 /harness-work로 별도 진행 예정. 세분화 기준
   (agents/task-decomposer.md) 통과 확인: 파일당 단일 관심사, grill-me 관련
   2건(산출 경로 인자·headless 모드)은 관심사가 달라 4.5·4.6으로 분리.
+
+## 2026-07-08 — Planning observability v1
+
+- 사용자 요청으로 독립 task-decomposer proposal 기본 흐름과 비개발자 친화 planning
+  JSONL 감시 구조 구현. `docs/specs/2026-07-08-planning-observability.md`에
+  계획 문서 저장.
+- `.harness/shared/planning/runs/`와 `.harness/events/` 골격 추가, skeleton에도
+  반영해 `init.sh` 복사 대상에 포함.
+- planning 전용 스크립트 추가:
+  `planning_log.py`, `build_planning_context.py`, `run_task_decomposer.py`,
+  `validate_task_proposal.py`, `apply_task_proposal.py`.
+- 문서 규약 갱신: `agents/task-decomposer.md`, `CLAUDE.md`, `BLUEPRINT.md`,
+  `README.md`, `docs/session-recovery.md`, `.harness/CONTEXT_INDEX.md`,
+  `templates/skeleton/.harness/CONTEXT_INDEX.md`, `harness.toml`.
+- 검증: `python3 -m unittest tests.test_tasks tests.test_planning -v` PASS(18),
+  `python3 scripts/validate_tasks.py` PASS, `python3 scripts/sync_plans.py --check` PASS,
+  `init.sh` smoke test PASS.

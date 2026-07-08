@@ -17,10 +17,16 @@
 ---
 
 <!--
-Task Status 마커:
-  cc:TODO   — 미시작
-  cc:WIP    — 진행 중 (harness가 자동 설정)
-  cc:완료   — 완료 (harness가 자동 설정)
+Task 상태의 단일 출처는 tasks/index.json이다.
+Plans.md는 사람이 필요할 때 python3 scripts/sync_plans.py로 갱신하는
+읽기용 snapshot이며 stale일 수 있다. 상태 판단과 CI 검증은 항상
+tasks/index.json을 기준으로 한다.
+
+JSON status 값:
+  todo    — 미시작 (Plans.md 표시: cc:TODO)
+  wip     — 진행 중 (Plans.md 표시: cc:WIP)
+  done    — 완료 (Plans.md 표시: cc:완료)
+  blocked — 차단됨 (Plans.md 표시: cc:BLOCKED, blocked_reason 필수)
 
 GH 컬럼:
   -         — GitHub 미연동 또는 이슈 미생성
@@ -31,6 +37,8 @@ Acceptance 컬럼:
               패턴은 oracle을 무력화하므로 금지 — 검증 안 할 거면 "-"로 명시.
   명령어     — PR 오픈 시 plans-guard CI가 실행, 실패하면 PR 차단.
               CI checkout 범위 밖 경로(예: ../다른-repo/)는 실행 불가 — 금지.
+              Given=repo checkout/Depends 산출물, When=명령 실행, Then=exit 0
+              또는 출력·파일·응답 검증이 되도록 쓴다.
   예시: pytest tests/test_auth.py -k login
   예시: curl -sf http://localhost/health | grep '"status":"ok"'
   패턴별 예시:
@@ -47,4 +55,5 @@ DoD (Definition of Done) 작성 원칙:
   - 검증 가능한 파일·명령·출력으로 기술
   - "존재한다", "성공한다", "에러 0"처럼 객관적 기준
   - "잘 작성된다", "좋다"처럼 주관적 기준 금지
+  - INVEST 기준: 독립 검증 가능, 관찰 가능한 가치, 1 PR 이내, 테스트 가능
 -->

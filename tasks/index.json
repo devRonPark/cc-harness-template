@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "0.1",
+      "title": "PRD 작성 (`/grill-me` 인터뷰)",
+      "dod": "docs/PRD.md v0.1 존재, Open Questions 정리됨",
+      "acceptance": "test -f docs/PRD.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "0.2",
+      "title": "기획 보완 문서",
+      "dod": "UserFlow.md·Architecture.md 작성 (docs/templates/ 골격 사용)",
+      "acceptance": "test -f docs/UserFlow.md && test -f docs/Architecture.md",
+      "depends": [
+        "0.1"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "0.3",
+      "title": "Harness 초기화",
+      "dod": "harness doctor 전체 통과, CLAUDE.md·Plans.md 존재",
+      "acceptance": "test -f CLAUDE.md && test -f Plans.md && test -f harness.toml",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "0.4",
+      "title": "Plugin 설정",
+      "dod": "ponytail·caveman·VFF 설치 확인, agent MEMORY.md 3개 존재",
+      "acceptance": "-",
+      "depends": [
+        "0.3"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "완료된 작업"
+    },
+    {
+      "id": "1.0",
+      "title": "Plans.md 템플릿 개선",
+      "dod": "bootstrap Task에 Acceptance 예시 있음, 현실적 샘플 Task 포함",
+      "acceptance": "grep -qE 'test -f|npm test|pytest|go test|curl' Plans.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.1",
+      "title": "test agent 추가",
+      "dod": "agents/test-agent.md 존재, harness.toml [test] 섹션, BLUEPRINT.md 업데이트",
+      "acceptance": "test -f agents/test-agent.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.2",
+      "title": "기획 파이프라인 추가",
+      "dod": "grill-me 스킬 + docs/templates/ 골격 3종, CLAUDE.md 기획 규칙",
+      "acceptance": "test -f .claude/skills/grill-me/SKILL.md && test -f docs/templates/PRD.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.3",
+      "title": "task-decomposer + 세분화 게이트 추가",
+      "dod": "agents/task-decomposer.md 존재, harness.toml [plan] 섹션, plans-guard.yml granularity-check 잡, CLAUDE.md 구현 규칙",
+      "acceptance": "test -f agents/task-decomposer.md && grep -q 'granularity-check' .github/workflows/plans-guard.yml",
+      "depends": [
+        "1.1"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "1.4",
+      "title": ".harness/ 상태 문서 체계 추가",
+      "dod": ".harness/ 골격 7종(STATE·HANDOFF·TASKS·LOG·LESSONS·CHECKPOINTS·CONTEXT_INDEX) 존재, CLAUDE.md 상태 문서 규칙 섹션 존재",
+      "acceptance": "test -f .harness/STATE.md && test -f .harness/CONTEXT_INDEX.md && grep -q '상태 문서 규칙' CLAUDE.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 1 — 템플릿 개선"
+    },
+    {
+      "id": "2.1",
+      "title": "테스트 프로젝트 골격 생성",
+      "dod": "../routine-saas/에 CLAUDE.md·Plans.md·harness.toml·agents/·docs/templates/·.github/ 복사됨",
+      "acceptance": "-",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.2",
+      "title": "기획 파이프라인 테스트 (grill-me 인터뷰)",
+      "dod": "../routine-saas/docs/PRD.md v0.1 존재, Decisions 섹션 기록됨",
+      "acceptance": "-",
+      "depends": [
+        "2.1"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.3",
+      "title": "보완 문서 테스트 (UserFlow·Architecture 골격 적용)",
+      "dod": "../routine-saas/docs/UserFlow.md·Architecture.md 존재",
+      "acceptance": "-",
+      "depends": [
+        "2.2"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.4",
+      "title": "계획 파이프라인 테스트 (task-decomposer → Plans.md)",
+      "dod": "../routine-saas/Plans.md에 세분화 기준 통과 Task 표 존재",
+      "acceptance": "-",
+      "depends": [
+        "2.3"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.5",
+      "title": "템플릿 결함 기록",
+      "dod": "테스트 중 발견한 템플릿 문제를 .harness/LESSONS.md에 기록, 수정 필요 항목은 Week 3 후보로 정리",
+      "acceptance": "-",
+      "depends": [
+        "2.4"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.6",
+      "title": "DESIGN.md 기획 산출물 추가",
+      "dod": "docs/templates/DESIGN.md 골격 존재, CLAUDE.md 기획 규칙에 DESIGN 단계 반영, routine-saas에 실제 작성 적용",
+      "acceptance": "test -f docs/templates/DESIGN.md",
+      "depends": [
+        "2.5"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "2.7",
+      "title": "GitHub 연동 E2E 검증 + plans-complete 워크플로",
+      "dod": "harness-gh-test repo에서 plans-guard 3잡 시나리오 4종 검증, 빈틈 7건 도출, plans-complete.yml 신설 검증, CLAUDE.md GitHub 플로우 명문화",
+      "acceptance": "test -f .github/workflows/plans-complete.yml && grep -q 'plans-complete' CLAUDE.md",
+      "depends": [
+        "2.5"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 2 — 템플릿 dogfooding (루틴 관리 SaaS로 실전 테스트, 커밋 제외)"
+    },
+    {
+      "id": "3.1",
+      "title": "plans-complete branch protection 호환 (H1)",
+      "dod": "protection 활성 테스트 repo에서 자동 flip 실증, 선택한 방식(bypass/PR)의 근거를 워크플로 주석에 기록",
+      "acceptance": "grep -qi 'protection' .github/workflows/plans-complete.yml",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.2",
+      "title": "clean 골격 세트 분리 (H5)",
+      "dod": "templates/skeleton/에 Plans.md·.harness/ 7종 초기 상태 존재, dogfood 이력 미포함",
+      "acceptance": "test -f templates/skeleton/Plans.md && test -f templates/skeleton/.harness/STATE.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.3",
+      "title": "init.sh 초기화 스크립트 (H5)",
+      "dod": "init.sh가 plans-complete.yml·ci.yml·.harness/ 골격 포함 복사, README 수동 cp 절차를 스크립트 안내로 교체",
+      "acceptance": "test -x init.sh && grep -q 'plans-complete.yml' init.sh",
+      "depends": [
+        "3.2"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.4",
+      "title": "plans-guard diff 보호 잡 (H2)",
+      "dod": "비-task 브랜치의 Status 변경 PR 차단, task 브랜치의 타 행 Status 변경 차단 — 시나리오 2종 테스트 repo 검증",
+      "acceptance": "grep -q 'plans-diff-check' .github/workflows/plans-guard.yml",
+      "depends": [
+        "3.6"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.5",
+      "title": "plans-guard depends-check 잡 (H3)",
+      "dod": "WIP Task의 Depends 대상이 cc:완료 아니면 FAIL — 시나리오 검증",
+      "acceptance": "grep -q 'depends-check' .github/workflows/plans-guard.yml",
+      "depends": [
+        "3.6"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.6",
+      "title": "Plans.md 헤더 검증 선행 파싱 (M1·M7)",
+      "dod": "헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard·plans-complete에 공통 적용",
+      "acceptance": "grep -q 'header-check' .github/workflows/plans-guard.yml",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.7",
+      "title": "완료 전환 서술 통일 (M3)",
+      "dod": "README·BLUEPRINT의 세션 직접 flip 서술을 CLAUDE.md 기준(plans-complete 자동 전환)으로 교체",
+      "acceptance": "grep -q 'plans-complete' README.md && grep -q 'plans-complete' BLUEPRINT.md",
+      "depends": [
+        "3.1"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.8",
+      "title": "harness.toml 죽은 설정 정리 (M4)",
+      "dod": "미사용 키 제거, 미파싱 섹션 역할 주석 재정의(실행 SSOT는 CLAUDE.md)",
+      "acceptance": "! grep -q 'max_iterations' harness.toml",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.9",
+      "title": "Plans.md anti-pattern 예시 교정 (M2)",
+      "dod": "무력화 패턴(echo skip) 행 교정, repo 밖 경로 acceptance `-` 처리, 주석에 금지 규약 추가",
+      "acceptance": "! grep -qE 'echo sk[i]p' Plans.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.10",
+      "title": "agents 문서 수행 주체 명시 (M5)",
+      "dod": "BLUEPRINT·README에 \"절차 문서, 수행 주체=세션 Claude\" 명시, .claude/agents/ 이전 여부 결정 기록",
+      "acceptance": "grep -q '수행 주체' BLUEPRINT.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.11",
+      "title": "ci.yml 이름 고정 요약 잡 (M6)",
+      "dod": "ci-ok 잡 신설(스택 잡 needs 집약), required check 등록 안내 주석",
+      "acceptance": "grep -q 'ci-ok' .github/workflows/ci.yml",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "3.12",
+      "title": "플러그인 SHA 기록 절차 (M8)",
+      "dod": "README 버전 표에 검증 커밋 SHA 컬럼 추가, 업데이트 전 확인 절차 단락",
+      "acceptance": "grep -q 'SHA' README.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 3 — 감사 빈틈 개선 (기준 문서: docs/specs/2026-07-04-template-audit.md)"
+    },
+    {
+      "id": "4.1",
+      "title": "granularity 오탐지 정규식 정확도 개선 (L1)",
+      "dod": "vague_re가 \"그리고\" 포함 정상 문장은 통과시키고 쉼표 나열·\"와\"/\"과\" 열거 표현은 미달로 탐지",
+      "acceptance": "! grep -q \"vague_re='(전체|모든| 및 |그리고)'\" .github/workflows/plans-guard.yml",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.2",
+      "title": "test-agent pretest 오탐 스택 감지 수정 (L2)",
+      "dod": "\"pretest\" 스크립트만 있는 package.json을 npm test 스택으로 오판하지 않음",
+      "acceptance": "grep -q '\"test\":' agents/test-agent.md",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.3",
+      "title": "CONTEXT_INDEX.md 미존재 파일 인덱스 정리 (L3)",
+      "dod": "이 저장소에 없는 docs/PRD.md·UserFlow.md·Architecture.md 인덱스 항목 제거",
+      "acceptance": "! grep -q 'docs/PRD.md' .harness/CONTEXT_INDEX.md",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.4",
+      "title": "rm 위험 패턴 매칭 범위 확대 (L4)",
+      "dod": "harness.toml ask 목록이 rm -fr·rm -R 조합도 포착",
+      "acceptance": "[ $(grep -c 'rm -' harness.toml) -gt 1 ]",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.5",
+      "title": "grill-me 산출 경로 인자 지원 (L5)",
+      "dod": "SKILL.md에 대상 디렉토리 인자 규약 명시, 기본값은 현재 프로젝트 docs/",
+      "acceptance": "grep -q '산출 경로' .claude/skills/grill-me/SKILL.md",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    },
+    {
+      "id": "4.6",
+      "title": "grill-me 비대화형 실행 호환 모드 (L5)",
+      "dod": "무응답·headless 환경에서 질문마다 권장값으로 자동 확정 후 진행하는 대안 경로 명시",
+      "acceptance": "grep -q 'headless' .claude/skills/grill-me/SKILL.md",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
+    }
+  ]
+}

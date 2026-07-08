@@ -1,12 +1,12 @@
 name: Task
-description: Plans.md Task를 GitHub Issue로 등록
+description: tasks/index.json Task를 GitHub Issue로 등록
 labels: ["task"]
 body:
   - type: input
     id: task-id
     attributes:
       label: Task ID
-      description: Plans.md의 Task ID (예: 1.1)
+      description: tasks/index.json의 Task ID (예: 1.1)
       placeholder: "1.1"
     validations:
       required: true
