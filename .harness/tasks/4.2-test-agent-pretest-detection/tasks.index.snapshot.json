@@ -323,7 +323,7 @@
       "dod": "\"pretest\" 스크립트만 있는 package.json을 npm test 스택으로 오판하지 않음",
       "acceptance": "grep -q '\"test\":' agents/test-agent.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
