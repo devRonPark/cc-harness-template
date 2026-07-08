@@ -108,7 +108,9 @@ cd /path/to/my-new-project
 # 템플릿 파일 복사
 cp /path/to/cc-harness-template/harness.toml .
 cp /path/to/cc-harness-template/CLAUDE.md .
-cp /path/to/cc-harness-template/Plans.md .
+cp /path/to/cc-harness-template/templates/skeleton/Plans.md .
+cp -r /path/to/cc-harness-template/templates/skeleton/tasks .
+cp -r /path/to/cc-harness-template/scripts .
 cp /path/to/cc-harness-template/BLUEPRINT.md .
 mkdir -p .claude/agent-memory/claude-code-harness-worker
 mkdir -p .claude/agent-memory/claude-code-harness-reviewer
@@ -133,7 +135,8 @@ description = "프로젝트 설명"      # ← 변경
 
 **CLAUDE.md** — `[PROJECT_NAME]`, 기술 스택, 코딩 규칙 섹션 채우기.
 
-**Plans.md** — Week 구조와 Task 정의. DoD는 검증 가능한 기준으로 작성.
+**tasks/index.json** — Week 구조와 Task 상태 단일 출처. DoD는 검증 가능한 기준으로 작성.
+수정 후 `python3 scripts/sync_plans.py`로 **Plans.md**를 재생성한다.
 
 **agent-memory/*.md** — `## Project Context` 섹션에 프로젝트 이름과 PRD 경로 입력.
 
@@ -188,7 +191,7 @@ GitHub → Settings → Branches → main:
 
 ## Step 4. 작업 시작
 
-### Plans.md에 Task 추가
+### tasks/index.json에 Task 추가
 
 ```
 /harness-plan
@@ -244,6 +247,6 @@ harness sync
 worker MEMORY.md의 `### caveman: lite 모드` 섹션이 제대로 작성됐는지 확인.
 Claude Code 재시작 후 재시도.
 
-### Plans.md Task가 선택되지 않을 때
+### Task가 선택되지 않을 때
 
-Task Status가 `cc:TODO`인지 확인. `cc:WIP`는 이미 진행 중으로 간주됨.
+Task status가 `tasks/index.json`에서 `todo`인지 확인. `wip`는 이미 진행 중으로 간주됨.

@@ -18,6 +18,7 @@
 [project-name]/
 ├── src/
 ├── docs/
+├── tasks/index.json
 ├── Plans.md
 ├── harness.toml
 └── package.json (또는 pyproject.toml 등)
@@ -39,14 +40,15 @@
 - 보완 문서 골격: `docs/templates/UserFlow.md`, `docs/templates/DESIGN.md`,
   `docs/templates/Architecture.md` 복사 후 작성.
 - **UI가 있는 프로젝트는 DESIGN.md가 UI 구현의 single source of truth다.**
-  UI 관련 Task는 Plans.md Depends에 DESIGN.md 작성 Task를 걸어 게이트한다 —
+  UI 관련 Task는 `tasks/index.json` Depends에 DESIGN.md 작성 Task를 걸어 게이트한다 —
   worker가 색·간격·톤을 Task마다 즉흥 결정하지 않게 하기 위함. UI 없는
   프로젝트(CLI·라이브러리)는 DESIGN.md 생략.
 - 기획 중 확정된 결정은 PRD의 Decisions 섹션에 근거와 함께 기록한다.
   ADR 별도 파일은 만들지 않는다 — 큰 결정이 쌓이면 그때 `docs/adr/`로 분리.
-- **`/harness-plan`이 Plans.md에 Task 행을 쓰기 전, 반드시 `agents/task-decomposer.md`를
+- **`/harness-plan`이 `tasks/index.json`에 Task를 쓰기 전, 반드시 `agents/task-decomposer.md`를
   먼저 실행한다.** PRD 핵심 기능을 바로 Task 행으로 옮기지 않는다 — 세분화 기준
-  (agents/task-decomposer.md 참고)을 통과한 행 단위로만 Plans.md에 적는다.
+  (agents/task-decomposer.md 참고)을 통과한 Task 단위로만 `tasks/index.json`에 적고,
+  `python3 scripts/sync_plans.py`로 `Plans.md`를 재생성한다.
   이 순서를 건너뛰고 뭉뚱그린 Task를 바로 적으면 안 된다.
 - 이 단계는 harness 플러그인이 자동 실행하지 않는다 — Claude가 이 규칙에 따라
   세션에서 직접 수행한다 (테스트 규칙과 동일 패턴).
@@ -55,10 +57,11 @@
 
 - **터미널 세션은 언제든 끊길 수 있다고 가정한다.** 작업 시작 전·작업 단위
   종료 후마다 `.harness/` 상태 문서를 갱신한다.
-- **Task 상태의 단일 출처는 Plans.md다.** `.harness/`는 Plans.md가 담지 않는
+- **Task 상태의 단일 출처는 `tasks/index.json`이다.** `Plans.md`는 사람이 읽는
+  동기화 산출물이고 직접 편집하지 않는다. `.harness/`는 `tasks/index.json`이 담지 않는
   세션 맥락만 담는다 — Task 상태를 `.harness/`에 복제하지 않는다.
 - 세션 재개 시 읽는 순서: `.harness/STATE.md` → `.harness/LESSONS.md`(최근 5개)
-  → `Plans.md`. 나머지는 `.harness/CONTEXT_INDEX.md`로 필요한 파일만 선별해서
+  → `tasks/index.json` → `Plans.md`. 나머지는 `.harness/CONTEXT_INDEX.md`로 필요한 파일만 선별해서
   읽는다 — 목적 없이 전체 파일을 다시 읽지 않는다.
 - 파일별 역할: `STATE.md`(현재 스냅샷) · `HANDOFF.md`(다음 세션 인수인계) ·
   `TASKS.md`(현재 Task의 세션 체크리스트) · `LOG.md`(작업·에러 append-only) ·
@@ -80,16 +83,16 @@
 - **Planning**: Week → Milestone은 `gh api repos/{owner}/{repo}/milestones -f title="..."`
   (gh CLI에 milestone 기본 명령 없음). Task → Issue는
   `gh issue create --title "[{task-id}] {내용}" --milestone "..."` — 본문에
-  DoD·Acceptance·Depends 기재. 생성된 이슈 번호를 Plans.md GH 컬럼에 `#N`으로 기입
-- **Implementation**: Task당 브랜치 생성 → **브랜치에서 해당 Task를 cc:WIP로 마킹**
+  DoD·Acceptance·Depends 기재. 생성된 이슈 번호를 `tasks/index.json`의 `gh` 값에 `#N`으로 기입 후 `Plans.md` 동기화
+- **Implementation**: Task당 브랜치 생성 → **브랜치에서 해당 Task를 `wip`로 마킹**
   → 구현 → reviewer APPROVE 후 PR 오픈. PR 본문에 `Closes #{이슈번호}` 필수
   (누락 시 머지돼도 이슈가 안 닫힌다)
 - **Merge 조건**: CI 통과 (`ci` + `plans-guard`) + PR 승인 후 main 머지
-- **완료 전환**: 머지 시 `plans-complete.yml`이 해당 Task를 cc:WIP → cc:완료로
+- **완료 전환**: 머지 시 `plans-complete.yml`이 해당 Task를 `wip` → `done`으로
   자동 커밋한다. PR 안에서 미리 완료로 바꾸지 말 것 — wip-branch-check가 cc:WIP를
   요구하므로 모순. stale WIP가 main에 남으면 이후 모든 PR이 그 Task의 acceptance를
   재실행하므로 이 자동 전환이 꼭 필요하다
-- **Plans.md 충돌 주의**: 여러 task 브랜치가 Plans.md 상태를 동시에 고치면 머지
+- **Task 상태 충돌 주의**: 여러 task 브랜치가 `tasks/index.json` 상태를 동시에 고치면 머지
   충돌이 잦다 — PR 오픈 전 main을 머지해 최신화할 것
 - **branch protection**: plans-guard는 PR에만 걸린다. main 직접 push를 막으려면
   Settings → Branches에서 required checks 설정 필수 (`[github] require_ci` 참고)
@@ -97,7 +100,7 @@
 
 ## 구현 규칙 (세분화 게이트)
 
-- **`/harness-work` 실행 전, Plans.md의 대상 cc:TODO Task가 전부
+- **`/harness-work` 실행 전, `tasks/index.json`의 대상 `todo` Task가 전부
   `agents/task-decomposer.md`의 세분화 기준을 통과했는지 먼저 확인한다.**
   하나라도 미달(DoD·Acceptance 미기재, "전체/모든/및"으로 뭉뚱그린 표현,
   여러 관심사 혼재 등)이면 worker에게 위임하지 않는다 — task-decomposer를
@@ -109,7 +112,8 @@
 - **worker가 작업 도중 범위가 예상보다 크다는 걸 발견하면**(관련 없는 파일
   3개 이상을 동시에 고쳐야 하거나, 서로 다른 관심사가 뒤섞여 있음을 인지하면)
   즉시 구현을 멈추고 `agents/task-decomposer.md`를 다시 호출한다. 남은 작업을
-  `{원본 task-id}.{n}` 형태 하위 Task로 분리하고, 원본 Task는 "분리 완료"로
+  `{원본 task-id}.{n}` 형태 하위 Task로 분리하고, `python3 scripts/sync_plans.py`로
+  `Plans.md`를 갱신한다. 원본 Task는 "분리 완료"로
   마킹한 뒤 하위 Task 단위로 이어서 진행한다 — 같은 에이전트를 재사용해
   계획 단계와 구현 단계 세분화를 하나의 기준으로 유지한다.
 - 이 단계는 harness 플러그인이 자동 실행하지 않는다 — `/harness-work` 흐름에서
@@ -118,7 +122,7 @@
 ## 테스트 규칙
 
 - **worker 구현 완료 후, reviewer 검토 전에 `agents/test-agent.md` 절차를 실행한다.**
-  Plans.md 해당 Task의 Acceptance 명령 + 프로젝트 테스트 스위트를 돌린다.
+  `tasks/index.json` 해당 Task의 Acceptance 명령 + 프로젝트 테스트 스위트를 돌린다.
 - Verdict FAIL이면 reviewer 진입 금지. 실패 내용을 근거로 수정 후 재실행.
 - 이 단계는 harness 플러그인이 자동 실행하지 않는다 — `/harness-work` 흐름에서
   Claude가 이 규칙에 따라 직접 수행한다 (`harness.toml [test]` 참고).

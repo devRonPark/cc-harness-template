@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "0.1",
+      "title": "PRD 작성 (`/grill-me` 인터뷰)",
+      "dod": "docs/PRD.md v0.1 존재, Open Questions 정리됨",
+      "acceptance": "test -f docs/PRD.md",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 0 — 부트스트랩"
+    },
+    {
+      "id": "0.2",
+      "title": "기획 보완 문서",
+      "dod": "UserFlow.md·Architecture.md 작성 (docs/templates/ 골격 사용)",
+      "acceptance": "test -f docs/UserFlow.md && test -f docs/Architecture.md",
+      "depends": [
+        "0.1"
+      ],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 0 — 부트스트랩"
+    },
+    {
+      "id": "0.3",
+      "title": "Harness 초기화",
+      "dod": "harness doctor 전체 통과, CLAUDE.md·Plans.md 존재",
+      "acceptance": "test -f CLAUDE.md && test -f Plans.md && test -f harness.toml",
+      "depends": [],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 0 — 부트스트랩"
+    },
+    {
+      "id": "0.4",
+      "title": "Plugin 설정",
+      "dod": "ponytail·caveman 등 필요한 플러그인 설치 확인",
+      "acceptance": "test -f ~/.claude/settings.json",
+      "depends": [
+        "0.3"
+      ],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 0 — 부트스트랩"
+    }
+  ]
+}

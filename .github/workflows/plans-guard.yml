@@ -9,179 +9,115 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  header-check:
-    name: Plans.md 헤더 스키마
+  validate-tasks:
+    name: tasks/index.json 검증
     runs-on: ubuntu-22.04
     timeout-minutes: 5
-    # M1/M7 (2026-07-04 감사): 아래 acceptance-check·granularity-check의
-    # `[ "$n" -lt 8 ] && continue`는 컬럼이 하나라도 빠지면 전 행을 조용히
-    # skip한다 — "게이트가 도는 것"과 "아무것도 안 보는 것"이 CI 로그만
-    # 봐선 구분되지 않는다. 파싱 전에 헤더 7컬럼을 명시 검증해 불일치 시
-    # FAIL로 드러낸다. plans-complete.yml에도 동일 로직 적용.
     steps:
       - uses: actions/checkout@v4
 
-      - name: 헤더 컬럼 스키마 검증
-        shell: bash
-        run: |
-          if [ ! -f Plans.md ]; then
-            echo "Plans.md 없음 — skip"
-            exit 0
-          fi
+      - name: Task JSON 스키마·의존성 검증
+        run: python3 scripts/validate_tasks.py
 
-          expected='|Task|내용|DoD|Acceptance|Depends|Status|GH|'
-          mapfile -t headers < <(grep -E '^\|[[:space:]]*Task[[:space:]]*\|' Plans.md)
+      - name: Plans.md 동기화 확인
+        run: python3 scripts/sync_plans.py --check
 
-          if [ ${#headers[@]} -eq 0 ]; then
-            echo "✗ Plans.md에 'Task' 헤더 행이 없습니다"
-            exit 1
-          fi
-
-          failed=0
-          for h in "${headers[@]}"; do
-            norm=$(echo "$h" | sed -E 's/[[:space:]]+//g')
-            if [ "$norm" != "$expected" ]; then
-              echo "✗ 헤더 불일치: $h"
-              echo "  기대: | Task | 내용 | DoD | Acceptance | Depends | Status | GH |"
-              failed=1
-            fi
-          done
-
-          if [ "$failed" -eq 1 ]; then
-            echo "Plans.md 컬럼 스키마가 기대값과 다릅니다 — acceptance-check/granularity-check가"
-            echo "행을 조용히 건너뛸 수 있어 명시적으로 차단합니다."
-            exit 1
-          fi
-          echo "✓ 헤더 스키마 확인 (${#headers[@]}개 테이블)"
-
-  plans-diff-check:
-    name: Plans.md Diff 보호
-    needs: header-check
+  tasks-diff-check:
+    name: tasks/index.json Diff 보호
+    needs: validate-tasks
     runs-on: ubuntu-22.04
     timeout-minutes: 5
-    # H2 (2026-07-04 감사): wip-branch-check는 task/* 브랜치가 아니면 통째로
-    # skip한다 — 임의 브랜치(docs/x 등)에서 Plans.md Status 컬럼을 직접
-    # cc:완료로 바꾸거나 남의 행을 건드려도 검사가 0개다. task 브랜치도 자기
-    # Task 행 외 다른 행 변경은 아무도 보지 않는다. 이 잡은 base와 head 사이
-    # Plans.md의 Status 변경만 diff로 추출해: ① cc:완료 전환은 PR 안에서
-    # 절대 불가(완료는 plans-complete 봇의 머지 후 커밋으로만 발생) ② cc:TODO
-    # → cc:WIP 전환은 자기 task/{id}-* 브랜치의 해당 id 행에서만 허용.
-    # 그 외 Status 변경(신규 행 추가, 텍스트 컬럼 수정 등)은 제한하지 않는다.
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Plans.md Status 컬럼 변경 범위 검증
+      - name: Task status 변경 범위 검증
         shell: bash
         env:
           HEAD_REF: ${{ github.head_ref }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          if [ ! -f Plans.md ]; then
-            echo "Plans.md 없음 — skip"
-            exit 0
-          fi
+          git show "$BASE_SHA:tasks/index.json" > /tmp/base-tasks.json 2>/dev/null || echo '{"tasks":[]}' > /tmp/base-tasks.json
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
 
-          parse() {
-            while IFS= read -r line; do
-              [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
-              [[ "$line" != *"|"* ]] && continue
-              line="${line%"${line##*[![:space:]]}"}"
-              line="${line%|}"
-              IFS='|' read -ra fields <<< "$line"
-              n=${#fields[@]}
-              [ "$n" -lt 8 ] && continue
-              task_id=$(echo "${fields[1]}" | xargs)
-              status=$(echo "${fields[n-2]}" | xargs)
-              [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
-              echo "$task_id $status"
-            done < "$1"
-          }
+          with open("/tmp/base-tasks.json", encoding="utf-8") as fh:
+              base = {task["id"]: task for task in json.load(fh).get("tasks", [])}
+          with open("tasks/index.json", encoding="utf-8") as fh:
+              head = {task["id"]: task for task in json.load(fh).get("tasks", [])}
 
-          git show "$BASE_SHA:Plans.md" > /tmp/base-plans.md 2>/dev/null || : > /tmp/base-plans.md
-          parse /tmp/base-plans.md > /tmp/base-status.txt
-          parse Plans.md > /tmp/head-status.txt
+          owner = None
+          match = re.match(r"^task/([0-9]+\.[0-9]+(\.[0-9]+)?)-", os.environ["HEAD_REF"])
+          if match:
+              owner = match.group(1)
 
-          owner=""
-          if [[ "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+(\.[0-9]+)?)- ]]; then
-            owner="${BASH_REMATCH[1]}"
-          fi
-
-          failed=0
-          while IFS=' ' read -r task_id new_status; do
-            old_status=$(awk -v t="$task_id" '("x" $1)==("x" t){print $2}' /tmp/base-status.txt)
-            [ -z "$old_status" ] && old_status="(신규)"
-            [ "$old_status" == "$new_status" ] && continue
-
-            case "$new_status" in
-              "cc:완료")
-                echo "✗ PR 안에서 Task ${task_id}을(를) cc:완료로 전환할 수 없습니다 (${old_status} → cc:완료). 완료 전환은 plans-complete 봇의 머지 후 커밋만 허용됩니다."
-                failed=1
-                ;;
-              "cc:WIP")
-                if [ "$old_status" != "cc:TODO" ]; then
-                  echo "✗ Task ${task_id}: 비정상 Status 전환 (${old_status} → cc:WIP)"
-                  failed=1
-                elif [ -z "$owner" ]; then
-                  echo "✗ 비-task 브랜치(${HEAD_REF})에서 Task ${task_id} cc:TODO → cc:WIP 전환 감지"
-                  failed=1
-                elif [ "$task_id" != "$owner" ]; then
-                  echo "✗ Task ${owner} 브랜치에서 타 Task ${task_id}의 cc:TODO → cc:WIP 전환 감지"
-                  failed=1
-                else
-                  echo "✓ Task ${task_id}: cc:TODO → cc:WIP 정상 전환"
-                fi
-                ;;
-              *)
-                : # cc:TODO 유지·신규 행 추가 등은 제한하지 않음
-                ;;
-            esac
-          done < /tmp/head-status.txt
-
-          exit $failed
+          failed = False
+          for task_id, task in sorted(head.items()):
+              old_status = base.get(task_id, {}).get("status", "(new)")
+              new_status = task.get("status")
+              if old_status == new_status:
+                  continue
+              if new_status == "done":
+                  print(f"✗ PR 안에서 Task {task_id}을(를) done으로 전환할 수 없습니다. 완료 전환은 plans-complete 봇 전용입니다.")
+                  failed = True
+              elif new_status == "wip":
+                  if old_status != "todo":
+                      print(f"✗ Task {task_id}: 비정상 status 전환 ({old_status} → wip)")
+                      failed = True
+                  elif owner is None:
+                      print(f"✗ 비-task 브랜치({os.environ['HEAD_REF']})에서 Task {task_id} todo → wip 전환 감지")
+                      failed = True
+                  elif owner != task_id:
+                      print(f"✗ Task {owner} 브랜치에서 타 Task {task_id}의 todo → wip 전환 감지")
+                      failed = True
+                  else:
+                      print(f"✓ Task {task_id}: todo → wip 정상 전환")
+          sys.exit(1 if failed else 0)
+          PY
 
   wip-branch-check:
     name: WIP↔Branch
-    needs: header-check
+    needs: validate-tasks
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
-      - name: PR 브랜치 ↔ Plans.md WIP 일관성 확인
+      - name: PR 브랜치 ↔ tasks/index.json WIP 일관성 확인
         shell: bash
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [ ! -f Plans.md ]; then
-            echo "Plans.md 없음 — skip"
-            exit 0
-          fi
-
-          # task/{X.Y}-* 또는 구현 중 재분해된 task/{X.Y.Z}-* 브랜치가 아니면 검사 대상 아님 (docs, hotfix 등)
           if [[ ! "$HEAD_REF" =~ ^task/([0-9]+\.[0-9]+(\.[0-9]+)?)- ]]; then
             echo "task/* 브랜치 아님 ($HEAD_REF) — skip"
             exit 0
           fi
           task_id="${BASH_REMATCH[1]}"
-          task_id_re="${task_id//./\\.}"
+          python3 - "$task_id" <<'PY'
+          import json
+          import sys
 
-          # 이 PR의 Task 행이 Plans.md에서 cc:WIP 상태인지만 검사한다.
-          # (다른 WIP Task는 이 PR과 무관 — 전체 검사 시 병렬 작업이 오탐으로 차단됨)
-          if grep -E "^\|[[:space:]]*${task_id_re}[[:space:]]*\|" Plans.md | grep -q 'cc:WIP'; then
-            echo "✓ Task ${task_id}: Plans.md cc:WIP 확인"
-          else
-            echo "✗ Task ${task_id}: Plans.md에 cc:WIP 행 없음 (harness-work가 마커를 갱신했는지 확인)"
-            exit 1
-          fi
+          task_id = sys.argv[1]
+          with open("tasks/index.json", encoding="utf-8") as fh:
+              tasks = {task["id"]: task for task in json.load(fh).get("tasks", [])}
+          task = tasks.get(task_id)
+          if task and task.get("status") == "wip":
+              print(f"✓ Task {task_id}: tasks/index.json wip 확인")
+              raise SystemExit(0)
+          print(f"✗ Task {task_id}: tasks/index.json에 wip Task 없음")
+          raise SystemExit(1)
+          PY
 
   acceptance-check:
     name: Acceptance Oracle
-    needs: header-check
+    needs: validate-tasks
     runs-on: ubuntu-22.04
     timeout-minutes: 15
-    # fork PR은 Plans.md에 임의 명령을 심어 CI에서 eval시킬 수 있으므로 same-repo PR만 실행
+    # fork PR은 tasks/index.json에 임의 명령을 심어 CI에서 실행시킬 수 있으므로 same-repo PR만 실행
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
@@ -201,48 +137,24 @@ jobs:
       - name: WIP Task acceptance 명령 실행
         shell: bash
         run: |
-          if [ ! -f Plans.md ]; then
-            echo "Plans.md 없음 — skip"
+          python3 - <<'PY' > /tmp/wip-acceptance.tsv
+          import json
+
+          with open("tasks/index.json", encoding="utf-8") as fh:
+              tasks = json.load(fh).get("tasks", [])
+          for task in tasks:
+              if task.get("status") == "wip":
+                  acceptance = task.get("acceptance", "").strip()
+                  print(f"{task['id']}\t{acceptance}")
+          PY
+
+          if [ ! -s /tmp/wip-acceptance.tsv ]; then
+            echo "WIP Task 없음 — skip"
             exit 0
           fi
 
           failed=0
-          wip_found=0
-
-          while IFS= read -r line; do
-            # 구분자 행·파이프 없는 행 skip
-            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
-            [[ "$line" != *"|"* ]] && continue
-
-            # 행 정규화: 끝 공백·마지막 파이프 제거 → 필드 인덱스 고정
-            line="${line%"${line##*[![:space:]]}"}"
-            line="${line%|}"
-
-            IFS='|' read -ra fields <<< "$line"
-            n=${#fields[@]}
-
-            # 컬럼은 오른쪽부터 센다: n-1=GH, n-2=Status, n-3=Depends.
-            # Acceptance 셀 안의 \| 는 split로 조각나므로 fields[4..n-4]를 다시 합친다.
-            # (왼쪽부터 세면 파이프 포함 acceptance에서 Status가 밀려 WIP 행이 조용히 skip됨)
-            [ "$n" -lt 8 ] && continue
-
-            task_id=$(echo "${fields[1]}" | xargs)
-            status=$(echo "${fields[n-2]}" | xargs)
-
-            # Task ID 형식 (숫자.숫자 또는 재분해된 숫자.숫자.숫자) + cc:WIP 행만 처리
-            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
-            [[ "$status" != "cc:WIP" ]] && continue
-
-            wip_found=$((wip_found + 1))
-
-            acceptance=""
-            for ((i=4; i<=n-4; i++)); do
-              [ -n "$acceptance" ] && acceptance+="|"
-              acceptance+="${fields[i]}"
-            done
-            # markdown escape 복원(\| → |) + 앞뒤 공백 제거 (xargs는 따옴표를 삼키므로 사용 금지)
-            acceptance=$(echo "$acceptance" | sed 's/\\|/|/g; s/^[[:space:]]*//; s/[[:space:]]*$//')
-
+          while IFS=$'\t' read -r task_id acceptance; do
             if [ -z "$acceptance" ] || [ "$acceptance" = "-" ]; then
               echo "⚠ Task ${task_id}: acceptance 없음 — skip"
               continue
@@ -255,163 +167,60 @@ jobs:
               echo "✗ Task ${task_id}: FAIL — acceptance 명령이 실패했습니다"
               failed=1
             fi
-          done < Plans.md
-
-          if [ "$wip_found" -eq 0 ]; then
-            echo "WIP Task 없음 — skip"
-          fi
-
+          done < /tmp/wip-acceptance.tsv
           exit $failed
 
   granularity-check:
     name: Task Granularity
-    needs: header-check
+    needs: validate-tasks
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
-      - name: cc:WIP Task 세분화 기준 확인 (agents/task-decomposer.md 기준)
-        shell: bash
+      - name: wip Task 세분화 기준 확인
         run: |
-          if [ ! -f Plans.md ]; then
-            echo "Plans.md 없음 — skip"
-            exit 0
-          fi
+          python3 - <<'PY'
+          import json
+          import re
+          import sys
 
-          failed=0
-          wip_found=0
-          vague_re='(전체|모든| 및 |그리고)'
+          vague_re = re.compile(r"(전체|모든| 및 |그리고)")
+          with open("tasks/index.json", encoding="utf-8") as fh:
+              tasks = json.load(fh).get("tasks", [])
 
-          while IFS= read -r line; do
-            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
-            [[ "$line" != *"|"* ]] && continue
+          failed = False
+          wip_found = False
+          for task in tasks:
+              if task.get("status") != "wip":
+                  continue
+              wip_found = True
+              reasons = []
+              if not task.get("dod", "").strip():
+                  reasons.append("DoD 미기재")
+              if "depends" not in task:
+                  reasons.append("Depends 키 미기재")
+              match = vague_re.search(task.get("title", ""))
+              if match:
+                  reasons.append(f"내용에 뭉뚱그린 표현 감지: {match.group(1)}")
+              if reasons:
+                  print(f"✗ Task {task['id']}: 세분화 기준 미달 — {', '.join(reasons)}")
+                  failed = True
+              else:
+                  print(f"✓ Task {task['id']}: 세분화 기준 통과")
 
-            line="${line%"${line##*[![:space:]]}"}"
-            line="${line%|}"
-
-            IFS='|' read -ra fields <<< "$line"
-            n=${#fields[@]}
-            [ "$n" -lt 8 ] && continue
-
-            task_id=$(echo "${fields[1]}" | xargs)
-            content=$(echo "${fields[2]}" | xargs)
-            dod=$(echo "${fields[3]}" | xargs)
-            depends=$(echo "${fields[n-3]}" | xargs)
-            status=$(echo "${fields[n-2]}" | xargs)
-
-            # Task ID 형식 (숫자.숫자 또는 재분해된 숫자.숫자.숫자) + cc:WIP 행만 처리
-            # (harness-work가 Task를 WIP로 옮기는 시점 = 세분화 게이트가 걸려야 하는 시점)
-            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
-            [[ "$status" != "cc:WIP" ]] && continue
-
-            wip_found=$((wip_found + 1))
-            reasons=()
-
-            if [ -z "$dod" ] || [[ "$dod" =~ ^\[.*\]$ ]]; then
-              reasons+=("DoD 미기재/placeholder")
-            fi
-            if [ -z "$depends" ]; then
-              reasons+=("Depends 비어있음(- 라도 명시 필요)")
-            fi
-            if [[ "$content" =~ $vague_re ]]; then
-              reasons+=("내용에 뭉뚱그린 표현 감지: ${BASH_REMATCH[1]}")
-            fi
-
-            if [ ${#reasons[@]} -gt 0 ]; then
-              echo "✗ Task ${task_id}: 세분화 기준 미달 — ${reasons[*]}"
-              echo "  → agents/task-decomposer.md로 하위 Task(${task_id}.N)로 재분해 필요"
-              failed=1
-            else
-              echo "✓ Task ${task_id}: 세분화 기준 통과"
-            fi
-          done < Plans.md
-
-          if [ "$wip_found" -eq 0 ]; then
-            echo "WIP Task 없음 — skip"
-          fi
-
-          exit $failed
+          if not wip_found:
+              print("WIP Task 없음 — skip")
+          sys.exit(1 if failed else 0)
+          PY
 
   depends-check:
     name: Depends 검증
-    needs: header-check
+    needs: validate-tasks
     runs-on: ubuntu-22.04
     timeout-minutes: 5
-    # H3 (2026-07-04 감사): granularity-check는 Depends 컬럼이 "비어있지
-    # 않음"만 확인한다 — 선행 Task가 cc:완료인지는 아무도 검사하지 않아
-    # CLAUDE.md의 "UI Task는 DESIGN.md Task를 Depends로 게이트" 규약이
-    # 이빨 없었다. 이 잡은 cc:WIP 행의 Depends가 가리키는 모든 Task가
-    # 현재 Plans.md에서 cc:완료인지 확인, 아니면 FAIL.
     steps:
       - uses: actions/checkout@v4
 
       - name: WIP Task의 Depends 완료 여부 확인
-        shell: bash
-        run: |
-          if [ ! -f Plans.md ]; then
-            echo "Plans.md 없음 — skip"
-            exit 0
-          fi
-
-          declare -A status_map
-          while IFS= read -r line; do
-            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
-            [[ "$line" != *"|"* ]] && continue
-            line="${line%"${line##*[![:space:]]}"}"
-            line="${line%|}"
-            IFS='|' read -ra fields <<< "$line"
-            n=${#fields[@]}
-            [ "$n" -lt 8 ] && continue
-            task_id=$(echo "${fields[1]}" | xargs)
-            status=$(echo "${fields[n-2]}" | xargs)
-            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
-            status_map["$task_id"]="$status"
-          done < Plans.md
-
-          failed=0
-          wip_found=0
-
-          while IFS= read -r line; do
-            [[ "$line" =~ ^[[:space:]]*\|[[:space:]]*[-:] ]] && continue
-            [[ "$line" != *"|"* ]] && continue
-            line="${line%"${line##*[![:space:]]}"}"
-            line="${line%|}"
-            IFS='|' read -ra fields <<< "$line"
-            n=${#fields[@]}
-            [ "$n" -lt 8 ] && continue
-            task_id=$(echo "${fields[1]}" | xargs)
-            depends=$(echo "${fields[n-3]}" | xargs)
-            status=$(echo "${fields[n-2]}" | xargs)
-            [[ ! "$task_id" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] && continue
-            [[ "$status" != "cc:WIP" ]] && continue
-
-            wip_found=$((wip_found + 1))
-
-            if [ -z "$depends" ] || [ "$depends" = "-" ]; then
-              echo "✓ Task ${task_id}: Depends 없음"
-              continue
-            fi
-
-            IFS=',' read -ra dep_list <<< "$depends"
-            for dep in "${dep_list[@]}"; do
-              dep=$(echo "$dep" | xargs)
-              [ -z "$dep" ] && continue
-              dep_status="${status_map[$dep]:-}"
-              if [ -z "$dep_status" ]; then
-                echo "✗ Task ${task_id}: Depends ${dep}가 Plans.md에 존재하지 않음"
-                failed=1
-              elif [ "$dep_status" != "cc:완료" ]; then
-                echo "✗ Task ${task_id}: Depends ${dep} 아직 미완료 (현재 ${dep_status}) — 선행 Task 완료 전까지 WIP 진행 불가"
-                failed=1
-              else
-                echo "✓ Task ${task_id}: Depends ${dep} 완료 확인"
-              fi
-            done
-          done < Plans.md
-
-          if [ "$wip_found" -eq 0 ]; then
-            echo "WIP Task 없음 — skip"
-          fi
-
-          exit $failed
+        run: python3 scripts/validate_tasks.py

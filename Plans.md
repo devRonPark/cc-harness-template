@@ -74,11 +74,17 @@
 
 ---
 
-<!-- 
-Task Status 마커:
-  cc:TODO   — 미시작
-  cc:WIP    — 진행 중 (harness가 자동 설정)
-  cc:완료   — 완료 (harness가 자동 설정)
+<!--
+Task 상태의 단일 출처는 tasks/index.json이다.
+Plans.md의 Task 표와 Status 컬럼은 직접 편집하지 말고 tasks/index.json을 수정한 뒤
+python3 scripts/sync_plans.py를 실행한다. CI에서는 scripts/validate_tasks.py가
+tasks/index.json을 검증하고, --check로 Plans.md 동기화 여부를 확인한다.
+
+JSON status 값:
+  todo    — 미시작 (Plans.md 표시: cc:TODO)
+  wip     — 진행 중 (Plans.md 표시: cc:WIP)
+  done    — 완료 (Plans.md 표시: cc:완료)
+  blocked — 차단됨 (Plans.md 표시: cc:BLOCKED, blocked_reason 필수)
 
 GH 컬럼:
   -         — GitHub 미연동 또는 이슈 미생성
