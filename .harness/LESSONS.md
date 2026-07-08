@@ -90,3 +90,10 @@
 - **교훈**: 모니터/훅이 주는 상태 요약은 참고만 하고, 실제 상태는 Plans.md와
   `git status`로 직접 확인한 뒤 판단한다.
 - **CLAUDE.md 반영**: 불필요 (일회성 판단 습관).
+## 2026-07-08 — Task status 변경은 Task ID context와 함께 패치할 것
+
+- `tasks/index.json`에는 `"status": "todo"` 같은 반복 문자열이 많다. 상태를 바꿀 때
+  단일 status 줄만 패치하면 다른 Task가 변경될 수 있다.
+- 예방 규칙: status 패치는 반드시 `"id": "{task-id}"`와 title/acceptance 일부를
+  포함한 context hunk로 적용하고, 직후 `grep -n '"id": "{task-id}"' -A8`로 대상
+  Task 상태를 확인한다.

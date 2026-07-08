@@ -23,7 +23,7 @@
 | 1.0 | Plans.md 템플릿 개선 | bootstrap Task에 Acceptance 예시 있음, 현실적 샘플 Task 포함 | grep -qE 'test -f\|npm test\|pytest\|go test\|curl' Plans.md | - | cc:완료 | - |
 | 1.1 | test agent 추가 | agents/test-agent.md 존재, harness.toml [test] 섹션, BLUEPRINT.md 업데이트 | test -f agents/test-agent.md | - | cc:완료 | - |
 | 1.2 | 기획 파이프라인 추가 | grill-me 스킬 + docs/templates/ 골격 3종, CLAUDE.md 기획 규칙 | test -f .claude/skills/grill-me/SKILL.md && test -f docs/templates/PRD.md | - | cc:완료 | - |
-| 1.3 | task-decomposer + 세분화 게이트 추가 | agents/task-decomposer.md 존재, harness.toml [plan] 섹션, plans-guard.yml granularity-check 잡, CLAUDE.md 구현 규칙 | test -f agents/task-decomposer.md && grep -q 'granularity-check' .github/workflows/plans-guard.yml | 1.1 | cc:완료 | - |
+| 1.3 | task-decomposer + 세션 세분화 게이트 추가 | agents/task-decomposer.md 존재, harness.toml [plan] 섹션, CLAUDE.md 구현 규칙에 세분화 게이트 명시 | test -f agents/task-decomposer.md && grep -q '세분화 게이트' CLAUDE.md | 1.1 | cc:완료 | - |
 | 1.4 | .harness/ 상태 문서 체계 추가 | .harness/ 골격 7종(STATE·HANDOFF·TASKS·LOG·LESSONS·CHECKPOINTS·CONTEXT_INDEX) 존재, CLAUDE.md 상태 문서 규칙 섹션 존재 | test -f .harness/STATE.md && test -f .harness/CONTEXT_INDEX.md && grep -q '상태 문서 규칙' CLAUDE.md | - | cc:완료 | - |
 
 ---
@@ -38,7 +38,7 @@
 | 2.4 | 계획 파이프라인 테스트 (task-decomposer → Plans.md) | ../routine-saas/Plans.md에 세분화 기준 통과 Task 표 존재 | - | 2.3 | cc:완료 | - |
 | 2.5 | 템플릿 결함 기록 | 테스트 중 발견한 템플릿 문제를 .harness/LESSONS.md에 기록, 수정 필요 항목은 Week 3 후보로 정리 | - | 2.4 | cc:완료 | - |
 | 2.6 | DESIGN.md 기획 산출물 추가 | docs/templates/DESIGN.md 골격 존재, CLAUDE.md 기획 규칙에 DESIGN 단계 반영, routine-saas에 실제 작성 적용 | test -f docs/templates/DESIGN.md | 2.5 | cc:완료 | - |
-| 2.7 | GitHub 연동 E2E 검증 + plans-complete 워크플로 | harness-gh-test repo에서 plans-guard 3잡 시나리오 4종 검증, 빈틈 7건 도출, plans-complete.yml 신설 검증, CLAUDE.md GitHub 플로우 명문화 | test -f .github/workflows/plans-complete.yml && grep -q 'plans-complete' CLAUDE.md | 2.5 | cc:완료 | - |
+| 2.7 | GitHub 연동 E2E 검증 | harness-gh-test repo에서 GitHub 연동 시나리오를 검증하고 발견한 빈틈을 문서화 | grep -q 'GitHub 플로우' CLAUDE.md | 2.5 | cc:완료 | - |
 
 ---
 
@@ -46,13 +46,13 @@
 
 | Task | 내용 | DoD | Acceptance | Depends | Status | GH |
 |------|------|-----|------------|---------|--------|----|
-| 3.1 | plans-complete branch protection 호환 (H1) | protection 활성 테스트 repo에서 자동 flip 실증, 선택한 방식(bypass/PR)의 근거를 워크플로 주석에 기록 | grep -qi 'protection' .github/workflows/plans-complete.yml | - | cc:완료 | - |
+| 3.1 | GitHub branch protection 호환 (H1) | protection 활성 테스트 repo에서 자동 flip 실증, 선택한 방식(bypass/PR)의 근거를 워크플로 주석에 기록 | grep -qi 'branch protection' docs/github-integration.md | - | cc:완료 | - |
 | 3.2 | clean 골격 세트 분리 (H5) | templates/skeleton/에 Plans.md·.harness/ 7종 초기 상태 존재, dogfood 이력 미포함 | test -f templates/skeleton/Plans.md && test -f templates/skeleton/.harness/STATE.md | - | cc:완료 | - |
-| 3.3 | init.sh 초기화 스크립트 (H5) | init.sh가 plans-complete.yml·ci.yml·.harness/ 골격 포함 복사, README 수동 cp 절차를 스크립트 안내로 교체 | test -x init.sh && grep -q 'plans-complete.yml' init.sh | 3.2 | cc:완료 | - |
-| 3.4 | plans-guard diff 보호 잡 (H2) | 비-task 브랜치의 Status 변경 PR 차단, task 브랜치의 타 행 Status 변경 차단 — 시나리오 2종 테스트 repo 검증 | grep -q 'plans-diff-check' .github/workflows/plans-guard.yml | 3.6 | cc:완료 | - |
-| 3.5 | plans-guard depends-check 잡 (H3) | WIP Task의 Depends 대상이 cc:완료 아니면 FAIL — 시나리오 검증 | grep -q 'depends-check' .github/workflows/plans-guard.yml | 3.6 | cc:완료 | - |
-| 3.6 | Plans.md 헤더 검증 선행 파싱 (M1·M7) | 헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard·plans-complete에 공통 적용 | grep -q 'header-check' .github/workflows/plans-guard.yml | - | cc:완료 | - |
-| 3.7 | 완료 전환 서술 통일 (M3) | README·BLUEPRINT의 세션 직접 flip 서술을 CLAUDE.md 기준(plans-complete 자동 전환)으로 교체 | grep -q 'plans-complete' README.md && grep -q 'plans-complete' BLUEPRINT.md | 3.1 | cc:완료 | - |
+| 3.3 | init.sh 초기화 스크립트 (H5) | init.sh가 ci.yml·plans-guard.yml·.harness/ 골격 포함 복사, README 수동 cp 절차를 스크립트 안내로 교체 | test -x init.sh && grep -q 'plans-guard.yml' init.sh && grep -q 'ci.yml' init.sh | 3.2 | cc:완료 | - |
+| 3.4 | plans-guard 상태 변경 보호 검토 기록 (H2) | Task 상태 변경 보호를 CI가 아닌 세션 에이전트 책임으로 둘지 검토하고 결정을 문서화 | - | 3.6 | cc:완료 | - |
+| 3.5 | Depends 검증 경로 정리 (H3) | Depends 존재 여부와 WIP 선행 완료 검증 경로가 validate_tasks.py 기준으로 정리됨 | python3 scripts/validate_tasks.py | 3.6 | cc:완료 | - |
+| 3.6 | Plans.md 헤더 검증 선행 파싱 (M1·M7) | 헤더 7컬럼 불일치 시 명시 FAIL(조용한 skip 제거), plans-guard에 적용 | python3 scripts/sync_plans.py --check | - | cc:완료 | - |
+| 3.7 | 완료 전환 서술 통일 (M3) | README·BLUEPRINT의 Task 상태 전환 서술을 CLAUDE.md 기준과 일치시킴 | grep -q 'GitHub Actions는 Task 상태를 바꾸지 않는다' README.md && grep -q 'Actions는 Task 상태를 쓰지 않고' BLUEPRINT.md | 3.1 | cc:완료 | - |
 | 3.8 | harness.toml 죽은 설정 정리 (M4) | 미사용 키 제거, 미파싱 섹션 역할 주석 재정의(실행 SSOT는 CLAUDE.md) | ! grep -q 'max_iterations' harness.toml | - | cc:완료 | - |
 | 3.9 | Plans.md anti-pattern 예시 교정 (M2) | 무력화 패턴(echo skip) 행 교정, repo 밖 경로 acceptance `-` 처리, 주석에 금지 규약 추가 | ! grep -qE 'echo sk[i]p' Plans.md | - | cc:완료 | - |
 | 3.10 | agents 문서 수행 주체 명시 (M5) | BLUEPRINT·README에 "절차 문서, 수행 주체=세션 Claude" 명시, .claude/agents/ 이전 여부 결정 기록 | grep -q '수행 주체' BLUEPRINT.md | - | cc:완료 | - |
@@ -65,12 +65,23 @@
 
 | Task | 내용 | DoD | Acceptance | Depends | Status | GH |
 |------|------|-----|------------|---------|--------|----|
-| 4.1 | granularity 오탐지 정규식 정확도 개선 (L1) | vague_re가 "그리고" 포함 정상 문장은 통과시키고 쉼표 나열·"와"/"과" 열거 표현은 미달로 탐지 | ! grep -q "vague_re='(전체\|모든\| 및 \|그리고)'" .github/workflows/plans-guard.yml | - | cc:TODO | - |
+| 4.1 | 세분화 기준 표현 정확도 개선 (L1) | agents/task-decomposer.md가 정상 연결어와 여러 관심사 열거 표현을 구분하는 기준을 설명 | grep -q '여러 관심사' agents/task-decomposer.md | - | cc:TODO | - |
 | 4.2 | test-agent pretest 오탐 스택 감지 수정 (L2) | "pretest" 스크립트만 있는 package.json을 npm test 스택으로 오판하지 않음 | grep -q '"test":' agents/test-agent.md | - | cc:TODO | - |
 | 4.3 | CONTEXT_INDEX.md 미존재 파일 인덱스 정리 (L3) | 이 저장소에 없는 docs/PRD.md·UserFlow.md·Architecture.md 인덱스 항목 제거 | ! grep -q 'docs/PRD.md' .harness/CONTEXT_INDEX.md | - | cc:TODO | - |
 | 4.4 | rm 위험 패턴 매칭 범위 확대 (L4) | harness.toml ask 목록이 rm -fr·rm -R 조합도 포착 | [ $(grep -c 'rm -' harness.toml) -gt 1 ] | - | cc:TODO | - |
 | 4.5 | grill-me 산출 경로 인자 지원 (L5) | SKILL.md에 대상 디렉토리 인자 규약 명시, 기본값은 현재 프로젝트 docs/ | grep -q '산출 경로' .claude/skills/grill-me/SKILL.md | - | cc:TODO | - |
 | 4.6 | grill-me 비대화형 실행 호환 모드 (L5) | 무응답·headless 환경에서 질문마다 권장값으로 자동 확정 후 진행하는 대안 경로 명시 | grep -q 'headless' .claude/skills/grill-me/SKILL.md | - | cc:TODO | - |
+
+---
+
+## Week 4 — Codex 호환 환경 구성
+
+| Task | 내용 | DoD | Acceptance | Depends | Status | GH |
+|------|------|-----|------------|---------|--------|----|
+| 4.7 | Codex 호환 진입점 추가 | AGENTS.md가 Codex 진입점으로 존재하고 init.sh가 새 프로젝트에 복사하며 README·BLUEPRINT에 Codex 동작 경로가 명시됨 | test -f AGENTS.md && grep -q 'AGENTS.md' init.sh && grep -q 'Recommended Codex Workflow' README.md | - | cc:완료 | - |
+| 4.8 | Codex harness skills 추가 | .agents/skills 아래 harness 흐름 6종 SKILL.md가 존재하고 init.sh가 새 프로젝트에 복사함 | test -f .agents/skills/grill-me/SKILL.md && test -f .agents/skills/harness-plan/SKILL.md && test -f .agents/skills/harness-work/SKILL.md && test -f .agents/skills/harness-review/SKILL.md && test -f .agents/skills/harness-progress/SKILL.md && test -f .agents/skills/harness-sync/SKILL.md && grep -q '.agents/skills' init.sh | 4.7 | cc:완료 | - |
+| 4.9 | Git workflow helper command/skill 추가 | Claude custom command와 Codex skill로 branch-checkout·git-push·pr-create 절차가 제공되고 init.sh가 복사함 | test $(find .claude/commands -name '*.md' \| wc -l) -ge 3 && test -f .agents/skills/branch-checkout/SKILL.md && test -f .agents/skills/git-push/SKILL.md && test -f .agents/skills/pr-create/SKILL.md && grep -q '.claude/commands' init.sh | 4.8 | cc:완료 | - |
+| 4.10 | Claude/Codex 공용 Quality Gate 문서화 | docs/specs/2026-07-08-codex-claude-quality-gates.md와 agents/quality-gates.md가 존재하고 Codex skill, README, BLUEPRINT, AGENTS, init skeleton이 quality gate 기준을 참조함 | test -f docs/specs/2026-07-08-codex-claude-quality-gates.md && test -f agents/quality-gates.md && grep -q 'YAGNI' agents/quality-gates.md && grep -q 'caveman' README.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-work/SKILL.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-review/SKILL.md | 4.8 | cc:완료 | - |
 
 ---
 
@@ -93,7 +104,7 @@ GH 컬럼:
 Acceptance 컬럼:
   -         — 기계 검증 없음 (skip). "|| echo skip"처럼 항상 성공하는
               패턴은 oracle을 무력화하므로 금지 — 검증 안 할 거면 "-"로 명시.
-  명령어     — PR 오픈 시 plans-guard CI가 실행, 실패하면 PR 차단.
+  명령어     — 세션 에이전트가 완료 전 실행, 실패하면 done 전환 금지.
               CI checkout 범위 밖 경로(예: ../다른-repo/)는 실행 불가 — 금지.
               Given=repo checkout/Depends 산출물, When=명령 실행, Then=exit 0
               또는 출력·파일·응답 검증이 되도록 쓴다.
@@ -107,7 +118,7 @@ Acceptance 컬럼:
     출력 포함: go test ./... | grep -v SKIP
   escaped pipe(예: grep 'a\|b')는 Acceptance 컬럼에서만 사용 — DoD 등 다른
   컬럼에 쓰면 파서가 열 개수를 오인식한다.
-  * 스택 설치(npm ci 등)는 .github/workflows/plans-guard.yml 상단 주석 해제
+  * GitHub CI 스택 설치(npm ci 등)는 .github/workflows/ci.yml에서 설정
 
 DoD (Definition of Done) 작성 원칙:
   - 검증 가능한 파일·명령·출력으로 기술

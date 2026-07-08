@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    {
+      "id": "4.10",
+      "title": "Claude/Codex 공용 Quality Gate 문서화",
+      "dod": "docs/specs/2026-07-08-codex-claude-quality-gates.md와 agents/quality-gates.md가 존재하고 Codex skill, README, BLUEPRINT, AGENTS, init skeleton이 quality gate 기준을 참조함",
+      "acceptance": "test -f docs/specs/2026-07-08-codex-claude-quality-gates.md && test -f agents/quality-gates.md && grep -q 'YAGNI' agents/quality-gates.md && grep -q 'caveman' README.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-work/SKILL.md && grep -q 'agents/quality-gates.md' .agents/skills/harness-review/SKILL.md",
+      "depends": [
+        "4.8"
+      ],
+      "status": "todo",
+      "gh": "-",
+      "section": "Week 4 — Codex 호환 환경 구성"
+    }
+  ]
+}

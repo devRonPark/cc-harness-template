@@ -105,3 +105,48 @@
 - 검증: `python3 -m unittest tests.test_tasks tests.test_planning -v` PASS(18),
   `python3 scripts/validate_tasks.py` PASS, `python3 scripts/sync_plans.py --check` PASS,
   `init.sh` smoke test PASS.
+
+## 2026-07-08 — Codex repo-scoped harness skills
+
+- 사용자 제공 계획에 따라 `.agents/skills/` 아래 Codex skill 6종 추가:
+  `grill-me`, `harness-plan`, `harness-work`, `harness-review`,
+  `harness-progress`, `harness-sync`.
+- `AGENTS.md`, `README.md`, `BLUEPRINT.md`를 `$grill-me`/`$harness-*` 호출
+  방식으로 갱신하고, `init.sh`가 `.agents/skills`와 planning proposal scripts를
+  새 프로젝트에 복사하도록 수정.
+- `.agents/skills` 디렉터리가 샌드박스에서 read-only로 잡혀 최초 `mkdir -p`가
+  `Read-only file system`으로 실패. 승인된 escalated command로 디렉터리를 생성한
+  뒤 `apply_patch`로 파일을 추가해 해결.
+- 검증: skill 6개 존재 확인, frontmatter 확인, `python3 scripts/validate_tasks.py`
+  PASS, `python3 scripts/validate_tasks.py --root templates/skeleton` PASS,
+  `python3 scripts/sync_plans.py --check` PASS, skeleton sync check PASS,
+  `init.sh /tmp/cc-harness-skill-test.iB2C65` smoke test PASS,
+  `python3 -m unittest tests.test_tasks tests.test_planning -v` PASS(18).
+
+## 2026-07-08 — Git workflow helper command/skill
+
+- Claude Code local custom command 3종 추가:
+  `.claude/commands/branch-checkout.md`, `.claude/commands/git-push.md`,
+  `.claude/commands/pr-create.md`.
+- Codex repo-scoped skill 3종 추가:
+  `.agents/skills/branch-checkout/SKILL.md`, `.agents/skills/git-push/SKILL.md`,
+  `.agents/skills/pr-create/SKILL.md`.
+- 각 절차는 `git status`와 현재 브랜치를 먼저 확인하고, local changes discard와
+  force push를 금지하도록 작성.
+- `init.sh`, `README.md`, `BLUEPRINT.md`, `AGENTS.md`, `docs/setup-guide.md`,
+  context index, `tasks/index.json`, `Plans.md` 갱신.
+- 검증: skill frontmatter PASS, command 파일 존재 확인 PASS,
+  `python3 scripts/validate_tasks.py` PASS, skeleton validate PASS,
+  `python3 scripts/sync_plans.py --check` PASS, skeleton sync check PASS,
+  `python3 -m unittest tests.test_tasks tests.test_planning -v` PASS(18),
+  `init.sh /tmp/cc-harness-git-helper-test.9j00Yd` smoke test PASS.
+## 2026-07-08 12:20 KST — Task status patch target mistake
+
+- 상황: Task `4.10`을 완료 처리하려고 `"status": "todo"` 단일 패턴을 패치했더니
+  첫 번째 TODO였던 `4.1`이 잘못 `done`으로 변경됐다.
+- 원인: `apply_patch` context가 Task ID를 포함하지 않아 동일한 status 문자열 중
+  첫 매칭에 적용됐다.
+- 조치: `grep -n '"id": "4\.' -A7 tasks/index.json`으로 상태를 확인했고,
+  `4.1`은 `todo`로 복구, `4.10`만 `done`으로 전환했다.
+- 검증: `python3 scripts/sync_plans.py`, `python3 scripts/validate_tasks.py`,
+  `python3 scripts/sync_plans.py --check`, 전체 unittest 재실행 모두 PASS.

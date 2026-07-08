@@ -36,8 +36,8 @@
     {
       "id": "0.4",
       "title": "Plugin 설정",
-      "dod": "ponytail·caveman 등 필요한 플러그인 설치 확인",
-      "acceptance": "test -f ~/.claude/settings.json",
+      "dod": "프로젝트 전용 Claude 권한 설정 예시가 복사되고, 전역 플러그인 설치는 README 절차로 확인",
+      "acceptance": "test -f .claude/settings.local.json",
       "depends": [
         "0.3"
       ],

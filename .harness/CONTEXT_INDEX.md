@@ -23,9 +23,13 @@
 | `.harness/shared/planning/latest.json` | 최신 planning run의 context/proposal/report 위치 | 최신 task-decomposer proposal 확인 시 |
 | `.harness/shared/planning/runs/` | run별 context.json·proposed-tasks.json·decomposition-report.md 작업대 | 특정 planning run 감사 시 |
 | `CLAUDE.md` | 프로젝트 규칙 (기획·구현·테스트·리뷰·상태 문서) | 규칙 확인 시 |
+| `AGENTS.md` | Codex 진입점. CLAUDE.md 규칙을 Codex 세션에서 동일 절차로 실행하기 위한 호환 지침 | Codex 환경 구성·규칙 확인 시 |
+| `.agents/skills/` | Codex repo-scoped skills (`$grill-me`, `$harness-plan`, `$harness-work`, `$harness-review`, `$harness-progress`, `$harness-sync`, `$branch-checkout`, `$git-push`, `$pr-create`) | Codex skill 호출 UX·절차 수정 시 |
+| `.claude/commands/` | Claude Code local custom commands (`/branch-checkout`, `/git-push`, `/pr-create`) | Claude command 호출 UX·절차 수정 시 |
 | `harness.toml` | harness 플러그인 설정 ([plan]·[test]·[review]) | 설정 변경 시 |
 | `BLUEPRINT.md` | 시스템 전체 아키텍처 설명 (읽기용) | 구조 이해 필요 시 |
 | `README.md` | 템플릿 사용법 (외부 사용자용) | 문서 갱신 시 |
+| `agents/quality-gates.md` | Claude/Codex 공통 scope·YAGNI·review·reporting 게이트. ponytail/caveman 원칙을 repo 규칙으로 적용 | 구현·리뷰·Codex skill 절차 수정 시 |
 | `agents/task-decomposer.md` | Task 세분화 기준·게이트 정의 | 계획/게이트 실행 시 |
 | `agents/test-agent.md` | 런타임 검증 절차 정의 | worker 완료 후 |
 | `.github/workflows/plans-guard.yml` | header-check·WIP 확인·diff 보호·depends 검증·Acceptance Oracle·세분화 CI (6잡) | CI 수정 시 |
@@ -37,6 +41,7 @@
 | `docs/templates/` | 기획 문서 골격 4종 (PRD·UserFlow·DESIGN·Architecture) | 새 기획 착수 시 |
 | `docs/github-integration.md` | GitHub 연동 상세 가이드 (branch protection·CI 잡 6종·plans-complete 동작) | GitHub 연동 설정 시 |
 | `docs/specs/2026-07-04-template-audit.md` | 템플릿 빈틈 감사 보고서 (H1~H5·M1~M8·L1~L5), Week 3 Task 매핑 근거 (L1~L5는 Plans.md Week 4 Task 4.1~4.6로 전환됨) | 감사 배경 확인 시 |
+| `docs/specs/2026-07-08-codex-claude-quality-gates.md` | ponytail/caveman Claude-only enhancement와 Codex quality-gates 적용 경계 기록 | 품질 게이트 설계 배경 확인 시 |
 | `docs/claude-code-hooks.md` | hooks 미설정 현황 + 권장 hooks 예시, harness.toml [safety.permissions]와 역할 분담 | hooks 추가 검토 시 |
 | `docs/session-recovery.md` | `.harness/` 재개 절차 심화 (파일별 역할·읽는 순서·실제 형식·다중 프로젝트 시나리오) | 세션 복구 절차 상세 확인 시 |
 | `docs/error-memory.md` | `LOG.md`/`LESSONS.md` 작성 규칙·실제 형식·CLAUDE.md 승격 기준 | 에러 기록 규칙 확인 시 |
