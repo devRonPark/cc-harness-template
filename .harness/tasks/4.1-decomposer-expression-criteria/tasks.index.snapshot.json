@@ -313,7 +313,7 @@
       "dod": "agents/task-decomposer.md가 정상 연결어와 여러 관심사 열거 표현을 구분하는 기준을 설명",
       "acceptance": "grep -q '여러 관심사' agents/task-decomposer.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
@@ -323,7 +323,7 @@
       "dod": "\"pretest\" 스크립트만 있는 package.json을 npm test 스택으로 오판하지 않음",
       "acceptance": "grep -q '\"test\":' agents/test-agent.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
@@ -333,7 +333,7 @@
       "dod": "이 저장소에 없는 docs/PRD.md·UserFlow.md·Architecture.md 인덱스 항목 제거",
       "acceptance": "! grep -q 'docs/PRD.md' .harness/CONTEXT_INDEX.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
@@ -343,7 +343,7 @@
       "dod": "harness.toml ask 목록이 rm -fr·rm -R 조합도 포착",
       "acceptance": "[ $(grep -c 'rm -' harness.toml) -gt 1 ]",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
@@ -353,7 +353,7 @@
       "dod": "SKILL.md에 대상 디렉토리 인자 규약 명시, 기본값은 현재 프로젝트 docs/",
       "acceptance": "grep -q '산출 경로' .claude/skills/grill-me/SKILL.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },
@@ -363,7 +363,7 @@
       "dod": "무응답·headless 환경에서 질문마다 권장값으로 자동 확정 후 진행하는 대안 경로 명시",
       "acceptance": "grep -q 'headless' .claude/skills/grill-me/SKILL.md",
       "depends": [],
-      "status": "done",
+      "status": "todo",
       "gh": "-",
       "section": "Week 4 — 백로그 정리 (기준 문서: docs/specs/2026-07-04-template-audit.md L1~L5)"
     },

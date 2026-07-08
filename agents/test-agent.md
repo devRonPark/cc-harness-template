@@ -37,7 +37,7 @@ ACCEPT_EXIT=$?
 
 ```bash
 cd "${worktree_path:-.}"
-if [ -f package.json ] && grep -q '"test"' package.json; then
+if [ -f package.json ] && grep -q '"test":' package.json; then
   npm test 2>&1; TEST_EXIT=$?
 elif [ -f pyproject.toml ] || [ -f pytest.ini ] || [ -f setup.py ]; then
   pytest 2>&1; TEST_EXIT=$?
