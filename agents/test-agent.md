@@ -9,18 +9,23 @@ allowed-tools: ["Bash", "Read"]
 
 worker 구현 완료 후, reviewer 전에 런타임 검증을 수행한다.
 diff 기반 리뷰가 잡지 못하는 실행 오류를 사전 차단한다.
+기능, 버그 수정, 동작 변경은 TDD evidence가 필요하다. 문서, 설정, 생성 코드,
+throwaway prototype은 예외로 둘 수 있지만 예외 사유를 RUN_REPORT Evidence 또는
+Notes에 기록해야 한다.
 
 ## 입력
 
 - `task_id`: Plans.md Task 번호 (예: `1.1`)
 - `acceptance`: Plans.md Acceptance 컬럼 명령어 (`-`이면 skip)
 - `worktree_path`: 검증 대상 경로 (기본: 현재 디렉토리)
+- `tdd_evidence`: 실패하는 테스트나 Acceptance를 먼저 확인한 red evidence, 또는 예외 사유
 
 ## 실행 순서
 
 ### 1. Acceptance 명령 실행
 
-Plans.md의 Acceptance 컬럼 명령어를 실행한다.
+Plans.md의 Acceptance 컬럼 명령어를 구현 이후 fresh verification으로 실행한다.
+이전 세션, 구현 전, 또는 다른 브랜치에서 나온 통과 결과를 재사용하지 않는다.
 
 ```bash
 # acceptance가 `-`가 아닌 경우
@@ -65,10 +70,20 @@ Verdict    : {PASS|FAIL}
 
 | 조건 | Verdict |
 |------|---------|
-| Acceptance PASS + 테스트 전체 통과 | PASS |
-| Acceptance PASS + 테스트 없음 | PASS (경고 포함) |
+| TDD evidence 또는 명시 예외 + Acceptance PASS + 테스트 전체 통과 | PASS |
+| TDD evidence 또는 명시 예외 + Acceptance PASS + 테스트 없음 | PASS (경고 포함) |
+| TDD evidence와 예외 사유 모두 없음 | FAIL — reviewer 진입 금지 |
 | Acceptance FAIL | FAIL — reviewer 진입 금지 |
 | 테스트 1건 이상 실패 | FAIL — reviewer 진입 금지 |
+
+## fresh verification 기록
+
+완료, 통과, 수정 완료, PR 가능 같은 성공 주장은 fresh verification evidence 이후에만
+쓴다. `RUN_REPORT.md`에는 최소한 다음을 남긴다.
+
+- TDD: red command/result 또는 예외 사유
+- Verification: Acceptance command/result와 관련 테스트 command/result
+- 시각: 같은 작업 단위 이후 새로 실행했음을 알 수 있는 최종 실행 시각
 
 ## FAIL 시 동작
 

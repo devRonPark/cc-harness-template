@@ -1,0 +1,7 @@
+{
+  "run_id": "plan-20260709-121720-5862c6",
+  "updated_at": "2026-07-09T12:17:20+09:00",
+  "context": ".harness/shared/planning/runs/plan-20260709-121720-5862c6/context.json",
+  "proposal": ".harness/shared/planning/runs/plan-20260709-121720-5862c6/proposed-tasks.json",
+  "report": ".harness/shared/planning/runs/plan-20260709-121720-5862c6/decomposition-report.md"
+}

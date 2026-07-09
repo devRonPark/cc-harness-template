@@ -73,6 +73,7 @@ branches, pushing, or creating PRs. Never force push or discard local changes.
 
 ## Mandatory Gates
 
+- Core workflow is `spec -> plan -> isolated work -> TDD -> fresh verification -> review -> finish`.
 - Before adding or changing task rows, use the planning proposal contract in
   `CLAUDE.md` and the scripts:
   `build_planning_context.py`, `validate_task_proposal.py`,
@@ -81,7 +82,8 @@ branches, pushing, or creating PRs. Never force push or discard local changes.
   `agents/task-decomposer.md` granularity criteria and
   `agents/quality-gates.md` scope/YAGNI criteria.
 - After implementation and before review, follow `agents/test-agent.md`: run
-  the task Acceptance command and the relevant project test suite.
+  the task Acceptance command and the relevant project test suite, and record
+  TDD or explicit exception evidence.
 - During review, apply `agents/quality-gates.md`: findings first, verification
   evidence first, and only useful residual risk after approval.
 - Do not mark a task `done` unless the Acceptance evidence has passed. GitHub

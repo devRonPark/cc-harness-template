@@ -14,9 +14,10 @@ Codex용 PRD 인터뷰 스킬이다. `CLAUDE.md` 기획 규칙과 `.claude/skill
 2. 코드베이스나 기존 문서로 답할 수 있는 내용은 직접 확인한다.
 3. 사용자에게 질문은 한 번에 하나만 한다.
 4. 모든 질문에는 권장 답과 이유를 함께 제시한다.
-5. 목적, 대상 사용자, 핵심 기능 3±2개, Non-goals, 측정 가능한 성공 기준이 나오면 질문을 멈춘다.
-6. `docs/templates/PRD.md`를 기준으로 `docs/PRD.md`를 작성하고, 미확정 항목은 Open Questions에 남긴다.
-7. 승인 후 UserFlow·DESIGN·Architecture 보완과 `$harness-plan` 실행을 안내한다.
+5. 목적, 제약, 대상 사용자, 핵심 기능 3±2개, Non-goals, 측정 가능한 성공 기준을 확인한다.
+6. 구현 전 접근안 2-3개와 추천안을 짧게 비교한다. 사용자가 답하지 못하면 권장안을 임시 결정으로 둔다.
+7. `docs/templates/PRD.md`를 기준으로 `docs/PRD.md`를 작성하고, 미확정 항목은 Open Questions에 남긴다.
+8. 승인 후 UserFlow·DESIGN·Architecture 보완과 `$harness-plan` 실행을 안내한다.
 
 ## 기본값
 

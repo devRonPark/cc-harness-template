@@ -13,6 +13,12 @@
 
 ## Task별 맥락
 
+- `.harness/tasks/4.14-superpowers-workflow-docs/`: workflow 문서 정렬 evidence
+- `.harness/tasks/4.15-planning-decomposition-rules/`: task-decomposer 규칙 강화 evidence
+- `.harness/tasks/4.16-tdd-verification-gates/`: TDD/fresh verification gate evidence
+- `.harness/tasks/4.17-review-verdict/`: review verdict 이원화 evidence
+- `.harness/tasks/4.18-git-helper-safety/`: git helper 안전 흐름 evidence
+- `.harness/tasks/4.19-skeleton-evidence-template/`: skeleton RUN_REPORT 갱신 evidence
 - `.harness/tasks/<task-key>/STATE.md`: 현재 스냅샷
 - `.harness/tasks/<task-key>/LOG.md`: 작업·에러 원문
 - `.harness/tasks/<task-key>/RUN_REPORT.md`: 변경·결정·검증 요약
