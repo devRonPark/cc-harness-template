@@ -6,8 +6,7 @@
 #   /tmp/harness-tpl/init.sh /path/to/my-new-project
 #
 # README.md "새 프로젝트에 적용" Step 1의 수동 cp 목록을 스크립트로 대체.
-# 감사(H5/2026-07-04)에서 발견된 누락 항목(ci.yml, .harness/ 골격,
-# PR/Issue 템플릿)을 포함한 복사 목록을 사용한다.
+# ci.yml, .harness/ 골격, PR/Issue 템플릿을 포함한다.
 # Plans.md·tasks/index.json·.harness/는 이 저장소 자신의 dogfood 이력이 아니라
 # templates/skeleton/의 초기 상태 버전에서 복사한다.
 
@@ -45,7 +44,6 @@ cp "$SRC_DIR/scripts/build_planning_context.py" "$TARGET_DIR/scripts/"
 cp "$SRC_DIR/scripts/validate_task_proposal.py" "$TARGET_DIR/scripts/"
 cp "$SRC_DIR/scripts/apply_task_proposal.py" "$TARGET_DIR/scripts/"
 cp "$SRC_DIR/scripts/planning_log.py" "$TARGET_DIR/scripts/"
-cp "$SRC_DIR/scripts/run_task_decomposer.py" "$TARGET_DIR/scripts/"
 
 # companion 에이전트
 cp -r "$SRC_DIR/agents/." "$TARGET_DIR/agents/"

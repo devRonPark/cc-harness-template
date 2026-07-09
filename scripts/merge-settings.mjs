@@ -1,10 +1,6 @@
 #!/usr/bin/env node
-// merge-settings.mjs — settings.json에 이 템플릿이 요구하는 plugin 설정만
-// 병합한다. 기존에 사용자가 넣어둔 다른 plugin·permissions·설정은 그대로 둔다.
-// setup-plugins.sh가 백업본을 만든 뒤에 이 스크립트를 호출한다.
-//
-// value-for-fable은 optional plugin이다 — 세 번째 인자로 "--skip-vff"를
-// 넘기면 enabledPlugins·extraKnownMarketplaces에서 제외한다.
+// merge-settings.mjs — required plugin 설정만 병합한다.
+// 기존 사용자 설정은 보존하고, "--skip-vff"면 value-for-fable을 제외한다.
 
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -46,7 +42,7 @@ let raw = "{}";
 try {
   raw = readFileSync(target, "utf8");
 } catch {
-  // 파일이 없으면 빈 객체로 시작 — setup-plugins.sh가 이미 만들어두지만 방어적으로 처리
+  // 파일이 없으면 빈 객체로 시작한다.
 }
 
 let settings;

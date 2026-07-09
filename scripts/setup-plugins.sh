@@ -1,28 +1,8 @@
 #!/usr/bin/env bash
-# setup-plugins.sh — ~/.claude/settings.json에 이 템플릿이 요구하는 plugin을
-# 자동으로 등록하고 설치한다.
-#
-# 문제: README/setup-guide.md의 "Step 1"은 지금까지 사용자가 JSON 파일을 직접
-# 열어 손으로 병합하는 방식이었다 — 콤마 하나만 틀려도 Claude Code 전체가
-# 깨지고, 기존 설정을 실수로 덮어쓰기 쉽다. 이 스크립트는 그 단계를 대체한다.
-#
-# 사용법:
-#   ./scripts/setup-plugins.sh [--skip-vff|--with-vff]
-#
-# value-for-fable은 optional plugin이다 (Sonnet에 Fable 5 진단 규율을 적용하는
-# 개인 취향 플러그인). 필수 3종(claude-code-harness·ponytail·caveman)과 분리해
-# 아래 순서로 포함 여부를 결정한다:
-#   1. --skip-vff / --with-vff 플래그
-#   2. SETUP_SKIP_VFF 환경변수 (1이면 스킵)
-#   3. 위 둘 다 없고 대화형 터미널이면 y/N 프롬프트
-#   4. 비대화형(CI 등)이고 위 셋 다 없으면 기존 동작 유지 차원에서 설치
-#
-# 동작:
-#   1. ~/.claude/settings.json이 없으면 새로 만들고, 있으면 기존 값을 보존한 채
-#      enabledPlugins·extraKnownMarketplaces만 병합한다 (Node.js로 JSON 병합).
-#   2. 수정 전 파일을 settings.json.bak.<timestamp>로 백업한다.
-#   3. claude plugin install로 필수 3종 + (선택 시) value-for-fable을 설치한다.
-#   4. harness doctor로 설치 상태를 확인한다.
+# setup-plugins.sh — required Claude plugins를 settings.json에 병합하고 설치한다.
+# 사용법: ./scripts/setup-plugins.sh [--skip-vff|--with-vff]
+# value-for-fable은 optional이다. 플래그, SETUP_SKIP_VFF, 대화형 prompt 순서로 결정한다.
+# 기존 settings.json은 백업하고 enabledPlugins/extraKnownMarketplaces만 병합한다.
 
 set -euo pipefail
 

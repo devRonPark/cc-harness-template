@@ -1,18 +1,6 @@
 # GitHub Actions CI — [PROJECT_NAME]
-#
-# 사용법:
-#   1. 프로젝트 기술 스택 블록의 주석을 해제한다.
-#   2. 불필요한 블록은 삭제한다.
-#   3. placeholder job을 삭제하고, 아래 ci-ok job의 `needs:` 목록을
-#      [check, test]로 바꾼다. branch protection의 required check는
-#      "ci-ok" 하나만 등록 — 이 이름은 스택 전환과 무관하게 고정이므로
-#      GitHub Settings → Branches에서 다시 등록할 필요가 없다(M6/2026-07-04 감사).
-#
-# /harness-setup 실행 시 기술 스택 자동 감지 → 해당 블록 자동 주석 해제 제안.
-#
-# 보안 권장: uses: action@TAG 를 SHA로 고정 권장.
-#   예) actions/checkout@v4 → actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-#   참고: gajae-code/.github/workflows/ci.yml
+# 사용법: placeholder를 실제 check/test job으로 교체하고 ci-ok needs를 갱신한다.
+# Branch protection required check는 고정 이름인 "ci-ok" 하나만 등록한다.
 
 name: CI
 
@@ -28,136 +16,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-  # ── [STACK: Node.js / Bun] ──────────────────────────────────────────────────
-  # check:
-  #   name: Type check & lint
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 15
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #         cache: "npm"           # "yarn" / "pnpm" / "bun" 으로 변경 가능
-  #     - run: npm ci
-  #     - run: npm run typecheck   # tsconfig 기반; 없으면 삭제
-  #     - run: npm run lint
-  #
-  # test:
-  #   name: Unit tests
-  #   needs: [check]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 20
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #         cache: "npm"
-  #     - run: npm ci
-  #     - run: npm test
-  # ── [/STACK: Node.js / Bun] ─────────────────────────────────────────────────
-
-
-  # ── [STACK: Python] ──────────────────────────────────────────────────────────
-  # check:
-  #   name: Lint & type check
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.12"
-  #         cache: "pip"
-  #     - run: pip install ruff mypy
-  #     - run: ruff check .
-  #     - run: mypy .             # mypy.ini 또는 pyproject.toml 설정 필요
-  #
-  # test:
-  #   name: Unit tests
-  #   needs: [check]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 20
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.12"
-  #         cache: "pip"
-  #     - run: pip install -r requirements.txt
-  #     - run: pytest
-  # ── [/STACK: Python] ─────────────────────────────────────────────────────────
-
-
-  # ── [STACK: Go] ──────────────────────────────────────────────────────────────
-  # check:
-  #   name: Vet & lint
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 10
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version: "1.22"
-  #         cache: true
-  #     - run: go vet ./...
-  #
-  # test:
-  #   name: Unit tests
-  #   needs: [check]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 20
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version: "1.22"
-  #         cache: true
-  #     - run: go test -race ./...
-  # ── [/STACK: Go] ─────────────────────────────────────────────────────────────
-
-
-  # ── [STACK: Rust] ────────────────────────────────────────────────────────────
-  # check:
-  #   name: Clippy & fmt
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 20
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: dtolnay/rust-toolchain@stable
-  #     - uses: Swatinem/rust-cache@v2
-  #     - run: cargo clippy -- -D warnings
-  #     - run: cargo fmt --check
-  #
-  # test:
-  #   name: Unit tests
-  #   needs: [check]
-  #   runs-on: ubuntu-22.04
-  #   timeout-minutes: 30
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: dtolnay/rust-toolchain@stable
-  #     - uses: Swatinem/rust-cache@v2
-  #     - run: cargo test
-  # ── [/STACK: Rust] ───────────────────────────────────────────────────────────
-
-
-  # 스택 블록 활성화 전까지 CI가 빈 job으로 실패하지 않도록 유지.
-  # 스택 블록 주석 해제 후 이 job 삭제 + 아래 ci-ok의 needs를 [check, test]로 변경.
   placeholder:
-    name: CI (스택 미설정 — ci.yml 블록 활성화 후 삭제)
+    name: CI (스택 미설정 — 실제 check/test job으로 교체)
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
-      - run: echo "스택 블록 주석 해제 후 이 placeholder job 삭제 필요"
+      - run: echo "프로젝트 스택에 맞는 check/test job을 추가하세요"
 
-  # M6 (2026-07-04 감사): 스택 잡(check/test) 이름을 required check로 직접
-  # 등록하면, 스택 블록을 켜거나 잡을 추가·삭제할 때마다 GitHub Settings →
-  # Branches의 required check가 깨진다(존재하지 않는 체크를 영구 대기하거나
-  # 무방비 상태가 됨). 이 job 하나만 required check로 등록하면 이름이
-  # 절대 안 바뀐다 — 아래 needs만 스택 상태에 맞춰 갱신하면 된다.
   ci-ok:
     name: ci-ok
     if: always()
