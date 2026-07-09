@@ -74,19 +74,21 @@
   직접 편집하지 않는다. `.harness/tasks/<task-key>/`는 `tasks/index.json`이 담지
   않는 세션 맥락만 담는다 — Task 상태를 `.harness/`에 단일 출처처럼 복제하지 않는다.
 - 루트 `.harness/STATE.md`, `.harness/HANDOFF.md`, `.harness/TASKS.md`,
-  `.harness/LOG.md`, `.harness/CHECKPOINTS.md`는 **복사용 템플릿**이다. 실제
+  `.harness/LOG.md`, `.harness/CHECKPOINTS.md`, `.harness/RUN_REPORT.md`는 **복사용 템플릿**이다. 실제
   진행 상태를 루트 템플릿에 쓰지 않는다.
 - 새 Task 착수 시 `.harness/tasks/<task-key>/`를 만들고 루트 템플릿을 복사해
-  `STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, `CHECKPOINTS.md`를 둔다. 작업
-  시작 시점의 `tasks/index.json`은 참고본으로
+  `STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, `CHECKPOINTS.md`, `RUN_REPORT.md`를
+  둔다. 작업 시작 시점의 `tasks/index.json`은 참고본으로
   `.harness/tasks/<task-key>/tasks.index.snapshot.json`에 저장할 수 있다.
 - 세션 재개 시 읽는 순서: `tasks/index.json`에서 `wip` 또는 사용자가 지정한
-  Task 확인 → `.harness/tasks/<task-key>/STATE.md` → `.harness/LESSONS.md`(최근
+  Task 확인 → `.harness/tasks/<task-key>/STATE.md` → 있으면
+  `.harness/tasks/<task-key>/RUN_REPORT.md` → `.harness/LESSONS.md`(최근
   항목) → `Plans.md`. 나머지는 `.harness/CONTEXT_INDEX.md`로 필요한 파일만
   선별해서 읽는다 — 목적 없이 전체 파일을 다시 읽지 않는다.
 - Task별 파일 역할: `STATE.md`(해당 Task 현재 스냅샷) · `HANDOFF.md`(다음 세션
   인수인계) · `TASKS.md`(Task 내부 체크리스트) · `LOG.md`(작업·에러 append-only) ·
-  `CHECKPOINTS.md`(작업 단위 완료 + 커밋 해시) · `tasks.index.snapshot.json`
+  `CHECKPOINTS.md`(작업 단위 완료 + 커밋 해시) · `RUN_REPORT.md`(실행 요약,
+  결정 근거, 검증 evidence) · `tasks.index.snapshot.json`
   (작업 시작 시점 참고본). 루트 `LESSONS.md`는 전역 재발 방지 기록으로 유지한다.
   루트 `CONTEXT_INDEX.md`는 파일 역할 인덱스다.
 - 에러는 숨기지 말고 해당 Task의 `LOG.md`에 원문 기록, 해결하면 전역

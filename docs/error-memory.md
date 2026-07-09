@@ -18,6 +18,8 @@
 
 루트 `.harness/LOG.md`는 복사용 템플릿이다. 실제 에러 원문은 반드시 해당 Task의
 `.harness/tasks/<task-key>/LOG.md`에 남긴다.
+Task가 끝나거나 중단될 때 `.harness/tasks/<task-key>/RUN_REPORT.md`에는 에러 원문을
+반복하지 않고 원인, 해결 요약, 검증 evidence, `LOG.md` 위치만 남긴다.
 
 에러가 나면 먼저 Task별 `LOG.md`에 원문을 남기고, 해결되면 루트
 `.harness/LESSONS.md`에 재발 방지 요약을 추가한다. `LOG.md`만 남기면 다음 세션이

@@ -17,9 +17,10 @@ On resumed work, follow the recovery order in `CLAUDE.md`:
 
 1. `tasks/index.json` to identify the `wip` or user-specified Task
 2. `.harness/tasks/<task-key>/STATE.md`
-3. latest entries in `.harness/LESSONS.md`
-4. `Plans.md`
-5. only the extra files listed in `.harness/CONTEXT_INDEX.md` that are needed
+3. `.harness/tasks/<task-key>/RUN_REPORT.md` if it exists
+4. latest entries in `.harness/LESSONS.md`
+5. `Plans.md`
+6. only the extra files listed in `.harness/CONTEXT_INDEX.md` that are needed
 
 ## Source Of Truth
 
@@ -49,6 +50,7 @@ procedure directly:
 | `/harness-review` | Use `$harness-review` from `.agents/skills/harness-review/SKILL.md` to review the diff against `CLAUDE.md`, the target task, and acceptance evidence. |
 | `/harness-progress` | Use `$harness-progress` from `.agents/skills/harness-progress/SKILL.md` for read-only progress summaries. |
 | `/harness-sync` | Use `$harness-sync` from `.agents/skills/harness-sync/SKILL.md` to validate `tasks/index.json` and regenerate `Plans.md`. |
+| Harness YAGNI trim | Use `$harness-yagni-trimmer` from `.agents/skills/harness-yagni-trimmer/SKILL.md` to review and reduce harness/template complexity for solo-builder use. |
 
 Do not assume the Claude Code plugin has performed any gate automatically.
 Codex must execute the same gates explicitly.
@@ -88,12 +90,16 @@ branches, pushing, or creating PRs. Never force push or discard local changes.
 
 ## State Documents
 
-- Root `.harness/STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, and
-  `CHECKPOINTS.md` are templates. Do not write live task state into them.
+- Root `.harness/STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`,
+  `CHECKPOINTS.md`, and `RUN_REPORT.md` are templates. Do not write live task
+  state into them.
 - Store live context under `.harness/tasks/<task-key>/` and update that Task's
   `STATE.md` before risky work and after meaningful work units.
 - Append errors and fixes to `.harness/tasks/<task-key>/LOG.md`; add durable
   prevention rules to root `.harness/LESSONS.md`.
+- Summarize decisions, changed files, verification evidence, and handoff risks
+  in `.harness/tasks/<task-key>/RUN_REPORT.md` after meaningful work or before
+  handoff.
 - Update `.harness/CONTEXT_INDEX.md` when creating a file or changing a file's
   role.
 

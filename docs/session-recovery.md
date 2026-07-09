@@ -16,7 +16,8 @@ CLAUDE.md 상태 문서 규칙에 박혀 있는 순서다.
 4. **`Plans.md`** — 사람이 읽는 snapshot. stale일 수 있으며 직접 편집하지 않는다.
 5. 그 다음은 **필요할 때만**, `.harness/CONTEXT_INDEX.md`로 골라서 읽는다.
 
-루트 `.harness/STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, `CHECKPOINTS.md`는
+루트 `.harness/STATE.md`, `HANDOFF.md`, `TASKS.md`, `LOG.md`, `CHECKPOINTS.md`,
+`RUN_REPORT.md`는
 복사용 템플릿이다. 실제 진행 상태를 찾으려고 루트 템플릿을 읽지 않는다.
 
 ---
@@ -30,6 +31,7 @@ CLAUDE.md 상태 문서 규칙에 박혀 있는 순서다.
 | `.harness/tasks/<task-key>/TASKS.md` | Task 내부 체크리스트 | Task 착수·완료 시 |
 | `.harness/tasks/<task-key>/LOG.md` | 해당 Task 작업·에러 append-only 로그 | 매 작업/에러 발생 시 |
 | `.harness/tasks/<task-key>/CHECKPOINTS.md` | 해당 Task 작업 단위 완료 + 커밋 해시 | 완료 지점마다 |
+| `.harness/tasks/<task-key>/RUN_REPORT.md` | 실행 요약, 결정 근거, 검증 evidence | 완료/인수인계/감사 시 |
 | `.harness/tasks/<task-key>/tasks.index.snapshot.json` | 작업 시작 시점의 `tasks/index.json` 참고본 | Task 시작 시 |
 
 루트 `.harness/LESSONS.md`는 전역 재발 방지 기록으로 유지한다. 같은 유형의 실수가
@@ -51,6 +53,7 @@ cp .harness/HANDOFF.md .harness/tasks/<task-key>/HANDOFF.md
 cp .harness/TASKS.md .harness/tasks/<task-key>/TASKS.md
 cp .harness/LOG.md .harness/tasks/<task-key>/LOG.md
 cp .harness/CHECKPOINTS.md .harness/tasks/<task-key>/CHECKPOINTS.md
+cp .harness/RUN_REPORT.md .harness/tasks/<task-key>/RUN_REPORT.md
 cp tasks/index.json .harness/tasks/<task-key>/tasks.index.snapshot.json
 ```
 
@@ -76,12 +79,23 @@ slug를 함께 쓴다.
 
 ---
 
+## 실행 보고서와 원문 로그 분리
+
+`LOG.md`는 실패한 명령, 에러 원문, 세부 작업 타임라인을 append-only로 남기는 곳이다.
+`RUN_REPORT.md`는 다음 세션이나 리뷰어가 빠르게 읽을 요약이다. Task 완료 또는 중단
+시점에는 `RUN_REPORT.md`에 변경 요약, 주요 결정 근거, Acceptance/test evidence,
+남은 위험을 짧게 정리한다. 긴 stdout/stderr는 `RUN_REPORT.md`에 붙이지 말고
+`LOG.md` 위치만 링크한다.
+
+---
+
 ## 재개 프롬프트
 
 ```text
 Read tasks/index.json to identify the wip or requested Task.
-Then read .harness/tasks/<task-key>/STATE.md, recent .harness/LESSONS.md entries,
-and Plans.md.
+Then read .harness/tasks/<task-key>/STATE.md,
+.harness/tasks/<task-key>/RUN_REPORT.md if it exists,
+recent .harness/LESSONS.md entries, and Plans.md.
 Resume from the last recorded state.
 Do not repeat completed Tasks unless Acceptance requires re-verification.
 Before continuing, summarize the current state and next action.
@@ -89,7 +103,8 @@ Before continuing, summarize the current state and next action.
 
 ```text
 tasks/index.json에서 wip 또는 지정된 Task를 확인한 뒤,
-.harness/tasks/<task-key>/STATE.md와 .harness/LESSONS.md 최근 항목,
+.harness/tasks/<task-key>/STATE.md, 있으면
+.harness/tasks/<task-key>/RUN_REPORT.md, .harness/LESSONS.md 최근 항목,
 Plans.md를 읽어줘.
 마지막으로 기록된 상태부터 작업을 재개해줘.
 Acceptance 재검증이 필요한 경우가 아니면 이미 완료된 Task는 반복하지 마.

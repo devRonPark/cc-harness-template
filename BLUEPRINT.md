@@ -391,7 +391,8 @@ GitHub → Settings → Branches → main:
 
 Codex에서는 `/grill-me`와 `/harness-*` top-level slash command 대신
 `.agents/skills/`의 `$grill-me`, `$harness-plan`, `$harness-work`,
-`$harness-review`, `$harness-progress`, `$harness-sync`를 사용한다. Git helper는
+`$harness-review`, `$harness-progress`, `$harness-sync`,
+`$harness-yagni-trimmer`를 사용한다. Git helper는
 `$branch-checkout`, `$git-push`, `$pr-create`, `$rescue-from-main`를 사용한다.
 Codex용 별도 `$ponytail`/`$caveman` skill은 제공하지 않는다. 해당 원칙은
 `agents/quality-gates.md`에서 공통 gate로 적용한다.
