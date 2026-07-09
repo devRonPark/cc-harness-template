@@ -4,11 +4,12 @@
 
 ## 세션 재개 읽는 순서
 
-1. `tasks/index.json`에서 `wip` Task 또는 사용자가 지정한 Task를 확인한다.
+1. `python3 scripts/report_tasks.py`로 `wip` Task 또는 사용자가 지정한 Task를 확인한다.
+   Task 상세는 `grep -n -A12 '"id": "<task-id>"' tasks/index.json`으로 해당 블록만 읽는다.
 2. 해당 Task의 `.harness/tasks/<task-key>/STATE.md`를 읽는다.
-3. 루트 `.harness/LESSONS.md` 최근 항목을 읽는다.
-4. `Plans.md`를 읽어 사람이 보는 snapshot을 확인한다.
-5. 이 파일에서 필요한 추가 문서만 고른다.
+3. 루트 `.harness/LESSONS.md` 최근 5개 항목만 읽는다.
+4. 이 파일에서 필요한 추가 문서만 고른다. `Plans.md`는 사람용 snapshot이므로
+   에이전트는 읽지 않는다.
 
 ## Task별 맥락 디렉토리
 
@@ -17,7 +18,7 @@
 - `STATE.md`: 현재 스냅샷
 - `LOG.md`: 작업·에러 원문
 - `RUN_REPORT.md`: 변경·결정·검증 요약
-- `HANDOFF.md`, `TASKS.md`, `CHECKPOINTS.md`: 필요할 때만 읽는 보조 기록
+- `HANDOFF.md`, `TASKS.md`, `CHECKPOINTS.md`: 기본 복사 대상이 아니며, 필요할 때만 생성·읽는 보조 기록
 - `tasks.index.snapshot.json`: 시작 시점 비교가 필요할 때만 읽는 참고본
 
 ## 루트 템플릿과 전역 파일

@@ -19,3 +19,7 @@ docs/.pdca-status.json
 
 # harness sync 산출물 (harness.toml → 자동 생성 — 커밋 금지)
 .claude-plugin/
+
+# Python 테스트 부산물
+__pycache__/
+*.pyc
