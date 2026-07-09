@@ -1,422 +1,108 @@
-# BLUEPRINT.md — Claude Code / Codex Harness 시스템 구조
+# BLUEPRINT.md — Claude Code / Codex Harness 구조
 
-> 이 문서는 설치된 harness 시스템이 어떻게 동작하는지 한눈에 파악하기 위한 설계도다.
-> 코드가 아니라 "각 레이어가 무슨 역할을 하고, 언제 발동되며, 어떻게 맞물리는가"를 설명한다.
+이 문서는 구조 색인이다. 실행 규칙의 단일 출처는 `CLAUDE.md`이고, Codex 호환 절차는 `AGENTS.md`와 `.agents/skills/*`가 맡는다.
 
----
+## 최소 성공 흐름
 
-## 전체 구조 한 줄 요약
+1. 목표를 한 문단으로 적는다.
+2. `tasks/index.json`에 작은 Task, DoD, Acceptance를 둔다.
+3. 구현 전 `agents/task-decomposer.md`와 `agents/quality-gates.md`를 확인한다.
+4. 구현 후 Acceptance와 관련 테스트를 실행한다.
+5. 실패는 `.harness/tasks/<task-key>/LOG.md`, 완료 요약은 `RUN_REPORT.md`에 남긴다.
+6. `tasks/index.json`을 갱신하고 `python3 scripts/sync_plans.py`를 실행한다.
+
+## 레이어
 
 ```
 사용자 요청
-  → [Plugin Layer] 세션 시작·프롬프트 제출 시 자동 주입
-  → [Harness Layer] 요청을 분석해 적절한 Agent에게 위임
-  → [Agent Layer] Worker / Reviewer / Advisor 각자의 규칙으로 실행
-  → 결과 반환
+  -> CLAUDE.md / AGENTS.md 규칙 확인
+  -> tasks/index.json에서 대상 Task 선택
+  -> agents/* gate 적용
+  -> 구현, 테스트, 리뷰
+  -> Plans.md snapshot 갱신
 ```
 
----
-
-## 1. Plugin Layer (전역 — user scope)
-
-세션이 시작되거나 프롬프트가 제출될 때 자동으로 동작하는 네 개의 플러그인.
-Claude Code가 관리하며, 이 프로젝트에만 한정되지 않고 모든 세션에 적용된다.
-
-Codex에서는 이 플러그인 레이어가 자동 적용되지 않는다. 대신 루트 `AGENTS.md`가
-Codex 진입점으로 동작하며, `CLAUDE.md` 규약과 `agents/*.md` 절차, `scripts/`
-검증 도구를 직접 실행해 동일한 planning/test/review/state 흐름을 맞춘다.
-ponytail/caveman의 durable 원칙은 `agents/quality-gates.md`에 흡수한다.
-Claude Code에서는 plugin enhancement가 이를 자동 보강할 수 있고, Codex에서는
-`.agents/skills/*`가 같은 파일을 직접 참조한다.
-
-### 1-1. claude-code-harness v4 (핵심 엔진)
-
-Harness 전체를 구동하는 엔진. `harness` 명령어로 직접 호출하거나,
-스킬(`/harness-work`, `/harness-plan` 등)을 통해 간접 호출된다.
-`tasks/index.json`/Plans.md의 Task를 읽어 worker·reviewer·advisor에게 배분하는 오케스트레이터 역할.
-
-**주요 명령어**
-```
-harness init      → 프로젝트 초기화 (harness.toml 생성)
-harness sync      → harness.toml → .claude-plugin/ 파일 동기화
-harness doctor    → 설치 상태 전체 점검
-```
-
-**설치**
-```bash
-# ~/.claude/settings.json의 extraKnownMarketplaces에 추가 후:
-claude plugin install claude-code-harness@claude-code-harness-marketplace
-```
-
----
-
-### 1-2. ponytail (코드 효율 강제)
-
-"게으른 시니어 개발자" 모드. 코드를 작성하기 전에 7단계 의사결정 사다리를 실행해
-불필요한 코드 작성을 막는다.
-
-**발동 시점**
-
-| Hook | 타이밍 | 동작 |
-|------|--------|------|
-| `SessionStart` | 세션 시작 시 | lazy senior dev 시스템 프롬프트 주입 |
-| `SubagentStart` | 서브에이전트 시작 시 | worker 등 서브에이전트에도 동일 규칙 주입 |
-| `UserPromptSubmit` | 매 프롬프트 제출 시 | 현재 모드 상태 추적 |
-
-> 핵심: `SubagentStart` 훅 덕분에 harness가 worker를 spawning할 때 **자동으로** ponytail이 함께 적용된다.
-
-**7단계 의사결정 사다리**
-```
-1. 정말 필요한가? (YAGNI)
-2. 이미 코드베이스에 있는가? (재사용)
-3. 표준 라이브러리로 가능한가?
-4. 네이티브 플랫폼 기능인가?
-5. 설치된 의존성으로 가능한가?
-6. 한 줄로 가능한가?
-7. 그제야: 최소 필수 코드만 작성
-```
-
-**설치**
-```bash
-claude plugin install ponytail@ponytail
-```
-
----
-
-### 1-3. caveman (출력 토큰 압축)
-
-응답을 "스마트 원시인"처럼 압축해 출력 토큰을 평균 65% 줄인다.
-기술적 정확성은 그대로 유지.
-
-**발동 시점**
-
-| Hook | 타이밍 | 동작 |
-|------|--------|------|
-| `SessionStart` | 세션 시작 시 | caveman 모드 주입 (기본: full) |
-| `UserPromptSubmit` | 매 프롬프트 제출 시 | 모드 상태 추적 |
-
-**압축 강도**
-```
-lite   → filler/hedging만 제거. 문장 구조·조사 유지.
-full   → 관사 생략, 단편 문장 허용, 짧은 동의어. (기본값)
-ultra  → 극단적 압축. 단어도 약어화.
-```
-
-> worker 에이전트는 `lite`로 고정된다 (2절 참조).
-
-**설치**
-```bash
-claude plugin install caveman@caveman
-```
-
----
-
-### 1-4. value-for-fable (Fable 5 품질 구조, 선택)
-
-필수 3종(claude-code-harness·ponytail·caveman)과 달리 이 plugin은 optional이다 —
-`scripts/setup-plugins.sh` 실행 시 설치 여부를 묻거나 `--skip-vff`/`--with-vff`로
-지정한다. 설치하지 않아도 나머지 3종·harness 규칙은 정상 동작한다.
-
-Sonnet 모델에 Fable 5의 운영 규율을 적용해 Opus 수준 품질을
-Sonnet 비용(약 70% 절감)으로 끌어낸다. 압축이 아니라 **진단 구조**가 핵심.
-
-**컴포넌트 구성**
-
-| 컴포넌트 | 활성화 방식 | 역할 |
-|---------|-----------|------|
-| Skill (`/itsvff`) | "VFF", "패블 모드" 수동 트리거 | 현재 세션에 즉시 적용 |
-| Output Style (vff-v2) | reviewer/advisor MEMORY.md 지시 | 응답 구조 상시 적용 |
-| Agent (itsvff) | 복잡한 과제 자동 위임 | 별도 컨텍스트에서 처리 |
-| Hook (reminder.sh) | 컨텍스트 400KB 초과 시 자동 | 장시간 세션 드리프트 방지 |
-
-**VFF v2 핵심 원칙**
-```
-- 첫 문장 = 결론
-- 단서 우선 가설 (모든 단서를 설명하는 원인 먼저)
-- 측정 먼저 좁히기 (처방 전에 가장 싼 확인 수단 제시)
-- 확신도 표시 (직접 보지 않은 것은 단정하지 않는다)
-- 충실함 > 압축
-```
-
-**설치**
-```bash
-# ~/.claude/settings.json의 extraKnownMarketplaces에 git URL 추가 후:
-claude plugin install value-for-fable@itsinseong
-```
-
----
-
-## 2. Agent Layer (per-agent 규칙)
-
-harness가 요청을 처리할 때 spawning하는 세 종류의 플러그인 에이전트 +
-프로젝트가 직접 추가한 두 종류의 companion 에이전트.
-각각 다른 Plugin 조합을 적용한다.
-
-```
-.claude/agent-memory/
-├── claude-code-harness-worker/MEMORY.md    ← worker 전용 규칙
-├── claude-code-harness-reviewer/MEMORY.md  ← reviewer 전용 규칙
-└── claude-code-harness-advisor/MEMORY.md   ← advisor 전용 규칙
-
-agents/                                      ← 플러그인이 모르는 프로젝트 전용 절차 문서
-├── task-decomposer.md                      ← 계획 단계 세분화 + 구현 단계 게이트 (공용)
-├── test-agent.md                           ← worker 완료 후 런타임 검증
-└── quality-gates.md                        ← scope/YAGNI + review/reporting 공통 기준
-```
-
-> **M5 갱신 (2026-07-08) — `agents/*.md` 자체는 호출 가능한 Claude 서브에이전트가 아니다.**
-> Claude Code 서브에이전트 경로는 `.claude/agents/`이고 프론트매터 필드는
-> `tools`다. 이 디렉토리의 `role:`·`allowed-tools:` 필드는 어떤 런타임도
-> 읽지 않는다. 다만 `/harness-plan`의 기본 흐름은 이제 `harness.toml [plan]`의
-> `decomposer_command`가 `context.json`을 읽고 proposal 파일을 만드는 **외부 명령
-> 계약**이다. 이 명령이 없거나 실패하면 planning JSONL에 쉬운 실패 메시지를
-> 남기고, 허용된 경우에만 오케스트레이터 Claude가 inline fallback으로 같은
-> proposal 파일 계약을 채운다.
->
-> `test-agent`와 `/harness-work` 중 재분해 게이트는 여전히 세션 규칙으로 수행한다.
-> v1은 planning 단계만 독립 proposal/감시 구조를 갖고, work/review 이벤트나
-> 범용 runner 추상화는 만들지 않는다.
-
-### Plugin 적용 매트릭스
-
-| | worker | reviewer | advisor |
-|--|:------:|:--------:|:-------:|
-| **ponytail** (코드 효율) | 전체 | 전체 | 전체 |
-| **caveman** (토큰 압축) | **lite** | OFF | OFF |
-| **VFF v2** (진단 구조) | 검증·코드 규율만 | **전체** | **전체** |
-| **VFF Hook** (드리프트 방지) | 전역 발동 | 전역 발동 | 전역 발동 |
-| **quality-gates.md** (repo 기준) | scope/YAGNI | findings/reporting | scope/YAGNI |
-
-### worker
-구현 담당. `tasks/index.json`의 Task를 실제로 코드로 만드는 역할.
-- **caveman lite**: filler 제거, 문장 구조는 유지 → 간결하되 읽을 수 있는 응답
-- **ponytail 전체**: 코드 작성 전 7단계 사다리 → MVP 범위 외 구현 금지
-- **VFF 검증·코드 규율만**: 완료 선언 전 검증 의무 + 요청 범위 외 수정 금지
-- **quality-gates.md**: Codex에서도 같은 scope/YAGNI/split 조건을 직접 적용
-
-### reviewer
-완료된 구현을 검토하는 역할.
-- **caveman OFF**: 판단 근거와 리뷰 내용은 압축하지 않는다
-- **ponytail 전체**: 과도한 추상화·오버엔지니어링 지적 기준으로 활용
-- **VFF v2 전체**: 단서 우선 진단, 확신도 표시, 핵심 변수 1~2개로 추천
-- **quality-gates.md**: findings-first, verification-first, 테스트 gap 보고 기준
-
-### advisor
-방침과 설계 방향을 결정하는 역할.
-- **caveman OFF**: 설계 근거는 압축 없이 명확하게
-- **ponytail 전체**: YAGNI 원칙 우선 적용
-- **VFF v2 전체**: 의사결정 조언 시 핵심 변수 먼저, 일반론 나열 금지
-- **quality-gates.md**: 현재 Task 경계 안에서 가장 작은 실행 경로를 우선
-
----
-
-## 3. Harness Layer (프로젝트 설정)
-
-harness 자체의 동작을 정의하는 파일들.
-
-```
-[project-root]/
-├── harness.toml              ← 프로젝트명·버전·안전 규칙 정의
-├── .claude/
-│   ├── settings.local.json   ← 프로젝트 스코프 권한 설정
-│   ├── commands/             ← Git helper local commands (/branch-checkout 등)
-│   └── agent-memory/         ← 각 Agent MEMORY.md
-├── .agents/
-│   └── skills/               ← Codex repo-scoped skills ($grill-me, $harness-work 등)
-├── CLAUDE.md                 ← 프로젝트 전역 규칙 (기술 스택, 응답 포맷 등)
-├── AGENTS.md                 ← Codex 진입점 (CLAUDE.md 규약을 Codex 절차로 실행)
-├── tasks/index.json          ← Task 상태 단일 출처
-└── Plans.md                  ← 사람이 읽는 Task 로드맵 (JSON에서 생성)
-```
-
-**harness.toml 주요 설정**
-```toml
-[project]
-name = "my-project"
-
-[safety.permissions]
-deny = ["Bash(sudo:*)"]
-ask  = ["Bash(rm -r:*)", "Bash(git push --force:*)"]
-```
-
----
-
-## 3.5 GitHub 통합 레이어 (선택)
-
-`harness.toml`의 `[github] enabled = true` 설정 시 활성화.
-
-> **주의**: `[github]`·`[review]`·`[test]` 섹션은 harness sync가 파싱하지 않는
-> 프로젝트 규약이다 (플러그인 지원 섹션: project/agent/env/safety/tdd).
-> 실제 동작은 CLAUDE.md의 지시에 따라 Claude가 세션에서 gh CLI로 직접 수행한다.
-> CI 게이트(ci.yml, plans-guard.yml)만 GitHub Actions가 기계적으로 강제한다.
-
-### 활성화 전제조건
-```bash
-gh auth login          # GitHub CLI 로그인
-gh repo view           # 현재 디렉토리가 GitHub 원격 repo에 연결됐는지 확인
-harness sync           # toml → plugin 파일 동기화
-```
-
-### Planning 단계 (`/harness-plan`)
-
-| 액션 | tasks/index.json 입력 | GitHub 결과 |
-|------|-------------|-------------|
-| section 값 | `Week 1 — [주제]` | Milestone `Week 1` 생성 |
-| Task 객체 | `{ "id": "1.1", "title": "...", ... }` | Issue `[1.1] 내용` 생성, Milestone 연결 |
-| Issue 번호 기록 | `gh: "#N"` | `tasks/index.json`에 연결된 Issue 번호 보관 |
-
-### Implementation 단계 (`/harness-work`)
-
-```
-Task 선택 (todo)
-  → git checkout -b task/{task-id}-{설명}
-  → 세션이 tasks/index.json에서 해당 Task를 wip로 갱신하고 Plans.md 재생성
-  → worker 구현
-  → Acceptance + 관련 테스트 통과
-  → 세션이 tasks/index.json에서 해당 Task를 done으로 갱신하고 Plans.md 재생성
-  → reviewer 검토
-  → gh pr create --title "[{task-id}] ..." --body "Closes #{issue}"
-  → CI 통과 + 승인 후 main 머지
-```
-
-### CI 게이트
-
-| Workflow | 트리거 | 목적 |
-|----------|--------|------|
-| `ci.yml` | push/PR → main | 기술 스택별 빌드·테스트 |
-| `plans-guard.yml` | PR → main | `tasks/index.json` 검증 + `Plans.md` sync 확인 |
-
-### Task Acceptance
-
-`tasks/index.json` 각 Task의 `acceptance` 값에 기계 검증 명령을 기입한다.
-세션 에이전트는 완료 전 해당 명령과 관련 테스트 스위트를 실행한다. GitHub Actions는
-manifest 품질만 확인하고 acceptance 명령을 실행하지 않는다.
-
-```markdown
-| Task | 내용 | DoD | Acceptance | Depends | Status | GH |
-| 1.1  | 로그인 구현 | 200 응답 | pytest tests/test_auth.py -k login | - | cc:WIP | #5 |
-| 2.0  | DB 마이그레이션 | 스키마 적용 | python manage.py showmigrations \| grep '\[X\]' | 1.1 | cc:WIP | #8 |
-```
-
-- `-` 이면 acceptance 검증 skip (기계 검증 불가 항목)
-- 명령이 0 외 종료 코드를 반환하면 Task를 `done`으로 바꾸지 않는다.
-- CI에서 실행할 프로젝트 테스트는 `.github/workflows/ci.yml`의 스택 블록에 둔다.
-
-### Branch Protection 권장 설정
-
-```
-GitHub → Settings → Branches → main:
-  ✓ Require status checks to pass: ci-ok, plans-guard / tasks/index.json 검증, plans-guard / Plans.md sync 검증
-  ✓ Require pull request before merging
-  ✓ Dismiss stale pull request approvals
-```
-
-> 상세 설정 가이드: `docs/github-integration.md`
-
----
-
-## 4. 세션 타임라인 — 실제 실행 흐름
-
-### 세션 시작 시
-```
-1. ponytail SessionStart 훅 → lazy senior dev 시스템 프롬프트 주입
-2. caveman SessionStart 훅  → caveman 모드 주입 (기본 full)
-   ※ worker spawning 시: worker MEMORY.md의 "lite" 지시로 전환
-```
-
-### 매 프롬프트 제출 시
-```
-3. ponytail UserPromptSubmit 훅  → 현재 모드 상태 추적
-4. caveman UserPromptSubmit 훅   → 현재 모드 상태 추적
-5. VFF UserPromptSubmit 훅       → 컨텍스트 400KB 초과 + VFF 활성 상태면
-                                    VFF 리마인더를 컨텍스트에 주입
-```
-
-### harness-plan 실행 시 (`/harness-plan`) — 계획 단계
-```
-0. `scripts/build_planning_context.py`가 사용자 요청·기획 문서·기존 Task 요약을
-   `.harness/shared/planning/runs/{run_id}/context.json`에 저장
-1. 독립 task-decomposer 명령이 context를 읽고 `proposed-tasks.json` +
-   `decomposition-report.md` 생성. 명령 미설정/실패 시 planning.jsonl에 쉬운
-   실패 이벤트를 기록하고, 허용된 경우 현재 세션이 inline fallback으로 같은 파일 계약 작성
-2. `scripts/validate_task_proposal.py`가 기존 `tasks/index.json`과 proposal을
-   합쳐 ID 충돌·Depends·Acceptance를 검증
-3. 통과한 proposal만 `scripts/apply_task_proposal.py`가 `tasks/index.json`에
-   반영하고 `Plans.md` 재생성
-4. `[github] enabled = true`면 Task → GitHub Issue 자동 생성
-```
-
-### harness-work 실행 시 (`/harness-work`) — 구현 단계
-```
-6. harness가 `tasks/index.json`에서 `todo` Task 선택
-6-a. 세분화 + 품질 게이트: 선택된 Task가 task-decomposer 기준 또는
-     `agents/quality-gates.md`의 scope/YAGNI 기준 미달이면(DoD·Acceptance
-     미기재, 뭉뚱그린 표현, 관심사 혼재, 과잉 추상화 필요 등) worker에게 넘기지
-     않고 task-decomposer를 다시 호출해 하위 Task(`{task-id}.N`)로 쪼갠 뒤에만 진행
-7. advisor에게 방침 요청 (caveman OFF + VFF v2)
-8. worker에게 구현 위임 (caveman lite + ponytail + VFF 검증)
-   └─ SubagentStart 훅 → ponytail이 worker에 자동 주입
-   └─ worker가 작업 중 범위 초과를 발견하면(무관한 파일 3개+/관심사 혼재) 즉시
-      멈추고 task-decomposer를 재호출 — 남은 작업을 하위 Task로 분리 후 재개
-9. test-agent 검증 (Acceptance 명령 + 프로젝트 테스트 스위트) — FAIL 시 worker에 재위임
-10. reviewer에게 검토 요청 (caveman OFF + VFF v2)
-11. Acceptance와 관련 테스트 통과 후 세션이 `tasks/index.json`의 대상 Task를
-    `done`으로 갱신하고 `scripts/sync_plans.py`를 실행한다. GitHub 연동 시에도
-    Actions는 Task 상태를 쓰지 않고 PR 검증만 수행한다.
-```
-
-> 6-a와 8의 재분해 게이트는 세션 내 수동 확인으로 강제된다. `plans-guard.yml`은
-> Task manifest와 snapshot sync만 확인한다 (3. Harness Layer 참고).
-
----
-
-## 5. 사용 가능한 스킬 명령어
-
-| 명령어 | 역할 |
-|--------|------|
-| `/grill-me` | 인터뷰 기반 PRD 작성 — 기획 단계 진입점 (프로젝트 스코프 스킬, `.claude/skills/grill-me/`) |
-| `/harness-plan` | planning context/proposal 생성 → 검증 통과 Task를 tasks/index.json에 반영 + 읽기용 Plans.md snapshot 갱신 |
-| `/harness-work` | tasks/index.json Task 실행 (worker 팀 가동) |
-| `/harness-review` | 코드·계획 리뷰 |
-| `/harness-sync` | tasks/index.json ↔ Plans.md ↔ 구현 상태 동기화 확인 |
-| `/harness-progress` | 진행 현황 대시보드 |
-| `/ponytail [lite\|full\|ultra]` | ponytail 강도 수동 조절 |
-| `/caveman [lite\|full\|ultra]` | caveman 강도 수동 조절 |
-| `/itsvff` | VFF 세션 모드 수동 활성화 |
-| `/ponytail-review` | 현재 diff ponytail 기준 리뷰 |
-| `/branch-checkout` | 별도 작업 브랜치 생성·전환 (로컬 custom command) |
-| `/git-push` | 현재 브랜치 안전 push (로컬 custom command) |
-| `/pr-create` | 현재 브랜치에서 draft PR 작성 (로컬 custom command) |
-| `/rescue-from-main` | main/master 변경사항을 작업 브랜치로 옮겨 draft PR 작성 (로컬 custom command) |
-
-Codex에서는 `/grill-me`와 `/harness-*` top-level slash command 대신
-`.agents/skills/`의 `$grill-me`, `$harness-plan`, `$harness-work`,
-`$harness-review`, `$harness-progress`, `$harness-sync`,
-`$harness-yagni-trimmer`를 사용한다. Git helper는
-`$branch-checkout`, `$git-push`, `$pr-create`, `$rescue-from-main`를 사용한다.
-Codex용 별도 `$ponytail`/`$caveman` skill은 제공하지 않는다. 해당 원칙은
-`agents/quality-gates.md`에서 공통 gate로 적용한다.
-
----
-
-## 6. Plugin 간 협력 관계 요약
-
-```
-ponytail ──────────────────────────────────────────▶ 모든 Agent
-  코드를 쓰기 전에 "정말 필요한가?"를 강제
-
-caveman ───────────────────────────────────────────▶ worker(lite), reviewer/advisor(OFF)
-  worker: 간결한 진행 응답 / reviewer·advisor: 판단 근거 명확히
-
-VFF v2 ────────────────────────────────────────────▶ reviewer/advisor(전체), worker(검증만)
-  진단 구조 + 확신도 + 결론 첫 문장
-
-VFF Hook ──────────────────────────────────────────▶ 전체 (400KB+ 세션)
-  장시간 세션에서 VFF 원칙이 희미해지는 것을 자동으로 방지
-
-harness ───────────────────────────────────────────▶ 전체 조율
-  `tasks/index.json`/Plans.md 기반으로 위 세 Agent를 오케스트레이션
-
-quality-gates.md ─────────────────────────────────▶ Claude/Codex 공통 절차
-  plugin 자동 동작이 없는 환경에서도 scope/YAGNI/review/reporting 기준 유지
-```
+## 파일 역할
+
+| 파일 | 역할 |
+|---|---|
+| `CLAUDE.md` | Claude Code 기준 rulebook. 기획, 구현, 테스트, 리뷰, 상태 문서 규칙의 원본 |
+| `AGENTS.md` | Codex 진입점. Claude slash workflow를 Codex skill로 매핑 |
+| `harness.toml` | harness 설정과 `[github]`, `[review]`, `[test]`, `[plan]` 요약 인덱스 |
+| `tasks/index.json` | Task 상태 단일 출처 |
+| `Plans.md` | `tasks/index.json`에서 생성한 사람용 snapshot |
+| `.harness/` | Task별 재개 맥락, planning 이벤트, 템플릿 |
+| `agents/quality-gates.md` | Claude/Codex 공통 scope, YAGNI, review, reporting gate |
+| `agents/task-decomposer.md` | Task 세분화 게이트 |
+| `agents/test-agent.md` | Acceptance와 관련 테스트 실행 절차 |
+| `.agents/skills/` | Codex repo-scoped skills |
+| `.claude/commands/` | Claude Code local commands |
+| `.github/workflows/` | CI와 plans guard |
+| `scripts/` | task 검증, planning proposal, Plans sync 도구 |
+
+## Claude Code와 Codex 차이
+
+Claude Code는 plugin과 slash command를 사용할 수 있다. Codex는 plugin hook을 자동으로 받지 않으므로 `AGENTS.md`와 `.agents/skills/*`를 통해 같은 절차를 직접 수행한다.
+
+ponytail/caveman의 durable 원칙은 Codex에서 별도 plugin으로 실행된다고 가정하지 않는다. 공통 기준은 `agents/quality-gates.md`다.
+
+## 수행 주체
+
+`agents/*.md`는 호출 가능한 Claude 서브에이전트 파일이 아니라 절차 문서다. 수행 주체는 현재 세션의 Claude Code 또는 Codex다. planning은 inline proposal이 기본이고, 외부 실행은 `harness.toml [plan].decomposer_command`가 있을 때만 위임한다.
+
+## Planning
+
+`/harness-plan` 또는 `$harness-plan`은 다음 순서를 따른다.
+
+1. `scripts/build_planning_context.py`로 `.harness/shared/planning/runs/{run_id}/context.json` 생성
+2. 현재 세션이 proposal 작성
+3. `decomposer_command`가 있으면 외부 명령으로 proposal 생성을 위임할 수 있음
+4. `scripts/validate_task_proposal.py`로 검증
+5. `scripts/apply_task_proposal.py`로 `tasks/index.json` 반영과 `Plans.md` 재생성
+
+## Implementation
+
+`/harness-work` 또는 `$harness-work`는 다음 게이트를 통과해야 한다.
+
+1. `todo` Task 선택
+2. `agents/task-decomposer.md` 세분화 게이트 확인
+3. `agents/quality-gates.md` scope/YAGNI 확인
+4. `.harness/tasks/<task-key>/STATE.md` 갱신
+5. 구현
+6. Acceptance와 관련 테스트 실행
+7. 리뷰
+8. 통과 시 `tasks/index.json` 상태 변경과 `Plans.md` 재생성
+
+Actions는 Task 상태를 쓰지 않고 PR 검증만 수행한다.
+
+## GitHub 통합
+
+`harness.toml [github].enabled = true`일 때만 적용한다. 상세 절차는 `CLAUDE.md`와 `docs/github-integration.md`를 따른다.
+
+| 항목 | 기준 |
+|---|---|
+| 브랜치 | `task/{task-id}-{short-slug}` |
+| 커밋 | `task {task-id}: {summary}` |
+| PR | `gh pr create --draft`, 연결 이슈가 있으면 `Closes #N` |
+| 필수 check | `ci-ok`, `plans-guard` |
+
+## 명령 매핑
+
+| 목적 | Claude Code | Codex |
+|---|---|---|
+| 기획 인터뷰 | `/grill-me` | `$grill-me` |
+| Task 추가 | `/harness-plan` | `$harness-plan` |
+| Task 구현 | `/harness-work` | `$harness-work` |
+| 리뷰 | `/harness-review` | `$harness-review` |
+| 진행 확인 | `/harness-progress` | `$harness-progress` |
+| Plans sync | `/harness-sync` | `$harness-sync` |
+| 브랜치 전환 | `/branch-checkout` | `$branch-checkout` |
+| push | `/git-push` | `$git-push` |
+| PR 생성 | `/pr-create` | `$pr-create` |
+| main 작업 구조 | `/rescue-from-main` | `$rescue-from-main` |
+
+## 남긴 확장 지점
+
+- `scripts/run_task_decomposer.py`: planning proposal 외부 명령 계약 확인용. 새 프로젝트 기본 복사에서는 제외
+- `.github/workflows/ci.yml`: 프로젝트별 스택 테스트 블록 활성화용
+- `.github/workflows/plans-guard.yml`: `tasks/index.json`과 `Plans.md` 드리프트 방지

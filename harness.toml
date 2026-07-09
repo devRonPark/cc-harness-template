@@ -69,9 +69,9 @@ fail_blocks_review = true  # FAIL이면 reviewer 진입 금지, worker에 재위
 [plan]
 auto_run = true                     # /harness-plan이 Task 작성 전 task-decomposer proposal 실행
 agent = "agents/task-decomposer.md"
-decomposer_mode = "process"         # 기본: 외부 명령 계약 기반 독립 proposal. 미설정 시 실패 로그 후 fallback 가능
-decomposer_command = ""             # context.json을 읽고 proposed-tasks.json/report.md를 생성하는 외부 명령
-allow_inline_fallback = true         # decomposer_command 미설정/실패 시 현재 세션이 같은 proposal 계약을 채울 수 있음
+decomposer_mode = "inline"          # 기본: 현재 세션이 proposal 계약을 채움. 외부 명령은 선택 escape hatch
+decomposer_command = ""             # 선택: context.json을 읽고 proposed-tasks.json/report.md를 생성하는 외부 명령
+allow_inline_fallback = true         # 외부 명령 미설정/실패 시 현재 세션이 같은 proposal 계약을 채울 수 있음
 proposal_dir = ".harness/shared/planning"
 planning_event_log = ".harness/events/planning.jsonl"
 gate_work = true                     # 세분화 기준 미달 Task 있으면 /harness-work 실행 자체를 차단
