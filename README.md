@@ -2,7 +2,7 @@
 
 Claude Code와 Codex가 같은 repo 규칙으로 계획, 구현, 검증, 리뷰를 진행하게 하는 개인용 harness 템플릿.
 
-최소 성공 흐름: 템플릿 적용 -> `CLAUDE.md` 작성 -> `tasks/index.json`에 작은 작업 작성 -> 구현 -> Acceptance/test 실행 -> 실패는 `LOG.md`, 완료 요약은 `RUN_REPORT.md`에 기록.
+최소 성공 흐름: 템플릿 적용 -> `CLAUDE.md` 작성 -> spec 정리 -> `tasks/index.json`에 작은 작업 작성 -> isolated work -> TDD -> fresh verification -> review -> finish. 실패는 `LOG.md`, 완료 요약과 evidence는 `RUN_REPORT.md`에 기록한다.
 
 ## Quick Start
 
@@ -61,9 +61,11 @@ harness doctor
 | Task 구현 | `/harness-work` | `$harness-work` | Acceptance/test 통과 |
 | 현재 diff 리뷰 | `/harness-review` | `$harness-review` | blocker 없음 |
 | 진행률 확인 | `/harness-progress` | `$harness-progress` | `tasks/index.json` 기준 |
-| PR 준비 | `/git-push`, `/pr-create` | `$git-push`, `$pr-create` | 검증 evidence 포함 |
+| PR 준비 | `/git-push`, `/pr-create` | `$git-push`, `$pr-create` | TDD/fresh verification/review evidence 포함 |
 
 GitHub Actions는 Task 상태를 바꾸지 않는다. Acceptance와 관련 테스트가 통과하면 세션 에이전트가 `tasks/index.json`을 갱신하고 `python3 scripts/sync_plans.py`를 실행한다.
+
+TDD는 기능, 버그 수정, 동작 변경의 기본 완료 조건이다. 문서, 설정, 생성 코드, throwaway prototype은 예외로 둘 수 있지만 `RUN_REPORT.md`에 이유를 남긴다.
 
 ## Session Recovery
 

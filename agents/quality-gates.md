@@ -27,6 +27,9 @@ Run this before implementation and again whenever the work starts expanding.
 5. Split the Task before implementation if it mixes planning, runtime behavior,
    UI, infrastructure, docs, or test-system changes that can be verified
    independently.
+6. For behavior changes, require TDD: see a failing test or failing Acceptance
+   first, then make the smallest change that turns it green. Record exceptions
+   for docs, config, generated code, and throwaway prototypes in RUN_REPORT.
 
 Stop and re-plan when any of these is true:
 
@@ -36,6 +39,10 @@ Stop and re-plan when any of these is true:
 - a reusable abstraction is being added for only one current caller;
 - a requested change depends on a still-`todo` Task not listed in `depends`.
 
+Use implementer/reviewer subagents only as an optional gate for large Tasks or
+high review risk. Do not add a subagent ledger or `.superpowers/` directory;
+the state source remains `tasks/index.json` and `.harness/tasks/<task-key>/`.
+
 ## Review Gate
 
 Use this before approving work.
@@ -43,12 +50,19 @@ Use this before approving work.
 1. Findings first. Lead with bugs, regressions, rule violations, missing
    Acceptance evidence, and test gaps.
 2. Cite file and line evidence for each finding.
-3. Treat over-engineering as a review issue when it adds unused abstraction,
+3. Split the verdict into `Spec compliance` and `Code quality`. If either has a
+   blocker, the overall verdict is `REQUEST_CHANGES`.
+4. Treat over-engineering as a review issue when it adds unused abstraction,
    expands scope, hides simple control flow, or makes future Tasks harder.
-4. Verify that the recorded Acceptance command and relevant test suite ran after
-   the implementation.
-5. If there are no blockers, say so clearly and list only residual risk or test
+5. Verify that TDD evidence or a justified exception exists.
+6. Verify that the recorded Acceptance command and relevant test suite ran after
+   the implementation as fresh verification.
+7. If there are no blockers, say so clearly and list only residual risk or test
    gaps that still matter.
+
+Do not claim complete, fixed, passing, ready for PR, or approved before evidence
+exists. Partial verification can support a progress update, but it cannot
+support a completion claim.
 
 ## Reporting Gate
 

@@ -88,6 +88,19 @@
 
 ---
 
+## Week 4 — Superpowers benchmark 적용
+
+| Task | 내용 | DoD | Acceptance | Depends | Status | GH |
+|------|------|-----|------------|---------|--------|----|
+| 4.14 | Superpowers benchmark workflow 문서 정렬 | README.md, CLAUDE.md, AGENTS.md, BLUEPRINT.md가 spec -> plan -> work -> TDD/verification -> review -> finish 흐름과 완료 조건을 같은 기준으로 설명한다. | grep -q 'fresh verification' CLAUDE.md && grep -q 'TDD' README.md | - | cc:완료 | - |
+| 4.15 | Planning/Task decomposition 규칙 강화 | Task 작성 기준에 Files, Interfaces, Verification, no-placeholder 규칙이 반영된다. | grep -q 'Files' agents/task-decomposer.md && grep -q 'Verification' agents/task-decomposer.md | 4.14 | cc:완료 | - |
+| 4.16 | TDD 및 verification-before-completion gate 추가 | agents/test-agent.md와 agents/quality-gates.md가 TDD evidence와 fresh verification evidence를 요구한다. | grep -q 'fresh verification' agents/test-agent.md && grep -q 'TDD' agents/quality-gates.md | 4.14 | cc:완료 | - |
+| 4.17 | Review verdict 이원화 | .agents/skills/harness-review/SKILL.md가 Spec compliance와 Code quality를 별도 판정한다. | grep -q 'Spec compliance' .agents/skills/harness-review/SKILL.md && grep -q 'Code quality' .agents/skills/harness-review/SKILL.md | 4.16 | cc:완료 | - |
+| 4.18 | Git helper 안전 흐름 강화 | branch-checkout, git-push, pr-create skill이 branch/worktree 상태와 fresh verification evidence 확인 조건을 설명한다. | grep -q 'worktree' .agents/skills/branch-checkout/SKILL.md && grep -q 'verification' .agents/skills/pr-create/SKILL.md | 4.16 | cc:완료 | - |
+| 4.19 | Skeleton evidence template 갱신 | 새 프로젝트 skeleton의 RUN_REPORT.md가 TDD와 Verification evidence를 기록한다. | grep -q 'TDD' templates/skeleton/.harness/RUN_REPORT.md && grep -q 'Verification' templates/skeleton/.harness/RUN_REPORT.md | 4.16 | cc:완료 | - |
+
+---
+
 <!--
 Task 상태의 단일 출처는 tasks/index.json이다.
 Plans.md는 사람이 필요할 때 python3 scripts/sync_plans.py로 갱신하는

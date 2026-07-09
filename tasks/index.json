@@ -447,6 +447,76 @@
       "status": "done",
       "gh": "-",
       "section": "Week 4 — Codex 호환 환경 구성"
+    },
+    {
+      "id": "4.14",
+      "title": "Superpowers benchmark workflow 문서 정렬",
+      "dod": "README.md, CLAUDE.md, AGENTS.md, BLUEPRINT.md가 spec -> plan -> work -> TDD/verification -> review -> finish 흐름과 완료 조건을 같은 기준으로 설명한다.",
+      "acceptance": "grep -q 'fresh verification' CLAUDE.md && grep -q 'TDD' README.md",
+      "depends": [],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Superpowers benchmark 적용"
+    },
+    {
+      "id": "4.15",
+      "title": "Planning/Task decomposition 규칙 강화",
+      "dod": "Task 작성 기준에 Files, Interfaces, Verification, no-placeholder 규칙이 반영된다.",
+      "acceptance": "grep -q 'Files' agents/task-decomposer.md && grep -q 'Verification' agents/task-decomposer.md",
+      "depends": [
+        "4.14"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Superpowers benchmark 적용"
+    },
+    {
+      "id": "4.16",
+      "title": "TDD 및 verification-before-completion gate 추가",
+      "dod": "agents/test-agent.md와 agents/quality-gates.md가 TDD evidence와 fresh verification evidence를 요구한다.",
+      "acceptance": "grep -q 'fresh verification' agents/test-agent.md && grep -q 'TDD' agents/quality-gates.md",
+      "depends": [
+        "4.14"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Superpowers benchmark 적용"
+    },
+    {
+      "id": "4.17",
+      "title": "Review verdict 이원화",
+      "dod": ".agents/skills/harness-review/SKILL.md가 Spec compliance와 Code quality를 별도 판정한다.",
+      "acceptance": "grep -q 'Spec compliance' .agents/skills/harness-review/SKILL.md && grep -q 'Code quality' .agents/skills/harness-review/SKILL.md",
+      "depends": [
+        "4.16"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Superpowers benchmark 적용"
+    },
+    {
+      "id": "4.18",
+      "title": "Git helper 안전 흐름 강화",
+      "dod": "branch-checkout, git-push, pr-create skill이 branch/worktree 상태와 fresh verification evidence 확인 조건을 설명한다.",
+      "acceptance": "grep -q 'worktree' .agents/skills/branch-checkout/SKILL.md && grep -q 'verification' .agents/skills/pr-create/SKILL.md",
+      "depends": [
+        "4.16"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Superpowers benchmark 적용"
+    },
+    {
+      "id": "4.19",
+      "title": "Skeleton evidence template 갱신",
+      "dod": "새 프로젝트 skeleton의 RUN_REPORT.md가 TDD와 Verification evidence를 기록한다.",
+      "acceptance": "grep -q 'TDD' templates/skeleton/.harness/RUN_REPORT.md && grep -q 'Verification' templates/skeleton/.harness/RUN_REPORT.md",
+      "depends": [
+        "4.16"
+      ],
+      "status": "done",
+      "gh": "-",
+      "section": "Week 4 — Superpowers benchmark 적용"
     }
   ]
 }
