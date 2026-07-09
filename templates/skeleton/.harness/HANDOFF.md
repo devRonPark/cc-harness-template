@@ -1,7 +1,7 @@
 # HANDOFF.md — Task 인수인계 템플릿
 
 > 이 루트 파일은 실제 인수인계가 아니라 템플릿이다.
-> 새 Task를 시작할 때 `.harness/tasks/<task-key>/HANDOFF.md`로 복사해서 사용한다.
+> 기본 복사 대상이 아니다. 실제로 필요할 때만 `.harness/tasks/<task-key>/HANDOFF.md`로 복사해서 사용한다.
 
 ## 다음 세션이 먼저 읽을 최소 파일
 

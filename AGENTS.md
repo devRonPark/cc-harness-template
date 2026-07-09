@@ -8,19 +8,23 @@ project rules, task sources, and verification gates that Claude Code uses.
 At the start of a session, read these files before planning or editing:
 
 1. `CLAUDE.md`
-2. `harness.toml`
-3. `tasks/index.json`
-4. `Plans.md`
-5. `BLUEPRINT.md` when architecture or command provenance matters
+2. task state via `python3 scripts/report_tasks.py`; for one task's detail, read
+   only its block with `grep -n -A12 '"id": "<task-id>"' tasks/index.json` —
+   do not read `tasks/index.json` in full
+3. `harness.toml` only when configuration needs checking
+4. `BLUEPRINT.md` when architecture or command provenance matters
+
+Do not read `Plans.md` — it is a generated snapshot for humans, write-only for
+agents.
 
 On resumed work, follow the recovery order in `CLAUDE.md`:
 
-1. `tasks/index.json` to identify the `wip` or user-specified Task
+1. `report_tasks.py` summary and the target task's grep block to identify the
+   `wip` or user-specified Task
 2. `.harness/tasks/<task-key>/STATE.md`
 3. `.harness/tasks/<task-key>/RUN_REPORT.md` if it exists
-4. latest entries in `.harness/LESSONS.md`
-5. `Plans.md`
-6. only the extra files listed in `.harness/CONTEXT_INDEX.md` that are needed
+4. only the 5 most recent entries in `.harness/LESSONS.md`
+5. only the extra files listed in `.harness/CONTEXT_INDEX.md` that are needed
 
 ## Source Of Truth
 
